@@ -20,6 +20,7 @@ public abstract class DrawableItem {
     protected Color outline, fill;
     protected Shape shape;
     protected Boolean isSelected;
+    protected int type;
 
     public DrawableItem(PersistentCanvas c, Color o, Color f) {
         canvas = c;
@@ -74,6 +75,14 @@ public abstract class DrawableItem {
 
     public void setIsSelected(Boolean isSelected) {
         this.isSelected = isSelected;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     

@@ -8,7 +8,6 @@ package models;
 import UI.PersistentCanvas;
 import java.awt.Color;
 import java.awt.Point;
-import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 
 /**
@@ -25,6 +24,7 @@ public class PathItem extends DrawableItem {
     public PathItem(PersistentCanvas c, Color o, Color f, Point p, Layer l) {
         super(c, o, f);
         layer = l;
+        type = 1;
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(p.x, p.y);
         firstpoint = p;
@@ -35,6 +35,7 @@ public class PathItem extends DrawableItem {
         //shape = new Rectangle((Rectangle) other.shape);
         isSelected = false;
         layer = other.layer;
+        type = 1;
         firstpoint = other.firstpoint;
     }
 

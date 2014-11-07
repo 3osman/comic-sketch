@@ -69,6 +69,10 @@ public class DrawableItemController {
         drawShape(di, g);
     }
 
+    public void paintPath(DrawableItem di, Graphics2D g) {
+        drawShape(di, g);
+    }
+
     public Boolean contains(DrawableItem di, Point p) {
         return di.getShape().contains(p);
     }

@@ -17,10 +17,20 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javax.swing.JCheckBox;
 import models.DrawableItem;
 import models.Layer;
 import models.Panel;
@@ -35,13 +45,15 @@ public class GraphicalEditor extends JFrame {
     private JPanel fill;
     private Point mousepos; // Stores the previous mouse position
     DrawableItemController dic = new DrawableItemController();
+    private JCheckBox jcb; //checkbox for blue ink
 
     private String title; // Changes according to the mode
     private String mode;  // Mode of interaction
-
+    private Boolean isBlue;
     private PersistentCanvas canvas; // Stores the created items
     private DrawableItem selection; 	 // Stores the selected item
-
+    private Layer globalLayer; //global layer without panel
+    private Layer blueInkLayer; //blue ink layer
     // Listen the mode changes and update the Title
     private ActionListener modeListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -61,9 +73,13 @@ public class GraphicalEditor extends JFrame {
 
             String op = e.getActionCommand();
             if (op.equals("Delete")) {
-				//TODO delete the selected item
+                //TODO delete the selected item
 
                 canvas.removeItem(selection);
+            } else if (op.equals("Add Layer")) {
+                if (selection != null) {
+
+                }
 
             } else if (op.equals("Clone")) {
                 //TODO duplicate and translate the selected item
@@ -81,7 +97,7 @@ public class GraphicalEditor extends JFrame {
             JPanel p = (JPanel) e.getSource();
             Color c = p.getBackground();
             c = JColorChooser.showDialog(null, "Select a color", c);
-			// TODO Manage the color change
+            // TODO Manage the color change
             // You can test if the action have been done 
             // on the fill JPpanel or on the outline JPanel 
             p.setBackground(c);
@@ -137,8 +153,6 @@ public class GraphicalEditor extends JFrame {
         ButtonGroup group = new ButtonGroup();
         panel.add(createMode("Select/Move", group));
         panel.add(createMode("Rectangle", group));
-        panel.add(createMode("Ellipse", group));
-        panel.add(createMode("Line", group));
         panel.add(createMode("Path", group));
         panel.add(Box.createVerticalStrut(30));
         fill = createColorSample(Color.LIGHT_GRAY);
@@ -147,6 +161,21 @@ public class GraphicalEditor extends JFrame {
         outline = createColorSample(Color.BLACK);
         panel.add(outline);
         panel.add(Box.createVerticalStrut(30));
+        jcb = new JCheckBox("Blue Ink");
+        jcb.addItemListener(new ItemListener() {
+            @Override
+
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == 1) {
+                    isBlue = true;
+                } else {
+                    isBlue = false;
+                }
+            }
+
+        });
+        panel.add(jcb);
+
         operations = new ArrayList<JButton>();
         panel.add(createOperation("Delete"));
         panel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -159,7 +188,9 @@ public class GraphicalEditor extends JFrame {
         canvas.setBackground(Color.WHITE);
         canvas.setPreferredSize(new Dimension(width, height));
         pane.add(canvas);
-
+        globalLayer = new Layer(null, false);
+        blueInkLayer = new Layer(null, true);
+        isBlue = false;
         canvas.addMouseListener(new MouseAdapter() {
 
             public void mouseClicked(MouseEvent e) {
@@ -167,10 +198,12 @@ public class GraphicalEditor extends JFrame {
                 if (mode.equals("Select/Move")) {
                     // TODO you can use the function select(DrawableItem item);
                     DrawableItem item = canvas.getItemAt(p);
-                    select(item);
-                    fill.setBackground(item.getFill());
-                    outline.setBackground(item.getOutline());
-                    selection = item;
+                    if (item != null) {
+                        select(item);
+                        fill.setBackground(item.getFill());
+                        outline.setBackground(item.getOutline());
+                        selection = item;
+                    }
                 }
             }
 
@@ -184,9 +217,26 @@ public class GraphicalEditor extends JFrame {
                         item = new Panel(canvas, o, f, p);
 
                     } else if (mode.equals("Path")) {
+                        Panel insidePanel = (Panel) canvas.getItemAt(p);
+                        if (insidePanel == null) {
+                            if (!isBlue) {
+                                item = new PathItem(canvas, o, f, p, globalLayer);
+                            } else {
+                                item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, blueInkLayer);
+                            }
 
-                        Layer l = new Layer(new Panel(canvas, o, f, p));
-                        item = new PathItem(canvas, o, f, p, l);
+                        } else {
+                            if (!isBlue) {
+                                Layer l = new Layer(insidePanel, false);
+
+                                item = new PathItem(canvas, o, f, p, l);
+                                l.addObjectToLayer((PathItem) item);
+
+                            } else {
+                                item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, insidePanel.getLayers().get(0));
+                                insidePanel.getLayers().get(0).addObjectToLayer((PathItem) item);
+                            }
+                        }
                     }
                     canvas.addItem(item);
                     select(item);
@@ -201,7 +251,7 @@ public class GraphicalEditor extends JFrame {
                     return;
                 }
                 if (mode.equals("Select/Move")) {
-					// TODO move the selected object
+                    // TODO move the selected object
 
                     selection.move(e.getX() - mousepos.x, e.getY() - mousepos.y);
                 } else {
@@ -230,7 +280,7 @@ public class GraphicalEditor extends JFrame {
         selection = item;
         if (selection != null) {
             dic.select(selection);
-			// TODO set the color of the fill and outline JPanel 
+            // TODO set the color of the fill and outline JPanel 
             // to the color of the selected object
             for (JButton op : operations) {
                 op.setEnabled(true);

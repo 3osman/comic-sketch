@@ -18,12 +18,14 @@ import java.util.ArrayList;
  */
 public class Panel extends DrawableItem {
 
-   
     Point firstpoint;
     ArrayList<Layer> layers;
 
     public Panel(PersistentCanvas c, Color o, Color f, Point p) {
         super(c, o, f);
+        type = 0;
+        layers = new ArrayList<>();
+        layers.add(new Layer(this, true));
         shape = new Rectangle(p.x, p.y, 0, 0);
         firstpoint = p;
     }
@@ -31,7 +33,9 @@ public class Panel extends DrawableItem {
     public Panel(Panel other) {
         super(other.canvas, other.outline, other.fill);
         shape = new Rectangle((Rectangle) other.shape);
+        type = 0;
         isSelected = false;
+        layers = other.layers;
         firstpoint = other.firstpoint;
     }
 

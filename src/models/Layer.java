@@ -15,9 +15,24 @@ public class Layer {
 
     ArrayList<PathItem> drawn;
     Panel parentPanel;
+    boolean isBlueLayer;
 
-    public Layer(Panel p) {
+    public Layer(Panel p, boolean isB) {
         this.parentPanel = p;
+        this.drawn = new ArrayList<>();
+        this.isBlueLayer = isB;
+    }
+
+    public void addObjectToLayer(PathItem pi) {
+        this.drawn.add(pi);
+    }
+
+    public boolean isIsBlueLayer() {
+        return isBlueLayer;
+    }
+
+    public void setIsBlueLayer(boolean isBlueLayer) {
+        this.isBlueLayer = isBlueLayer;
     }
 
     public ArrayList<PathItem> getDrawn() {
