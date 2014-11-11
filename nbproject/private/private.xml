@@ -2,6 +2,15 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwingJavaFX/src/UI/GraphicalEditor.java</file>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwingJavaFX/src/models/UndoableItem.java</file>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwingJavaFX/src/models/Layer.java</file>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwingJavaFX/src/models/PathItem.java</file>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwingJavaFX/src/controller/UndoController.java</file>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwingJavaFX/src/controller/DrawableItemController.java</file>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwingJavaFX/src/models/Panel.java</file>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwingJavaFX/src/models/DrawableItem.java</file>
+        </group>
     </open-files>
 </project-private>

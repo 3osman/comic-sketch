@@ -16,11 +16,30 @@ public class Layer {
     ArrayList<PathItem> drawn;
     Panel parentPanel;
     boolean isBlueLayer;
-
+    boolean active;
     public Layer(Panel p, boolean isB) {
         this.parentPanel = p;
+        if (p != null && isB == false) {
+            this.parentPanel.addLayetToPanel(this);
+        }
         this.drawn = new ArrayList<>();
         this.isBlueLayer = isB;
+        this.active = true;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public void moveLayer(int x, int y) {
+        for (PathItem pi : this.drawn) {
+            pi.move(x, y);
+        }
+
     }
 
     public void addObjectToLayer(PathItem pi) {

@@ -8,6 +8,7 @@ package models;
 import UI.PersistentCanvas;
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 
 /**
@@ -16,9 +17,8 @@ import java.awt.geom.GeneralPath;
  */
 public class PathItem extends DrawableItem {
 
-    
     protected Layer layer;
-    
+
     Point firstpoint;
 
     public PathItem(PersistentCanvas c, Color o, Color f, Point p, Layer l) {
@@ -27,6 +27,8 @@ public class PathItem extends DrawableItem {
         type = 1;
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(p.x, p.y);
+        l.addObjectToLayer(this);
+
         firstpoint = p;
     }
 
@@ -57,10 +59,12 @@ public class PathItem extends DrawableItem {
     }
 
     public void move(int dx, int dy) {
-		//((GeneralPath) shape).x += dx;
-        //((Rectangle) shape).y += dy;
+        AffineTransform at = new AffineTransform();
+        at.translate(dx, dy);
+
+        ((GeneralPath) shape).transform(at);
+
         canvas.repaint();
     }
 
-    
 }
