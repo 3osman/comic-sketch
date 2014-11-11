@@ -9,6 +9,7 @@ import java.awt.RenderingHints;
 import java.util.ArrayList;
 import models.DrawableItem;
 import models.Panel;
+import models.PathItem;
 
 @SuppressWarnings("serial")
 public class PersistentCanvas extends Component {
@@ -38,6 +39,11 @@ public class PersistentCanvas extends Component {
             return null;
         }
         items.add(item);
+        if (item instanceof PathItem) {
+
+            ((PathItem) item).getLayer().setActive(true);
+
+        }
         repaint();
         return item;
     }
@@ -46,7 +52,23 @@ public class PersistentCanvas extends Component {
         if (item == null) {
             return;
         }
+        if (item instanceof PathItem) {
+            boolean active = false;
+            for (PathItem pi : ((PathItem) item).getLayer().getDrawn()) {
+                if (!pi.isHidden()) {
+                    active = true;
+                }
+            }
+
+            ((PathItem) item).getLayer().setActive(active);
+
+        }
         items.remove(item);
+        repaint();
+    }
+
+    public void clear() {
+        items.clear();
         repaint();
     }
 

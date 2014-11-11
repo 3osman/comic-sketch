@@ -20,6 +20,7 @@ public class PathItem extends DrawableItem {
     protected Layer layer;
 
     Point firstpoint;
+    boolean hidden;
 
     public PathItem(PersistentCanvas c, Color o, Color f, Point p, Layer l) {
         super(c, o, f);
@@ -28,6 +29,7 @@ public class PathItem extends DrawableItem {
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(p.x, p.y);
         l.addObjectToLayer(this);
+        hidden = false;
 
         firstpoint = p;
     }
@@ -38,6 +40,7 @@ public class PathItem extends DrawableItem {
         isSelected = false;
         layer = other.layer;
         type = 1;
+        hidden = other.hidden;
         firstpoint = other.firstpoint;
     }
 
@@ -47,6 +50,14 @@ public class PathItem extends DrawableItem {
 
     public void setLayer(Layer layer) {
         this.layer = layer;
+    }
+
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
     }
 
     public DrawableItem duplicate() {

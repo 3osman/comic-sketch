@@ -16,7 +16,7 @@ public class UndoableItem {
     private boolean isLayer;
     private int x;
     private int y;
-    private int actionType; //0 add, 1 delete, 2 move
+    private int actionType; //0 add, 1 delete, 2 move, 3 resize
 
     public UndoableItem(DrawableItem di, int at) {
         this.ditem = di;

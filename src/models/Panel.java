@@ -21,6 +21,8 @@ public class Panel extends DrawableItem {
     Point firstpoint;
     ArrayList<Layer> layers;
     private Point initialPoint;
+    private int initialWidth;
+    private int initialHeight;
 
     public Panel(PersistentCanvas c, Color o, Color f, Point p) {
         super(c, o, f);
@@ -39,6 +41,22 @@ public class Panel extends DrawableItem {
         isSelected = false;
         layers = other.layers;
         firstpoint = other.firstpoint;
+    }
+
+    public int getInitialWidth() {
+        return initialWidth;
+    }
+
+    public void setInitialWidth(int initialWidth) {
+        this.initialWidth = initialWidth;
+    }
+
+    public int getInitialHeight() {
+        return initialHeight;
+    }
+
+    public void setInitialHeight(int initialHeight) {
+        this.initialHeight = initialHeight;
     }
 
     public Point getInitialPoint() {
@@ -71,6 +89,8 @@ public class Panel extends DrawableItem {
 
     public void update(Point p) {
         ((Rectangle) shape).setFrameFromDiagonal(firstpoint, p);
+        this.initialHeight = ((Rectangle) shape).height;
+        this.initialWidth = ((Rectangle) shape).width;
         canvas.repaint();
     }
 

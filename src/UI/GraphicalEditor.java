@@ -41,6 +41,7 @@ public class GraphicalEditor extends JFrame {
     private ArrayList<JButton> operations;
     private JPanel outline;
     private JPanel fill;
+    private  JButton clearButton;
     private Point mousepos; // Stores the previous mouse position
     DrawableItemController dic = new DrawableItemController();
     UndoController udc = new UndoController();
@@ -63,6 +64,10 @@ public class GraphicalEditor extends JFrame {
         }
     };
 
+    private boolean clearAll() {
+        canvas.clear();
+        return true;
+    }
     // Listen the action on the button
     private ActionListener operationListener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -77,6 +82,7 @@ public class GraphicalEditor extends JFrame {
                 canvas.removeItem(selection);
                 if (selection instanceof Panel) {
                     for (Layer li : ((Panel) selection).getLayers()) {
+                        li.setActive(false);
                         for (PathItem pi : li.getDrawn()) {
                             canvas.removeItem(pi);
                         }
@@ -107,16 +113,18 @@ public class GraphicalEditor extends JFrame {
         if (selection == null) {
             return false;
         } else {
-            udc.addItemtoUndo(new UndoableItem(selection, 1));
+            
 
             canvas.removeItem(selection);
             if (selection instanceof Panel) {
                 for (Layer li : ((Panel) selection).getLayers()) {
+                    li.setActive(false);
                     for (PathItem pi : li.getDrawn()) {
                         canvas.removeItem(pi);
                     }
                 }
             }
+            udc.addItemtoUndo(new UndoableItem(selection, 1));
             return true;
         }
     }
@@ -165,11 +173,17 @@ public class GraphicalEditor extends JFrame {
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // Create the mode selection button list
-        mode = "Rectangle";
-        //ButtonGroup group = new ButtonGroup();
-        // panel.add(createMode("Select/Move", group));
-        // panel.add(createMode("Rectangle", group));
-        // panel.add(createMode("Path", group));
+        mode = "Path";
+        clearButton = new JButton();
+        AbstractAction clearAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clearAll();
+            }
+        };
+        clearButton.setAction(clearAction);
+        clearButton.setText("Clear All"); //an icon-only button
+        panel.add(clearButton);
         panel.add(Box.createVerticalStrut(30));
         fill = createColorSample(Color.WHITE);
         panel.add(fill);
@@ -322,9 +336,16 @@ public class GraphicalEditor extends JFrame {
                             udc.redoProcess(canvas);
                         } else if (e.getExtendedKeyCode() == 40) { //down
                             ((Panel) selection).resize(0, 2);
-
+                            udc.saveResizeToUndo(selection);
                         } else if (e.getExtendedKeyCode() == 39) { //right
                             ((Panel) selection).resize(2, 0);
+                            udc.saveResizeToUndo(selection);
+                        } else if (e.getExtendedKeyCode() == 38) { //up
+                            ((Panel) selection).resize(0, -2);
+                            udc.saveResizeToUndo(selection);
+                        } else if (e.getExtendedKeyCode() == 37) { //left
+                            ((Panel) selection).resize(-2, 0);
+                            udc.saveResizeToUndo(selection);
                         }
 
                     }
@@ -345,6 +366,8 @@ public class GraphicalEditor extends JFrame {
                         udc.saveMoveToUndo(selection);
                     }
                     isMoving = false;
+                } else if (mode.equals("Resize")) {
+                    udc.saveResizeToUndo(selection);
                 }
             }
 
@@ -466,7 +489,7 @@ public class GraphicalEditor extends JFrame {
     }
 
     public static void main(String[] args) {
-        GraphicalEditor editor = new GraphicalEditor("GraphicalEditor", 800, 600);
+        GraphicalEditor editor = new GraphicalEditor("GraphicalEditor", 1500, 1000);
         editor.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
