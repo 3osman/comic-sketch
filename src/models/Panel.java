@@ -23,6 +23,13 @@ public class Panel extends DrawableItem {
     private Point initialPoint;
     private int initialWidth;
     private int initialHeight;
+    Rectangle firstCorner;
+    Rectangle secondCorner;
+
+    Rectangle thirdCorner;
+
+    Rectangle fourthCorner;
+    Point anchor;
 
     public Panel(PersistentCanvas c, Color o, Color f, Point p) {
         super(c, o, f);
@@ -32,6 +39,7 @@ public class Panel extends DrawableItem {
         new Layer(this, false);
         shape = new Rectangle(p.x, p.y, 0, 0);
         firstpoint = p;
+        updateCornerRects();
     }
 
     public Panel(Panel other) {
@@ -41,6 +49,46 @@ public class Panel extends DrawableItem {
         isSelected = false;
         layers = other.layers;
         firstpoint = other.firstpoint;
+    }
+
+    public Rectangle getFirstCorner() {
+        return firstCorner;
+    }
+
+    public Point getAnchor() {
+        return anchor;
+    }
+
+    public void setAnchor(Point anchor) {
+        this.anchor = anchor;
+    }
+
+    public void setFirstCorner(Rectangle firstCorner) {
+        this.firstCorner = firstCorner;
+    }
+
+    public Rectangle getSecondCorner() {
+        return secondCorner;
+    }
+
+    public void setSecondCorner(Rectangle secondCorner) {
+        this.secondCorner = secondCorner;
+    }
+
+    public Rectangle getThirdCorner() {
+        return thirdCorner;
+    }
+
+    public void setThirdCorner(Rectangle thirdCorner) {
+        this.thirdCorner = thirdCorner;
+    }
+
+    public Rectangle getFourthCorner() {
+        return fourthCorner;
+    }
+
+    public void setFourthCorner(Rectangle fourthCorner) {
+        this.fourthCorner = fourthCorner;
     }
 
     public int getInitialWidth() {
@@ -91,23 +139,58 @@ public class Panel extends DrawableItem {
         ((Rectangle) shape).setFrameFromDiagonal(firstpoint, p);
         this.initialHeight = ((Rectangle) shape).height;
         this.initialWidth = ((Rectangle) shape).width;
+        updateCornerRects();
         canvas.repaint();
     }
 
     public void move(int dx, int dy) {
         ((Rectangle) shape).x += dx;
         ((Rectangle) shape).y += dy;
+        updateCornerRects();
         canvas.repaint();
     }
 
     public void resize(int dx, int dy) {
         ((Rectangle) shape).height += dy;
         ((Rectangle) shape).width += dx;
+        updateCornerRects();
         canvas.repaint();
     }
 
-    public void addLayetToPanel(Layer l) {
-        this.layers.add(l);
+    public void resize(Point anchor, Point end) {
+        (shape) = new Rectangle(anchor);
+        ((Rectangle) shape).add(end);		// creates smallest rectange which includes both anchor & end
+        updateCornerRects();
+        canvas.repaint();
     }
 
+    public Point getKnobContainingPoint(Point pt) {
+
+        if (firstCorner.contains(pt)) {
+            return new Point(((Rectangle) shape).x + ((Rectangle) shape).width, ((Rectangle) shape).y + ((Rectangle) shape).height);
+
+        } else if (secondCorner.contains(pt)) {
+            return new Point(((Rectangle) shape).x, ((Rectangle) shape).y + ((Rectangle) shape).height);
+        } else if (thirdCorner.contains(pt)) {
+            return new Point(((Rectangle) shape).x, ((Rectangle) shape).y);
+
+        } else if (fourthCorner.contains(pt)) {
+            return new Point(((Rectangle) shape).x + ((Rectangle) shape).width, ((Rectangle) shape).y);
+        }
+        return null;
+
+    }
+
+    public void updateCornerRects() {
+        int width = 7;
+        int height = 7;
+        Point fi = new Point(((Rectangle) getShape()).x - 5, ((Rectangle) getShape()).y - 5);
+        Point sec = new Point(((Rectangle) getShape()).x + ((Rectangle) getShape()).width, ((Rectangle) getShape()).y - 5);
+        Point thi = new Point(((Rectangle) getShape()).x + ((Rectangle) getShape()).width, ((Rectangle) getShape()).y + ((Rectangle) getShape()).height);
+        Point four = new Point(((Rectangle) getShape()).x - 5, ((Rectangle) getShape()).y + ((Rectangle) getShape()).height);
+        firstCorner = (new Rectangle(fi.x, fi.y, width, height));
+        secondCorner = (new Rectangle(sec.x, sec.y, width, height));
+        thirdCorner = (new Rectangle(thi.x, thi.y, width, height));
+        fourthCorner = (new Rectangle(four.x, four.y, width, height));
+    }
 }

@@ -20,7 +20,7 @@ public class Layer {
     public Layer(Panel p, boolean isB) {
         this.parentPanel = p;
         if (p != null && isB == false) {
-            this.parentPanel.addLayetToPanel(this);
+            this.parentPanel.addToLayers(this);
         }
         this.drawn = new ArrayList<>();
         this.isBlueLayer = isB;

@@ -9,8 +9,10 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Stroke;
 import models.DrawableItem;
+import models.Panel;
 
 /**
  *
@@ -37,12 +39,14 @@ public class DrawableItemController {
     }
 
     public void select(DrawableItem di) {
+
         di.setIsSelected(true);
         di.getCanvas().repaint();
     }
 
     public void deselect(DrawableItem di) {
         di.setIsSelected(false);
+
         di.getCanvas().repaint();
     }
 
@@ -59,12 +63,19 @@ public class DrawableItemController {
         }
         g.setColor(di.getOutline());
         g.draw(di.getShape());
+        if (di instanceof Panel && di.getIsSelected()) {
+            g.draw(((Panel) di).getFirstCorner());
+            g.draw(((Panel) di).getSecondCorner());
+            g.draw(((Panel) di).getThirdCorner());
+            g.draw(((Panel) di).getFourthCorner());
+        }
         if (oldstrk != null) {
             g.setStroke(oldstrk);
         }
     }
 
     public void paint(DrawableItem di, Graphics2D g) {
+
         fillShape(di, g);
         drawShape(di, g);
     }

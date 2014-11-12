@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.util.ArrayList;
 import models.DrawableItem;
@@ -27,8 +28,14 @@ public class PersistentCanvas extends Component {
         DrawableItem item = null;
 
         for (DrawableItem i : items) {
-            if (dic.contains(i, p) && (i instanceof Panel)) {
-                item = i;
+            if (i instanceof Panel) {
+               Point anchor = ((Panel) i).getKnobContainingPoint(p);
+
+                if (dic.contains(i, p) || anchor != null) {
+                    ((Panel) i).setAnchor(anchor);
+                    item = i;
+                    break;
+                }
             }
         }
         return item;
@@ -39,6 +46,7 @@ public class PersistentCanvas extends Component {
             return null;
         }
         items.add(item);
+
         if (item instanceof PathItem) {
 
             ((PathItem) item).getLayer().setActive(true);
