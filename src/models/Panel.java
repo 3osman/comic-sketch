@@ -21,6 +21,7 @@ public class Panel extends DrawableItem {
     Point firstpoint;
     ArrayList<Layer> layers;
     private Point initialPoint;
+    private Point initialResizePoint;
     private int initialWidth;
     private int initialHeight;
     Rectangle firstCorner;
@@ -37,7 +38,7 @@ public class Panel extends DrawableItem {
         layers = new ArrayList<>();
         layers.add(new Layer(this, true));
         new Layer(this, false);
-        new Layer(this,false);
+        new Layer(this, false);
         shape = new Rectangle(p.x, p.y, 0, 0);
         firstpoint = p;
         updateCornerRects();
@@ -112,6 +113,14 @@ public class Panel extends DrawableItem {
         return initialPoint;
     }
 
+    public Point getInitialResizePoint() {
+        return initialResizePoint;
+    }
+
+    public void setInitialResizePoint(Point initialResizePoint) {
+        this.initialResizePoint = initialResizePoint;
+    }
+
     public void setInitialPoint(Point initialPoint) {
         this.initialPoint = initialPoint;
     }
@@ -140,6 +149,7 @@ public class Panel extends DrawableItem {
         ((Rectangle) shape).setFrameFromDiagonal(firstpoint, p);
         this.initialHeight = ((Rectangle) shape).height;
         this.initialWidth = ((Rectangle) shape).width;
+        this.initialPoint = new Point(((Rectangle) shape).x, ((Rectangle) shape).y);
         updateCornerRects();
         canvas.repaint();
     }
@@ -147,8 +157,18 @@ public class Panel extends DrawableItem {
     public void move(int dx, int dy) {
         ((Rectangle) shape).x += dx;
         ((Rectangle) shape).y += dy;
+
         updateCornerRects();
         canvas.repaint();
+    }
+
+    public void moveAnchor(int x, int y) {
+        ((Rectangle) shape).x = x;
+        ((Rectangle) shape).y = y;
+
+        updateCornerRects();
+        canvas.repaint();
+
     }
 
     public void resize(int dx, int dy) {

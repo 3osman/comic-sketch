@@ -73,7 +73,8 @@ public class UndoController {
                 } else if (toUndo.get(0).getActionType() == 3) {
                     for (UndoableItem ui : toUndo) {
                         if (ui.getDitem() instanceof Panel) {
-                        Panel temp = (Panel) ui.getDitem();
+                            Panel temp = (Panel) ui.getDitem();
+                            temp.moveAnchor(toUndo.get(0).getInitialP().x, toUndo.get(0).getInitialP().y);
                             (temp).resize(toUndo.get(0).getX(), toUndo.get(0).getY());
                         }
                     }
@@ -136,13 +137,18 @@ public class UndoController {
     public void saveResizeToUndo(DrawableItem selection) {
         UndoableItem ud = new UndoableItem(selection, 3);
         Panel temp = (Panel) selection;
+        int x = ((Panel) selection).getInitialResizePoint().x;
+        int y = ((Panel) selection).getInitialResizePoint().y;
         int width = ((Panel) selection).getInitialWidth() - ((Rectangle) temp.getShape()).width;
         int height = ((Panel) selection).getInitialHeight() - ((Rectangle) temp.getShape()).height;
         ud.setX(width);
         ud.setY(height);
+        ud.setInitialP(new Point(x, y));
         this.addItemtoUndo(ud);
         ((Panel) selection).setInitialWidth(((Rectangle) temp.getShape()).width);
         ((Panel) selection).setInitialHeight(((Rectangle) temp.getShape()).height);
+        ((Panel) selection).setInitialResizePoint(new Point(((Rectangle) temp.getShape()).x, ((Rectangle) temp.getShape()).y));
+
     }
 
     public void saveMoveToUndo(DrawableItem selection) {

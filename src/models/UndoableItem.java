@@ -5,6 +5,8 @@
  */
 package models;
 
+import java.awt.Point;
+
 /**
  *
  * @author Osman
@@ -17,7 +19,7 @@ public class UndoableItem {
     private int x;
     private int y;
     private int actionType; //0 add, 1 delete, 2 move, 3 resize
-
+    private Point initialP;
     public UndoableItem(DrawableItem di, int at) {
         this.ditem = di;
         this.isLayer = false;
@@ -45,6 +47,14 @@ public class UndoableItem {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    public Point getInitialP() {
+        return initialP;
+    }
+
+    public void setInitialP(Point initialP) {
+        this.initialP = initialP;
     }
 
     public int getActionType() {

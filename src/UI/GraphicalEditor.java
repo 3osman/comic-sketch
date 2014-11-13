@@ -13,11 +13,9 @@ import java.awt.Container;
 import java.awt.Point;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Toolkit;
 import java.awt.Image;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -29,12 +27,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
@@ -173,7 +172,7 @@ public class GraphicalEditor extends JFrame {
     public GraphicalEditor(String theTitle, int width, int height) {
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-            //UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
+            // UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -195,7 +194,10 @@ public class GraphicalEditor extends JFrame {
         twoButton = new JToggleButton();
         threeButton = new JToggleButton();
         fourButton = new JToggleButton();
+        // Icon undoIcon = new ImageIcon(this.getClass().getResource("/Undo-icon.png"));
+
         undoButton = new JButton();
+
         AbstractAction oneAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -238,13 +240,25 @@ public class GraphicalEditor extends JFrame {
             }
         };
         oneButton.setAction(oneAction);
-        oneButton.setText("1");
+
         twoButton.setAction(twoAction);
-        twoButton.setText("2");
         threeButton.setAction(threeAction);
-        threeButton.setText("3");
         fourButton.setAction(fourAction);
-        fourButton.setText("4");
+        try {
+            Image img = ImageIO.read(getClass().getResource("/1s.gif")).getScaledInstance(25, 25, 1);
+            oneButton.setIcon(new ImageIcon(img));
+            img = ImageIO.read(getClass().getResource("/2s.gif")).getScaledInstance(25, 25, 1);
+            twoButton.setIcon(new ImageIcon(img));
+
+            img = ImageIO.read(getClass().getResource("/3s.gif")).getScaledInstance(25, 25, 1);
+            threeButton.setIcon(new ImageIcon(img));
+
+            img = ImageIO.read(getClass().getResource("/4s.gif")).getScaledInstance(25, 25, 1);
+            fourButton.setIcon(new ImageIcon(img));
+
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalEditor.class.getName()).log(Level.SEVERE, null, ex);
+        }
         AbstractAction undoAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -252,7 +266,15 @@ public class GraphicalEditor extends JFrame {
             }
         };
         undoButton.setAction(undoAction);
-        undoButton.setText("Undo");
+        try {
+            Image img = ImageIO.read(getClass().getResource("/Undo-icon.png")).getScaledInstance(25, 25, 1);
+            undoButton.setIcon(new ImageIcon(img));
+            undoButton.setToolTipText("Undo");
+
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalEditor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //undoButton.setText("Undo");
         redoButton = new JButton();
 
         AbstractAction redoAction = new AbstractAction() {
@@ -262,7 +284,14 @@ public class GraphicalEditor extends JFrame {
             }
         };
         redoButton.setAction(redoAction);
-        redoButton.setText("Redo");
+        try {
+            Image img = ImageIO.read(getClass().getResource("/Redo-icon.png")).getScaledInstance(25, 25, 1);
+            redoButton.setIcon(new ImageIcon(img));
+            redoButton.setToolTipText("Redo");
+
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalEditor.class.getName()).log(Level.SEVERE, null, ex);
+        }
         styleButton = new JButton();
         AbstractAction styleAction = new AbstractAction() {
             @Override
@@ -276,7 +305,14 @@ public class GraphicalEditor extends JFrame {
 
         };
         styleButton.setAction(styleAction);
-        styleButton.setText("Color");
+        try {
+            Image img = ImageIO.read(getClass().getResource("/color.png")).getScaledInstance(25, 25, 1);
+            styleButton.setIcon(new ImageIcon(img));
+            styleButton.setToolTipText("Color");
+
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalEditor.class.getName()).log(Level.SEVERE, null, ex);
+        }
         clearButton = new JButton();
 
         AbstractAction clearAction = new AbstractAction() {
@@ -286,11 +322,18 @@ public class GraphicalEditor extends JFrame {
             }
         };
         clearButton.setAction(clearAction);
-        clearButton.setText("Clear All"); //an icon-only button
+        try {
+            Image img = ImageIO.read(getClass().getResource("/clear.png")).getScaledInstance(25, 25, 1);
+            clearButton.setIcon(new ImageIcon(img));
+            clearButton.setToolTipText("Clear All");
+
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalEditor.class.getName()).log(Level.SEVERE, null, ex);
+        }
         //  panel.add(clearButton);
         //panel.add(Box.createVerticalStrut(30));
         JPanel canvasPanel = new JPanel();
-        jcb = new JToggleButton("Blue Ink");
+        jcb = new JToggleButton();
 
         jcb.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent ev) {
@@ -306,8 +349,15 @@ public class GraphicalEditor extends JFrame {
                 }
             }
         });
+        try {
+            Image img = ImageIO.read(getClass().getResource("/blue.png")).getScaledInstance(25, 25, 1);
+            jcb.setIcon(new ImageIcon(img));
+            jcb.setToolTipText("Blue Ink");
 
-        eraser = new JToggleButton("Eraser");
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalEditor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        eraser = new JToggleButton();
         eraser.addItemListener(new ItemListener() {
             //private Object GraphicsUtilities;
             public void itemStateChanged(ItemEvent ev) {
@@ -337,6 +387,14 @@ public class GraphicalEditor extends JFrame {
                 }
             }
         });
+        try {
+            Image img = ImageIO.read(getClass().getResource("/eraser.png")).getScaledInstance(25, 25, 1);
+            eraser.setIcon(new ImageIcon(img));
+            eraser.setToolTipText("Eraser");
+
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalEditor.class.getName()).log(Level.SEVERE, null, ex);
+        }
         JSeparator separator1 = new JSeparator(JSeparator.VERTICAL);
         Dimension size = new Dimension(
                 separator1.getMaximumSize().width,
@@ -550,6 +608,7 @@ public class GraphicalEditor extends JFrame {
                     if (mode.equals("Rectangle")) {
                         item = new Panel(canvas, o, f, p);
                         ((Panel) item).setInitialPoint(p);
+                        ((Panel) item).setInitialResizePoint(p);
 
                     } else if (mode.equals("Path")) {
                         Panel insidePanel = (Panel) canvas.getItemAt(p);
@@ -660,6 +719,7 @@ public class GraphicalEditor extends JFrame {
         mergeLayers = new JButton();
         deleteLayers = new JButton();
         // addLayer.show(true);
+
         AbstractAction addLayerAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -668,12 +728,23 @@ public class GraphicalEditor extends JFrame {
         };
         addLayer.setAction(addLayerAction);
         addLayer.show(true);
-        addLayer.setText("Add");
         addLayer.setEnabled(false);
-        mergeLayers.setText("Merge");
         mergeLayers.show(true);
         mergeLayers.setEnabled(false);
-        deleteLayers.setText("Delete");
+        try {
+            Image img = ImageIO.read(getClass().getResource("/delete.png")).getScaledInstance(25, 25, 1);
+            deleteLayers.setIcon(new ImageIcon(img));
+            deleteLayers.setToolTipText("Delete Layers");
+            img = ImageIO.read(getClass().getResource("/add.png")).getScaledInstance(25, 25, 1);
+            addLayer.setIcon(new ImageIcon(img));
+            addLayer.setToolTipText("Add Layer");
+            img = ImageIO.read(getClass().getResource("/merge.png")).getScaledInstance(25, 25, 1);
+            mergeLayers.setIcon(new ImageIcon(img));
+            mergeLayers.setToolTipText("Merge Layers");
+
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalEditor.class.getName()).log(Level.SEVERE, null, ex);
+        }
         deleteLayers.show(true);
         deleteLayers.setEnabled(false);
         JPanel buttonspanel = new JPanel();
