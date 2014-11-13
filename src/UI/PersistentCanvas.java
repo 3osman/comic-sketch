@@ -51,6 +51,7 @@ public class PersistentCanvas extends Component {
 
             ((PathItem) item).getLayer().setActive(true);
 
+
         }
         repaint();
         return item;

@@ -5,6 +5,7 @@
  */
 package controller;
 
+import UI.PersistentCanvas;
 import models.Layer;
 import models.PathItem;
 
@@ -16,5 +17,15 @@ public class LayersController {
 
     public void addToDrawn(Layer l, PathItem p) {
         l.getDrawn().add(p);
+    }
+
+    public void bringToTop(Layer l, PersistentCanvas canvas) {
+        for (PathItem pi : l.getDrawn()) {
+            canvas.removeItem(pi);
+        }
+
+        for (PathItem pi : l.getDrawn()) {
+            canvas.addItem(pi);
+        }
     }
 }

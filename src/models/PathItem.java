@@ -18,7 +18,7 @@ import java.awt.geom.GeneralPath;
 public class PathItem extends DrawableItem {
 
     protected Layer layer;
-
+    int thickness;
     Point firstpoint;
     boolean hidden;
 
@@ -26,6 +26,7 @@ public class PathItem extends DrawableItem {
         super(c, o, f);
         layer = l;
         type = 1;
+        thickness = 2;
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(p.x, p.y);
         l.addObjectToLayer(this);
@@ -42,6 +43,14 @@ public class PathItem extends DrawableItem {
         type = 1;
         hidden = other.hidden;
         firstpoint = other.firstpoint;
+    }
+
+    public int getThickness() {
+        return thickness;
+    }
+
+    public void setThickness(int thickness) {
+        this.thickness = thickness;
     }
 
     public Layer getLayer() {

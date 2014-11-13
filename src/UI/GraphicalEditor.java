@@ -2,17 +2,22 @@ package UI;
 
 import controller.DrawableItemController;
 import controller.UndoController;
+import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.BorderFactory;
 import java.awt.Container;
 import java.awt.Point;
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Toolkit;
+import java.awt.Image;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -23,12 +28,17 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
+import java.awt.image.BufferedImage;
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
+import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 import models.DrawableItem;
 import models.Layer;
 import models.Panel;
@@ -39,24 +49,36 @@ import models.UndoableItem;
 public class GraphicalEditor extends JFrame {
 
     // Graphical Interface
-    private ArrayList<JButton> operations;
-    private JPanel outline;
-    private JPanel fill;
     private JPanel panel2;
     private JButton addLayer;
+    private JButton mergeLayers;
+    private JButton deleteLayers;
+    private JToggleButton eraser;
     private JButton clearButton;
+    private JButton undoButton;
+    private JToggleButton oneButton;
+    private JToggleButton twoButton;
+    private JToggleButton threeButton;
+    private JToggleButton fourButton;
+    private JButton redoButton;
+    private JButton styleButton;
+    private Container pane;
+    private Color o;
+
     private Point mousepos; // Stores the previous mouse position
     DrawableItemController dic = new DrawableItemController();
     UndoController udc = new UndoController();
-    private JCheckBox jcb; //checkbox for blue ink
+    private JToggleButton jcb; //checkbox for blue ink
     private boolean isMoving; //is currently moving
     private String title; // Changes according to the mode
     private String mode;  // Mode of interaction
     private Boolean isBlue;
+    private Boolean isWhite;
     private PersistentCanvas canvas; // Stores the created items
-    private PersistentCanvas smallCanvas; //stores reduced size of panels
+    private int thickness;
     private DrawableItem selection; 	 // Stores the selected item
     private Layer globalLayer; //global layer without panel
+    private Layer whiteLayer; // white layer
     private Layer blueInkLayer; //blue ink layer
     // Listen the mode changes and update the Title
     private ActionListener modeListener = new ActionListener() {
@@ -85,8 +107,8 @@ public class GraphicalEditor extends JFrame {
                 canvas.removeItem(selection);
 
                 if (selection instanceof Panel) {
-                    smallCanvas.show(false);
-                    addLayer.show(false);
+                    //  smallCanvas.show(false);
+                    //addLayer.show(false);
                     for (Layer li : ((Panel) selection).getLayers()) {
                         li.setActive(false);
                         for (PathItem pi : li.getDrawn()) {
@@ -123,8 +145,8 @@ public class GraphicalEditor extends JFrame {
 
             canvas.removeItem(selection);
             if (selection instanceof Panel) {
-                smallCanvas.show(false);
-                addLayer.show(false);
+                // smallCanvas.show(false);
+                //addLayer.show(false);
                 for (Layer li : ((Panel) selection).getLayers()) {
                     li.setActive(false);
                     for (PathItem pi : li.getDrawn()) {
@@ -147,43 +169,116 @@ public class GraphicalEditor extends JFrame {
         }
     };
 
-    // Create the radio button for the mode
-    // Create the button for the operation
-    private JButton createOperation(String description) {
-        JButton btn = new JButton(description);
-        btn.setActionCommand(description);
-        btn.addActionListener(operationListener);
-        operations.add(btn);
-        return btn;
-    }
-
-    // Create the color sample used to choose the color
-    private JPanel createColorSample(Color c) {
-        JPanel p = new JPanel();
-        p.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-        p.setOpaque(true);
-        p.setBackground(c);
-        p.setMaximumSize(new Dimension(500, 150));
-        p.addMouseListener(colorListener);
-        return p;
-    }
-
     // Constructor of the Graphical Editor
     public GraphicalEditor(String theTitle, int width, int height) {
+        try {
+            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            //UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         title = theTitle;
         selection = null;
         isMoving = false;
-
-        Container pane = getContentPane();
+        thickness = 2;
+        o = Color.BLACK;
+        pane = getContentPane();
         pane.setLayout(new BoxLayout(pane, BoxLayout.LINE_AXIS));
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        panel.setPreferredSize(new Dimension(width / 5, height));
-        // Create the mode selection button list
+        //  JPanel panel = new JPanel();
+        // panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        // panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        // panel.setPreferredSize(new Dimension(width / 5, height));
         mode = "Path";
+        oneButton = new JToggleButton();
+        oneButton.setSelected(true);
+        twoButton = new JToggleButton();
+        threeButton = new JToggleButton();
+        fourButton = new JToggleButton();
+        undoButton = new JButton();
+        AbstractAction oneAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                thickness = 2;
+                twoButton.setSelected(false);
+                threeButton.setSelected(false);
+                fourButton.setSelected(false);
+                oneButton.setSelected(true);
+            }
+        };
+
+        AbstractAction twoAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                thickness = 6;
+                oneButton.setSelected(false);
+                threeButton.setSelected(false);
+                fourButton.setSelected(false);
+                twoButton.setSelected(true);
+            }
+        };
+        AbstractAction threeAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                thickness = 10;
+                oneButton.setSelected(false);
+                twoButton.setSelected(false);
+                fourButton.setSelected(false);
+                threeButton.setSelected(true);
+            }
+        };
+        AbstractAction fourAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                thickness = 14;
+                twoButton.setSelected(false);
+                threeButton.setSelected(false);
+                oneButton.setSelected(false);
+                fourButton.setSelected(true);
+            }
+        };
+        oneButton.setAction(oneAction);
+        oneButton.setText("1");
+        twoButton.setAction(twoAction);
+        twoButton.setText("2");
+        threeButton.setAction(threeAction);
+        threeButton.setText("3");
+        fourButton.setAction(fourAction);
+        fourButton.setText("4");
+        AbstractAction undoAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                udc.undoProcess(canvas);
+            }
+        };
+        undoButton.setAction(undoAction);
+        undoButton.setText("Undo");
+        redoButton = new JButton();
+
+        AbstractAction redoAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                udc.redoProcess(canvas);
+            }
+        };
+        redoButton.setAction(redoAction);
+        redoButton.setText("Redo");
+        styleButton = new JButton();
+        AbstractAction styleAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                o = JColorChooser.showDialog(
+                        canvas,
+                        "Choose Color",
+                        o);
+
+            }
+
+        };
+        styleButton.setAction(styleAction);
+        styleButton.setText("Color");
         clearButton = new JButton();
+
         AbstractAction clearAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -192,58 +287,101 @@ public class GraphicalEditor extends JFrame {
         };
         clearButton.setAction(clearAction);
         clearButton.setText("Clear All"); //an icon-only button
-        panel.add(clearButton);
-        panel.add(Box.createVerticalStrut(30));
-        /*fill = createColorSample(Color.WHITE);
-        panel.add(fill);
-        panel.add(Box.createVerticalStrut(10));
-        outline = createColorSample(Color.BLACK);
-        panel.add(outline);
-        panel.add(Box.createVerticalStrut(30));*/
-        jcb = new JCheckBox("Blue Ink");
-        jcb.addItemListener(new ItemListener() {
-            @Override
+        //  panel.add(clearButton);
+        //panel.add(Box.createVerticalStrut(30));
+        JPanel canvasPanel = new JPanel();
+        jcb = new JToggleButton("Blue Ink");
 
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == 1) {
+        jcb.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent ev) {
+                if (ev.getStateChange() == ItemEvent.SELECTED) {
                     isBlue = true;
-                } else {
+                    if (isWhite) {
+                        isWhite = false;
+                        eraser.setSelected(false);
+                        canvas.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    }
+                } else if (ev.getStateChange() == ItemEvent.DESELECTED) {
                     isBlue = false;
                 }
             }
-
         });
-        panel.add(jcb);
 
-        /*operations = new ArrayList<JButton>();
-        panel.add(createOperation("Undo"));
-        panel.add(Box.createRigidArea(new Dimension(0, 5)));
-        panel.add(createOperation("Redo"));
-        panel.add(Box.createRigidArea(new Dimension(0, 5)));
-        panel.add(createOperation("Add Layer"));
-        panel.add(Box.createRigidArea(new Dimension(0, 5)));
-        panel.add(createOperation("Delete"));
-        panel.add(Box.createRigidArea(new Dimension(0, 5)));
-        panel.add(createOperation("Clone"));
-        panel.add(Box.createVerticalGlue());*/
-        pane.add(panel);
+        eraser = new JToggleButton("Eraser");
+        eraser.addItemListener(new ItemListener() {
+            //private Object GraphicsUtilities;
+            public void itemStateChanged(ItemEvent ev) {
+                if (ev.getStateChange() == ItemEvent.SELECTED) {
+                    isWhite = true;
+                    twoButton.setEnabled(false);
+                    threeButton.setEnabled(false);
+                    oneButton.setEnabled(false);
+                    fourButton.setEnabled(false);
+                    try {
+
+                        Cursor custom = dic.createEraserCursor();
+                        canvas.setCursor(custom);
+                    } catch (Exception e) {
+                    }
+                    if (isBlue) {
+                        isBlue = false;
+                        jcb.setSelected(false);
+                    }
+                } else if (ev.getStateChange() == ItemEvent.DESELECTED) {
+                    isWhite = false;
+                    twoButton.setEnabled(true);
+                    threeButton.setEnabled(true);
+                    oneButton.setEnabled(true);
+                    fourButton.setEnabled(true);
+                    canvas.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                }
+            }
+        });
         JSeparator separator1 = new JSeparator(JSeparator.VERTICAL);
         Dimension size = new Dimension(
                 separator1.getMaximumSize().width,
                 separator1.getMaximumSize().height);
         separator1.setMaximumSize(size);
         pane.add(separator1);
-        smallCanvas = new PersistentCanvas(dic);
-        smallCanvas.setBackground(Color.WHITE);
-        smallCanvas.setPreferredSize(new Dimension(width / 5, height));
+
         // Create the canvas for drawing
+        canvasPanel.setLayout(new BoxLayout(canvasPanel, BoxLayout.PAGE_AXIS));
+        canvasPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        canvasPanel.setPreferredSize(new Dimension((5 * width) / 6, height));
+
+        JPanel canvasOpsPanel = new JPanel();
+        canvasOpsPanel.setLayout(new FlowLayout());
+        canvasOpsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        canvasOpsPanel.setPreferredSize(new Dimension((5 * width) / 6, height / 12));
+        canvasOpsPanel.add(oneButton);
+        canvasOpsPanel.add(twoButton);
+        canvasOpsPanel.add(threeButton);
+        canvasOpsPanel.add(fourButton);
+        canvasOpsPanel.add(styleButton);
+        canvasOpsPanel.add(jcb);
+        canvasOpsPanel.add(eraser);
+
+        canvasOpsPanel.add(clearButton);
+        canvasOpsPanel.add(undoButton);
+        canvasOpsPanel.add(redoButton);
+
         canvas = new PersistentCanvas(dic);
         canvas.setBackground(Color.WHITE);
-        canvas.setPreferredSize(new Dimension(width - 2 * (width / 5), height));
-        pane.add(canvas);
+        canvas.setPreferredSize(new Dimension(width - 5 * (width / 6), height));
+        canvasPanel.add(canvasOpsPanel, BorderLayout.PAGE_START);
+        JSeparator separator2 = new JSeparator(JSeparator.HORIZONTAL);
+        Dimension size2 = new Dimension(
+                separator2.getMaximumSize().width,
+                separator2.getMaximumSize().height);
+        separator2.setMaximumSize(size2);
+        canvasPanel.add(separator2);
+        canvasPanel.add(canvas, BorderLayout.CENTER);
+        pane.add(canvasPanel);
         globalLayer = new Layer(null, false);
         blueInkLayer = new Layer(null, true);
+        whiteLayer = new Layer(null, false);
         isBlue = false;
+        isWhite = false;
         // canvas.addUndoableEditListener(um);
         AbstractAction deleteAction = new AbstractAction() {
             @Override
@@ -315,25 +453,25 @@ public class GraphicalEditor extends JFrame {
             }
         };
 
-        panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        canvasPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(KeyStroke.getKeyStroke("DELETE"), "DELETE");
-        panel.getActionMap()
+        canvasPanel.getActionMap()
                 .put("DELETE", deleteAction);
-        panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        canvasPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(KeyStroke.getKeyStroke("UP"), "UP");
-        panel.getActionMap()
+        canvasPanel.getActionMap()
                 .put("UP", moveUpAction);
-        panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        canvasPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(KeyStroke.getKeyStroke("DOWN"), "DOWN");
-        panel.getActionMap()
+        canvasPanel.getActionMap()
                 .put("DOWN", moveDownAction);
-        panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        canvasPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(KeyStroke.getKeyStroke("RIGHT"), "RIGHT");
-        panel.getActionMap()
+        canvasPanel.getActionMap()
                 .put("RIGHT", moveRightAction);
-        panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        canvasPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(KeyStroke.getKeyStroke("LEFT"), "LEFT");
-        panel.getActionMap()
+        canvasPanel.getActionMap()
                 .put("LEFT", moveLeftAction);
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
             @Override
@@ -388,8 +526,8 @@ public class GraphicalEditor extends JFrame {
                     selection = ((PathItem) selection).getLayer().getParentPanel();
                     if (selection == null) {
                         //showButton.show(false);
-                        smallCanvas.show(false);
-                        addLayer.show(false);
+                        //  smallCanvas.show(false);
+                        // addLayer.show(false);
                     } else {
 
                         select(selection);
@@ -405,7 +543,9 @@ public class GraphicalEditor extends JFrame {
                 Point p = e.getPoint();
                 if (!mode.equals("Select/Move")) {
                     DrawableItem item = null;
-                    Color o = Color.BLACK;
+                    if (o == null) {
+                        o = Color.BLACK;
+                    }
                     Color f = Color.WHITE;
                     if (mode.equals("Rectangle")) {
                         item = new Panel(canvas, o, f, p);
@@ -415,18 +555,33 @@ public class GraphicalEditor extends JFrame {
                         Panel insidePanel = (Panel) canvas.getItemAt(p);
                         if (insidePanel == null) {
                             if (!isBlue) {
-                                item = new PathItem(canvas, o, f, p, globalLayer);
+                                if (isWhite) {
+                                    item = new PathItem(canvas, Color.WHITE, f, p, whiteLayer);
+                                    ((PathItem) item).setThickness(20);
+
+                                } else {
+                                    item = new PathItem(canvas, o, f, p, globalLayer);
+                                    ((PathItem) item).setThickness(thickness);
+                                }
                             } else {
                                 item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, blueInkLayer);
+                                ((PathItem) item).setThickness(thickness);
                             }
 
                         } else {
                             if (!isBlue) {
+                                if (isWhite) {
+                                    item = new PathItem(canvas, Color.WHITE, f, p, insidePanel.getLayers().get(2));
+                                    ((PathItem) item).setThickness(20);
 
-                                item = new PathItem(canvas, o, f, p, insidePanel.getLayers().get(1));
+                                } else {
+                                    item = new PathItem(canvas, o, f, p, insidePanel.getLayers().get(1));
+                                    ((PathItem) item).setThickness(thickness);
+                                }
 
                             } else {
                                 item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, insidePanel.getLayers().get(0));
+                                ((PathItem) item).setThickness(thickness);
                             }
                         }
                     }
@@ -441,8 +596,8 @@ public class GraphicalEditor extends JFrame {
                     DrawableItem item = canvas.getItemAt(p);
                     if (item != null) {
                         select(item);
-                        fill.setBackground(item.getFill());
-                        outline.setBackground(item.getOutline());
+                        //fill.setBackground(Color.BLACK);
+                        //outline.setBackground(Color.WHITE);
                         selection = item;
 
                     } else {
@@ -466,14 +621,15 @@ public class GraphicalEditor extends JFrame {
                 if (mode.equals("Select/Move")) {
                     if (((Panel) selection).getAnchor() != null) {
                         ((Panel) selection).resize(((Panel) selection).getAnchor(), e.getPoint());
+                        udc.saveResizeToUndo(selection);
                     } else {
                         isMoving = true;
                         if (selection instanceof PathItem) {
                             Panel item = ((PathItem) selection).getLayer().getParentPanel();
                             if (item != null) {
                                 select(item);
-                                fill.setBackground(item.getFill());
-                                outline.setBackground(item.getOutline());
+                                // fill.setBackground(item.getFill());
+                                // outline.setBackground(item.getOutline());
                                 selection = item;
                             }
                         }
@@ -501,7 +657,9 @@ public class GraphicalEditor extends JFrame {
         separator.setMaximumSize(size1);
         pane.add(separator);
         addLayer = new JButton();
-        addLayer.show(true);
+        mergeLayers = new JButton();
+        deleteLayers = new JButton();
+        // addLayer.show(true);
         AbstractAction addLayerAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -509,16 +667,27 @@ public class GraphicalEditor extends JFrame {
             }
         };
         addLayer.setAction(addLayerAction);
-        addLayer.show(false);
-        addLayer.setText("Add Layer"); //an icon-only button
+        addLayer.show(true);
+        addLayer.setText("Add");
+        addLayer.setEnabled(false);
+        mergeLayers.setText("Merge");
+        mergeLayers.show(true);
+        mergeLayers.setEnabled(false);
+        deleteLayers.setText("Delete");
+        deleteLayers.show(true);
+        deleteLayers.setEnabled(false);
+        JPanel buttonspanel = new JPanel();
+        buttonspanel.setLayout(new FlowLayout());
+        buttonspanel.setPreferredSize(new Dimension(width / 6, height));
         panel2 = new JPanel();
-        panel2.setLayout(new BoxLayout(panel2, BoxLayout.PAGE_AXIS));
+        //panel2.setLayout(new BoxLayout(panel2, BoxLayout.PAGE_AXIS));
         panel2.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        panel2.setPreferredSize(new Dimension(width / 5, height));
-        smallCanvas.show(false);
-        panel2.add(addLayer);
-        panel2.add(smallCanvas);
+        panel2.setPreferredSize(new Dimension(width / 6, height));
 
+        buttonspanel.add(addLayer);
+        buttonspanel.add(mergeLayers);
+        buttonspanel.add(deleteLayers);
+        panel2.add(buttonspanel, BorderLayout.PAGE_START);
         pane.add(panel2);
         pack();
         updateTitle();
@@ -539,23 +708,16 @@ public class GraphicalEditor extends JFrame {
         selection = item;
         if (selection != null) {
             if (selection instanceof Panel) {
-                smallCanvas.show(true);
-                addLayer.show(true);
+                // smallCanvas.show(true);
+                // addLayer.show(true);
+                pane.repaint();
 
             }
             dic.select(selection);
-
-            for (JButton op : operations) {
-                op.setEnabled(true);
-            }
         } else {
-            smallCanvas.show(false);
-            addLayer.show(false);
-            for (JButton op : operations) {
-                op.setEnabled(false);
-            }
+            //  smallCanvas.show(false);
+            //addLayer.show(false);
         }
-
     }
 
     public static void main(String[] args) {

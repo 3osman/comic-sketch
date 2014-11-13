@@ -7,12 +7,19 @@ package controller;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import javax.swing.ImageIcon;
 import models.DrawableItem;
 import models.Panel;
+import models.PathItem;
 
 /**
  *
@@ -60,6 +67,9 @@ public class DrawableItemController {
         if (di.getIsSelected()) {
             oldstrk = g.getStroke();
             g.setStroke(new BasicStroke(2));
+            if (di instanceof PathItem) {
+                g.setStroke(new BasicStroke(((PathItem) di).getThickness()));
+            }
         }
         g.setColor(di.getOutline());
         g.draw(di.getShape());
@@ -74,6 +84,20 @@ public class DrawableItemController {
         }
     }
 
+    public Cursor createEraserCursor() {
+        ImageIcon image = new ImageIcon(this.getClass().getResource("/rubber.gif"));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+
+        Image img = image.getImage();
+
+        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = bi.createGraphics();
+        g.drawImage(img, 0, 0, 10, 10, null);
+        ImageIcon newIcon = new ImageIcon(bi);
+        return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "rubber");
+    }
+
     public void paint(DrawableItem di, Graphics2D g) {
 
         fillShape(di, g);
@@ -81,6 +105,7 @@ public class DrawableItemController {
     }
 
     public void paintPath(DrawableItem di, Graphics2D g) {
+
         drawShape(di, g);
     }
 

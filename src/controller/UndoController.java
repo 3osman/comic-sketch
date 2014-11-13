@@ -9,7 +9,6 @@ import UI.PersistentCanvas;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Stack;
 import models.DrawableItem;
 import models.Layer;
 import models.Panel;
@@ -73,8 +72,10 @@ public class UndoController {
                     }
                 } else if (toUndo.get(0).getActionType() == 3) {
                     for (UndoableItem ui : toUndo) {
+                        if (ui.getDitem() instanceof Panel) {
                         Panel temp = (Panel) ui.getDitem();
-                        (temp).resize(toUndo.get(0).getX(), toUndo.get(0).getY());
+                            (temp).resize(toUndo.get(0).getX(), toUndo.get(0).getY());
+                        }
                     }
                 } else {
                     for (UndoableItem ui : toUndo) {

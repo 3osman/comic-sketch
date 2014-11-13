@@ -37,6 +37,7 @@ public class Panel extends DrawableItem {
         layers = new ArrayList<>();
         layers.add(new Layer(this, true));
         new Layer(this, false);
+        new Layer(this,false);
         shape = new Rectangle(p.x, p.y, 0, 0);
         firstpoint = p;
         updateCornerRects();
