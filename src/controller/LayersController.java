@@ -11,24 +11,27 @@ import models.Panel;
 import models.PathItem;
 
 /**
+ * Layers Controller
  *
  * @author Osman
  */
 public class LayersController {
 
     /**
+     * add drawn item to layer
      *
-     * @param l
-     * @param p
+     * @param l Layer
+     * @param p Item to be added
      */
     public void addToDrawn(Layer l, PathItem p) {
         l.getDrawn().add(p);
     }
 
     /**
+     * Brings layer to top
      *
-     * @param l
-     * @param canvas
+     * @param l layer
+     * @param canvas canvas in which the layer is situated
      */
     public void bringToTop(Layer l, PersistentCanvas canvas) {
         for (PathItem pi : l.getDrawn()) {
@@ -40,6 +43,12 @@ public class LayersController {
         }
     }
 
+    /**
+     * Toggles activity of a layer
+     *
+     * @param l Layer
+     * @param active active or not
+     */
     public void setActiveLayer(Layer l, boolean active) {
         if (active) {
             for (Layer other : l.getParentPanel().getLayers()) {
@@ -56,6 +65,12 @@ public class LayersController {
         }
     }
 
+    /**
+     * Gets the active layer in a panel
+     *
+     * @param p panel
+     * @return active layer
+     */
     public Layer getActiveLayer(Panel p) {
         for (Layer layer : p.getLayers()) {
 

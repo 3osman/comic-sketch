@@ -19,31 +19,29 @@ import java.awt.Image;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
@@ -53,16 +51,21 @@ import models.DrawableItem;
 import models.Layer;
 import models.Panel;
 import models.PathItem;
+import models.ThumbnailLayer;
 import models.UndoableItem;
 
+/**
+ * Editor for the graphical interface
+ *
+ * @author Osman
+ */
 @SuppressWarnings("serial")
 public class GraphicalEditor extends JFrame {
 
-    // Graphical Interface
+    //Global variables definition
     private JPanel panel2;
+    //buttons
     private JButton addLayer;
-    // private JButton mergeLayers;
-    // private JButton deleteLayers;
     private JToggleButton eraser;
     private JButton clearButton;
     private JButton undoButton;
@@ -75,75 +78,55 @@ public class GraphicalEditor extends JFrame {
     private JButton styleButton;
     private JButton saveButton;
     private JScrollPane scroller;
-    private Container pane;
-    private Color o;
+    private Container pane;//main container
+    private Color o; //color
     private Point mousepos; // Stores the previous mouse position
-    DrawableItemController dic = new DrawableItemController();
-    UndoController udc = new UndoController();
-    GroupingController gc = new GroupingController();
-    LayersController lc = new LayersController();
+    //controllers declaration
+    DrawableItemController dic = new DrawableItemController(); //controls all drawing
+    UndoController udc = new UndoController(); //undo controller
+    GroupingController gc = new GroupingController(); //grouping, not finished
+    LayersController lc = new LayersController(); //layers controller
     private JToggleButton jcb; //checkbox for blue ink
     private boolean isMoving; //is currently moving
-    private String title; // Changes according to the mode
     private String mode;  // Mode of interaction
-    private Boolean isBlue;
-    private Boolean isWhite;
-    private ArrayList<Point> anchorP;
+    private Boolean isBlue; //blue ink
+    private Boolean isWhite; //eraser
+    private ArrayList<Point> anchorP; //acnhor points for aligining panels
     private PersistentCanvas canvas; // Stores the created items
-    private int thickness;
+    private int thickness; //thickness of drawing
     private DrawableItem selection; 	 // Stores the selected item
     private Layer globalLayer; //global layer without panel
     private Layer whiteLayer; // white layer
     private Layer blueInkLayer; //blue ink layer
-    private int globalWidth;
-    private int globalHeight;
-
-    private boolean clearAll() {
-        canvas.clear();
-        return true;
-    }
-
-    private boolean removeShape() {
-        if (selection == null) {
-            return false;
-        } else {
-            emptyLayerPanel();
-            canvas.removeItem(selection);
-            if (selection instanceof Panel) {
-
-                for (Layer li : ((Panel) selection).getLayers()) {
-                    li.setActive(false);
-                    for (PathItem pi : li.getDrawn()) {
-                        canvas.removeItem(pi);
-                    }
-                }
-            }
-            udc.addItemtoUndo(new UndoableItem(selection, 1));
-            return true;
-        }
-    }
+    private int globalWidth; //width
+    private int globalHeight; //height
 
     // Constructor of the Graphical Editor
-    public GraphicalEditor(String theTitle, int width, int height) {
+    public GraphicalEditor(int width, int height) {
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
             // UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        pane = getContentPane();
+
         anchorP = gc.getDistinctivePoints(width, height);
-        title = theTitle;
         selection = null;
         isMoving = false;
         thickness = 2;
         o = Color.BLACK;
         globalWidth = width;
         globalHeight = height;
-        pane = getContentPane();
+
         scroller = new JScrollPane();
         pane.setLayout(new BoxLayout(pane, BoxLayout.LINE_AXIS));
 
         mode = "Path";
+
+        //Main buttons start here
+        //=====================================
         saveButton = new JButton();
         AbstractAction saveCanvas = new AbstractAction() {
             @Override
@@ -248,29 +231,13 @@ public class GraphicalEditor extends JFrame {
 
         addPanel.setAction(addPanelAction);
 
-        try {
-            Image img = ImageIO.read(getClass().getResource("/1s.gif")).getScaledInstance(25, 25, 1);
-            oneButton.setIcon(new ImageIcon(img));
-            img = ImageIO.read(getClass().getResource("/2s.gif")).getScaledInstance(25, 25, 1);
-            twoButton.setIcon(new ImageIcon(img));
+        setToggleButtonImage("/1s.gif", oneButton);
+        setToggleButtonImage("/2s.gif", twoButton);
+        setToggleButtonImage("/3s.gif", threeButton);
+        setToggleButtonImage("/4s.gif", fourButton);
+        setButtonImage("/addPanel.png", addPanel);
+        setButtonImage("/save-icon.png", saveButton);
 
-            img = ImageIO.read(getClass().getResource("/3s.gif")).getScaledInstance(25, 25, 1);
-            threeButton.setIcon(new ImageIcon(img));
-
-            img = ImageIO.read(getClass().getResource("/4s.gif")).getScaledInstance(25, 25, 1);
-            fourButton.setIcon(new ImageIcon(img));
-
-            img = ImageIO.read(getClass().getResource("/addPanel.png")).getScaledInstance(25, 25, 1);
-            addPanel.setIcon(new ImageIcon(img));
-            addPanel.setToolTipText("Add Panel");
-
-            img = ImageIO.read(getClass().getResource("/save-icon.png")).getScaledInstance(25, 25, 1);
-            saveButton.setIcon(new ImageIcon(img));
-            saveButton.setToolTipText("Save as image");
-
-        } catch (IOException ex) {
-            Logger.getLogger(GraphicalEditor.class.getName()).log(Level.SEVERE, null, ex);
-        }
         AbstractAction undoAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -281,15 +248,8 @@ public class GraphicalEditor extends JFrame {
         };
 
         undoButton.setAction(undoAction);
-
-        try {
-            Image img = ImageIO.read(getClass().getResource("/Undo-icon.png")).getScaledInstance(25, 25, 1);
-            undoButton.setIcon(new ImageIcon(img));
-            undoButton.setToolTipText("Undo");
-
-        } catch (IOException ex) {
-            Logger.getLogger(GraphicalEditor.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        setButtonImage("/Undo-icon.png", undoButton);
+        undoButton.setToolTipText("Undo");
 
         redoButton = new JButton();
 
@@ -302,15 +262,9 @@ public class GraphicalEditor extends JFrame {
         };
 
         redoButton.setAction(redoAction);
+        setButtonImage("/Redo-icon.png", redoButton);
+        redoButton.setToolTipText("Redo");
 
-        try {
-            Image img = ImageIO.read(getClass().getResource("/Redo-icon.png")).getScaledInstance(25, 25, 1);
-            redoButton.setIcon(new ImageIcon(img));
-            redoButton.setToolTipText("Redo");
-
-        } catch (IOException ex) {
-            Logger.getLogger(GraphicalEditor.class.getName()).log(Level.SEVERE, null, ex);
-        }
         styleButton = new JButton();
         AbstractAction styleAction = new AbstractAction() {
             @Override
@@ -326,14 +280,9 @@ public class GraphicalEditor extends JFrame {
 
         styleButton.setAction(styleAction);
 
-        try {
-            Image img = ImageIO.read(getClass().getResource("/color.png")).getScaledInstance(25, 25, 1);
-            styleButton.setIcon(new ImageIcon(img));
-            styleButton.setToolTipText("Color");
+        setButtonImage("/color.png", styleButton);
+        styleButton.setToolTipText("Color");
 
-        } catch (IOException ex) {
-            Logger.getLogger(GraphicalEditor.class.getName()).log(Level.SEVERE, null, ex);
-        }
         clearButton = new JButton();
 
         AbstractAction clearAction = new AbstractAction() {
@@ -346,14 +295,8 @@ public class GraphicalEditor extends JFrame {
 
         clearButton.setAction(clearAction);
 
-        try {
-            Image img = ImageIO.read(getClass().getResource("/clear.png")).getScaledInstance(25, 25, 1);
-            clearButton.setIcon(new ImageIcon(img));
-            clearButton.setToolTipText("Clear All");
-
-        } catch (IOException ex) {
-            Logger.getLogger(GraphicalEditor.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        setButtonImage("/clear.png", clearButton);
+        clearButton.setToolTipText("Clear All");
 
         JPanel canvasPanel = new JPanel();
         jcb = new JToggleButton();
@@ -382,15 +325,9 @@ public class GraphicalEditor extends JFrame {
             }
         }
         );
-        try {
-            Image img = ImageIO.read(getClass().getResource("/blue.png")).getScaledInstance(25, 25, 1);
-            jcb.setIcon(new ImageIcon(img));
-            jcb.setToolTipText("Blue Ink");
+        setToggleButtonImage("/blue.png", jcb);
+        jcb.setToolTipText("Blue Ink");
 
-        } catch (IOException ex) {
-            Logger.getLogger(GraphicalEditor.class
-                    .getName()).log(Level.SEVERE, null, ex);
-        }
         eraser = new JToggleButton();
         eraser.addItemListener(new ItemListener() {
 
@@ -429,15 +366,9 @@ public class GraphicalEditor extends JFrame {
                 }
             }
         });
-        try {
-            Image img = ImageIO.read(getClass().getResource("/eraser.png")).getScaledInstance(25, 25, 1);
-            eraser.setIcon(new ImageIcon(img));
-            eraser.setToolTipText("Eraser");
+        setToggleButtonImage("/eraser.png", eraser);
+        eraser.setToolTipText("Eraser");
 
-        } catch (IOException ex) {
-            Logger.getLogger(GraphicalEditor.class
-                    .getName()).log(Level.SEVERE, null, ex);
-        }
         JSeparator separator1 = new JSeparator(JSeparator.VERTICAL);
         Dimension size = new Dimension(
                 separator1.getMaximumSize().width,
@@ -445,7 +376,8 @@ public class GraphicalEditor extends JFrame {
         separator1.setMaximumSize(size);
         pane.add(separator1);
 
-        // Create the canvas for drawing
+        // Canvas Panel starts here
+        //==========================================
         canvasPanel.setLayout(new BoxLayout(canvasPanel, BoxLayout.PAGE_AXIS));
         canvasPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         canvasPanel.setPreferredSize(new Dimension((5 * width) / 6, height));
@@ -486,6 +418,8 @@ public class GraphicalEditor extends JFrame {
         isBlue = false;
         isWhite = false;
 
+        //Keyboard buttons management 
+        //=======================
         AbstractAction deleteAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -620,6 +554,9 @@ public class GraphicalEditor extends JFrame {
                 return false;
             }
         });
+
+        //Mouse events management 
+        //===================================
         canvas.addMouseListener(new MouseAdapter() {
 
             public void mouseReleased(MouseEvent e) {
@@ -766,6 +703,9 @@ public class GraphicalEditor extends JFrame {
                 separator.getMaximumSize().height);
         separator.setMaximumSize(size1);
         pane.add(separator);
+
+        //Layers panel start here
+        //============================
         addLayer = new JButton();
 
         AbstractAction addLayerAction = new AbstractAction() {
@@ -782,16 +722,8 @@ public class GraphicalEditor extends JFrame {
         addLayer.show(true);
         addLayer.setEnabled(false);
 
-        try {
-
-            Image img = ImageIO.read(getClass().getResource("/add.png")).getScaledInstance(25, 25, 1);
-            addLayer.setIcon(new ImageIcon(img));
-            addLayer.setToolTipText("Add Layer");
-
-        } catch (IOException ex) {
-            Logger.getLogger(GraphicalEditor.class
-                    .getName()).log(Level.SEVERE, null, ex);
-        }
+        setButtonImage("/add.png", addLayer);
+        addLayer.setToolTipText("Add Layer");
 
         JPanel buttonspanel = new JPanel();
         panel2 = new JPanel();
@@ -811,6 +743,10 @@ public class GraphicalEditor extends JFrame {
         setVisible(true);
     }
 
+    //functions for managing UI, not drawable items
+    /**
+     * Empties the panel of the layers, called when nothing is selected
+     */
     private void emptyLayerPanel() {
         pane.remove(panel2);
         pane.remove(scroller);
@@ -834,6 +770,11 @@ public class GraphicalEditor extends JFrame {
 
     }
 
+    /**
+     * Resets the layer side panel on any change
+     *
+     * @param p selected panel
+     */
     private void resetLayerPanel(Panel p) {
         pane.remove(panel2);
         pane.remove(scroller);
@@ -856,7 +797,7 @@ public class GraphicalEditor extends JFrame {
                 if (!l.isDeleted()) {
                     JButton deleteButton = new JButton();
                     JToggleButton show = new JToggleButton();
-                    show.setToolTipText("On Top");
+
                     JCheckBox select = new JCheckBox("Shown");
                     if (l.isActive()) {
                         show.setSelected(true);
@@ -865,7 +806,7 @@ public class GraphicalEditor extends JFrame {
                         select.setSelected(true);
                     }
 
-                    show.addItemListener(new ItemListener() {
+                    show.addItemListener(new ItemListener() { //getting a layer on top
 
                         public void itemStateChanged(ItemEvent ev) {
                             if (ev.getStateChange() == ItemEvent.SELECTED) {
@@ -879,7 +820,7 @@ public class GraphicalEditor extends JFrame {
                         }
                     }
                     );
-                    select.addItemListener(new ItemListener() {
+                    select.addItemListener(new ItemListener() { //show/hide layer
 
                         public void itemStateChanged(ItemEvent e) {
                             if (e.getStateChange() == 2) {
@@ -897,7 +838,7 @@ public class GraphicalEditor extends JFrame {
                             }
                         }
                     });
-                    AbstractAction deleteLayer = new AbstractAction() {
+                    AbstractAction deleteLayer = new AbstractAction() { //delete layer action
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             lc.setActiveLayer(l, false);
@@ -911,25 +852,57 @@ public class GraphicalEditor extends JFrame {
                         }
                     };
                     deleteButton.setAction(deleteLayer);
-                    if (i == 0 || i == 1) {
+                    if (i == 0 || i == 1) { //for blue and ground
                         deleteButton.setEnabled(false);
                     }
-                    JPanel layerToAdd = dic.getLayerDrawing(l, deleteButton, show, select);
+                    JPanel panel3 = new JPanel();
+                    panel3.setLayout(new FlowLayout());
+                    JPanel panel4 = new JPanel();
+                    panel4.setLayout(new GridLayout(3, 1));//buttons for layer
 
-                  //  deleteButton.setText("Delete");
-                    Image img;
-                    try {
-                        img = ImageIO.read(getClass().getResource("/merge.png")).getScaledInstance(25, 25, 1);
-                          show.setIcon(new ImageIcon(img));
-                          
-                          img = ImageIO.read(getClass().getResource("/delete.png")).getScaledInstance(25, 25, 1);
-                          deleteButton.setIcon(new ImageIcon(img));
-                    } catch (IOException ex) {
-                        Logger.getLogger(GraphicalEditor.class.getName()).log(Level.SEVERE, null, ex);
+                    panel4.add(select);
+                    panel4.add(show);
+                    panel4.add(deleteButton);
+                    panel3.add(panel4);//each layer}
+                    JPanel panel5 = new JPanel();
+                    panel5.setPreferredSize(new Dimension(150, 150));
+                    ThumbNailCanvas tempcanvas = new ThumbNailCanvas(dic);
+                    tempcanvas.setPreferredSize(new Dimension(150, 150));
+                    panel5.add(tempcanvas);
+                    panel3.add(panel5);
+                    tempcanvas.setBackground(Color.WHITE);
+                    ThumbnailLayer tl = new ThumbnailLayer();
+                    tl.setP((Panel) selection);
+                    tl.setL(l);
+                    tl.setLines();
+                    tl.translateAll();
+                    tl.resizeAll();
+                    for (GeneralPath gp : tl.getLines()) {
+                        tempcanvas.addItem(gp);
                     }
-                  
-                    layerToAdd.setPreferredSize(new Dimension(globalWidth / 6, globalHeight / 12));
-                    panel2.add(layerToAdd);
+                    //panel3.add();
+                    deleteButton.setToolTipText("Delete");
+                    show.setToolTipText("On Top");
+                    setToggleButtonImage("/merge.png", show);
+
+                    setButtonImage("/delete.png", deleteButton);
+
+                    panel3.setPreferredSize(new Dimension(globalWidth / 6, globalHeight / 12));
+                    if (i == 0) {
+                        JLabel label = new JLabel("<html><b><font size=\"4\" color=\"0000ff\">Blue layer</font><b></html>");
+
+                        panel2.add(label);
+                    } else if (i == 1) {
+                        JLabel label = new JLabel("<html><b><font size=\"4\" color=\"000000\">Ground layer</font><b></html>");
+                        panel2.add(label);
+                    }
+                    panel2.add(panel3);
+                    JSeparator separator1 = new JSeparator(JSeparator.HORIZONTAL);
+                    Dimension size = new Dimension(
+                            separator1.getMaximumSize().width,
+                            separator1.getMaximumSize().height);
+                    separator1.setMaximumSize(size);
+                    panel2.add(separator1);
                 }
             }
             i++;
@@ -942,12 +915,18 @@ public class GraphicalEditor extends JFrame {
         repaint();
     }
 
-    // Update the Title
+    /**
+     * Updates title
+     */
     private void updateTitle() {
         setTitle("Comico - Simple Comic Sketching App");
     }
 
-    // Select an Item
+    /**
+     * Selects a specific item
+     *
+     * @param item DrawableItem to be selected
+     */
     private void select(DrawableItem item) {
         if (selection != null) {
             dic.deselect(selection);
@@ -957,7 +936,7 @@ public class GraphicalEditor extends JFrame {
         if (selection != null) {
             if (selection instanceof Panel) {
 
-                resetLayerPanel(((Panel) item));
+                resetLayerPanel(((Panel) selection));
 
             }
             dic.select(selection);
@@ -966,8 +945,71 @@ public class GraphicalEditor extends JFrame {
         }
     }
 
+    /**
+     * Clears the canvas
+     */
+    private void clearAll() {
+        canvas.clear();
+
+    }
+
+    /**
+     * Sets the icon for a button
+     *
+     * @param path path of icon
+     * @param toSet JButton to be set
+     */
+    public void setButtonImage(String path, JButton toSet) {
+        Image img;
+        try {
+            img = ImageIO.read(getClass().getResource(path)).getScaledInstance(25, 25, 1);
+            toSet.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+        }
+    }
+
+    /**
+     * Sets the icon for a toggle button
+     *
+     * @param path path of icon
+     * @param toSet toggle button to be set
+     */
+    public void setToggleButtonImage(String path, JToggleButton toSet) {
+        Image img;
+        try {
+            img = ImageIO.read(getClass().getResource(path)).getScaledInstance(25, 25, 1);
+            toSet.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+        }
+    }
+
+    /**
+     * Removes selected item
+     *
+     * @return item removed or not
+     */
+    private boolean removeShape() {
+        if (selection == null) {
+            return false;
+        } else {
+            emptyLayerPanel();
+            canvas.removeItem(selection);
+            if (selection instanceof Panel) {
+
+                for (Layer li : ((Panel) selection).getLayers()) {
+                    li.setActive(false);
+                    for (PathItem pi : li.getDrawn()) {
+                        canvas.removeItem(pi);
+                    }
+                }
+            }
+            udc.addItemtoUndo(new UndoableItem(selection, 1));
+            return true;
+        }
+    }
+
     public static void main(String[] args) {
-        GraphicalEditor editor = new GraphicalEditor("GraphicalEditor", 1500, 1000);
+        GraphicalEditor editor = new GraphicalEditor(1500, 1000);
         editor.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 

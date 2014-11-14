@@ -11,6 +11,8 @@ import java.awt.Point;
 import java.awt.Shape;
 
 /**
+ * Drawable item is an abstract class that has all the basic drawing
+ * functionalities, and any drawing class can extend it
  *
  * @author Osman
  */
@@ -22,6 +24,13 @@ public abstract class DrawableItem {
     protected Boolean isSelected;
     protected int type;
 
+    /**
+     * Constructor
+     *
+     * @param c Canvas in which it lies
+     * @param o Outline color
+     * @param f Fill color
+     */
     public DrawableItem(PersistentCanvas c, Color o, Color f) {
         canvas = c;
         fill = f;
@@ -30,13 +39,30 @@ public abstract class DrawableItem {
         isSelected = false;
     }
 
-   
+    /**
+     * Duplicate item
+     *
+     * @return Duplicated item
+     */
     public abstract DrawableItem duplicate();
 
+    /**
+     * Updates position of item
+     *
+     * @param p new position
+     */
     public abstract void update(Point p);
 
+    /**
+     * Moves item by dx horizontally and dy vertically
+     *
+     * @param dx
+     * @param dy
+     */
     public abstract void move(int dx, int dy);
-
+    
+    //setters and getters
+    //===============
     public PersistentCanvas getCanvas() {
         return canvas;
     }
@@ -84,8 +110,5 @@ public abstract class DrawableItem {
     public void setType(int type) {
         this.type = type;
     }
-
-    
-    
 
 }

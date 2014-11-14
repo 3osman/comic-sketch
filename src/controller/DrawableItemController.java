@@ -21,7 +21,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -33,32 +32,16 @@ import models.Panel;
 import models.PathItem;
 
 /**
- *
+ * Controller for drawable items (Panels, Lines)
  * @author Osman
  */
 public class DrawableItemController {
+   
     
-    public Color getOutline(DrawableItem di) {
-        return di.getOutline();
-    }
-    
-    public Color getFill(DrawableItem di) {
-        return di.getFill();
-    }
-    
-    public void setOutlineColor(DrawableItem di, Color c) {
-        di.setOutline(c);
-        di.getCanvas().repaint();
-    }
-    
-    public void setFillColor(DrawableItem di, Color c) {
-        di.setFill(c);
-        di.getCanvas().repaint();
-    }
 
     /**
-     *
-     * @param di
+     * Selects an item from the canvas
+     * @param di the item to be selected
      */
     public void select(DrawableItem di) {
         
@@ -67,8 +50,8 @@ public class DrawableItemController {
     }
 
     /**
-     *
-     * @param di
+     * Deselects an item from the canvas
+     * @param di the item to be deselected
      */
     public void deselect(DrawableItem di) {
         di.setIsSelected(false);
@@ -77,9 +60,9 @@ public class DrawableItemController {
     }
 
     /**
-     *
-     * @param di
-     * @param g
+     *  Fills a panel
+     * @param di panel
+     * @param g graphics for filling
      */
     protected void fillShape(DrawableItem di, Graphics2D g) {
         g.setColor(di.getFill());
@@ -87,9 +70,9 @@ public class DrawableItemController {
     }
 
     /**
-     *
-     * @param di
-     * @param g
+     * Draws a shape using graphics2D
+     * @param di shape to be drawn
+     * @param g  graphics to draw
      */
     protected void drawShape(DrawableItem di, Graphics2D g) {
         
@@ -115,8 +98,8 @@ public class DrawableItemController {
     }
 
     /**
-     *
-     * @return
+     * Creates eraser cursor
+     * @return Cursor of the eraser
      */
     public Cursor createEraserCursor() {
         ImageIcon image = new ImageIcon(this.getClass().getResource("/rubber.gif"));
@@ -133,9 +116,9 @@ public class DrawableItemController {
     }
 
     /**
-     *
-     * @param di
-     * @param g
+     * Paints a shape
+     * @param di shape to be painted
+     * @param g graphics to paint
      */
     public void paint(DrawableItem di, Graphics2D g) {
         
@@ -144,38 +127,20 @@ public class DrawableItemController {
     }
 
     /**
-     *
-     * @param di
-     * @param g
+     * Paints a curve/pathitem
+     * @param di Curve to be painted
+     * @param g Graphics to paint
      */
     public void paintPath(DrawableItem di, Graphics2D g) {
         
         drawShape(di, g);
     }
-    
-    public JPanel getLayerDrawing(Layer l,   JButton deleteButton, JToggleButton show, JCheckBox select) {
-        
-        JPanel panel3 = new JPanel();
-        panel3.setLayout(new FlowLayout());
-        JPanel panel4 = new JPanel();
-        panel4.setLayout(new GridLayout(3, 1));//buttons for layer
-        panel4.add(select);
-        panel4.add(show);
-        panel4.add(deleteButton);
-        // panel4.add(new JButton("dfsf"));
-        panel3.add(panel4);//each layer}
-      
-        //=========
-        //add images here
-        //=========
-
-        return panel3;
-    }
+   
 
     /**
-     *
-     * @param di
-     * @param p
+     * Checks if item contains a point
+     * @param di Item or shape
+     * @param p Point to be checked
      * @return
      */
     public Boolean contains(DrawableItem di, Point p) {
@@ -183,8 +148,8 @@ public class DrawableItemController {
     }
 
     /**
-     *
-     * @param canvas
+     * Aligns panel on 9 anchors in the canvas, not finished
+     * @param canvas 
      * @param gd
      * @param points
      * @param width
@@ -196,7 +161,7 @@ public class DrawableItemController {
             if (di instanceof Panel) {
                 Rectangle t = ((Rectangle) (((Panel) di).getShape()));
                 
-                Point temp = gd.getClosestAnchor(new Point(t.x, t.y), points, width, height);
+                Point temp = gd.getClosestAnchor(new Point(t.x, t.y), points);
                 ((Panel) di).moveA(temp.x, temp.y);
                 
             }

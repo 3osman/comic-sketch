@@ -1,32 +1,46 @@
 package UI;
 
 import controller.DrawableItemController;
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
+import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
 import models.DrawableItem;
 import models.Panel;
 import models.PathItem;
 
+/**
+ * Persistent canvas class, holds all the drawn items
+ *
+ * @author Osman
+ */
 @SuppressWarnings("serial")
 public class PersistentCanvas extends Component {
 
     private ArrayList<DrawableItem> items;
     private DrawableItemController dic;
 
+    /**
+     * Constructor for the canvas
+     *
+     * @param dicon Controller for drawing objects
+     */
     PersistentCanvas(DrawableItemController dicon) {
         items = new ArrayList<DrawableItem>();
         dic = dicon;
     }
 
     /**
+     * Returns the item in which the point lies
      *
-     * @param p
-     * @return
+     * @param p the point
+     * @return drawable item
      */
     public DrawableItem getItemAt(Point p) {
 
@@ -47,9 +61,10 @@ public class PersistentCanvas extends Component {
     }
 
     /**
+     * Adds item to canvas, and updates the canvas
      *
-     * @param item
-     * @return
+     * @param item item to add
+     * @return the same item, null otherwise
      */
     public DrawableItem addItem(DrawableItem item) {
         if (item == null) {
@@ -67,8 +82,9 @@ public class PersistentCanvas extends Component {
     }
 
     /**
+     * Removes item from canvas, and updates it
      *
-     * @param item
+     * @param item item to be removed
      */
     public void removeItem(DrawableItem item) {
         if (item == null) {
@@ -90,7 +106,7 @@ public class PersistentCanvas extends Component {
     }
 
     /**
-     *
+     * Clears the canvas
      */
     public void clear() {
         items.clear();
@@ -98,6 +114,7 @@ public class PersistentCanvas extends Component {
     }
 
     /**
+     * Paints different drawable items on canvas
      *
      * @param graphics
      */
@@ -116,9 +133,11 @@ public class PersistentCanvas extends Component {
         }
     }
 
+   
     /**
+     * Returns all items in canvas
      *
-     * @return
+     * @return Arraylist of canvas items
      */
     public ArrayList<DrawableItem> getItems() {
         return items;

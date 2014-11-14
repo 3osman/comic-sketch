@@ -12,6 +12,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 
 /**
+ * Class for sketching lines/curves
  *
  * @author Osman
  */
@@ -23,6 +24,15 @@ public class PathItem extends DrawableItem {
     boolean hidden;
     boolean hiddenWithLayer;
 
+    /**
+     * Constructor
+     *
+     * @param c canvas in which the line lies
+     * @param o Outline color
+     * @param f Fill color
+     * @param p Current end
+     * @param l Layer it belongs to
+     */
     public PathItem(PersistentCanvas c, Color o, Color f, Point p, Layer l) {
         super(c, o, f);
         layer = l;
@@ -46,6 +56,42 @@ public class PathItem extends DrawableItem {
         firstpoint = other.firstpoint;
     }
 
+    /**
+     * Duplicate item
+     *
+     * @return Duplicated item
+     */
+    public DrawableItem duplicate() {
+        return canvas.addItem(new PathItem(this));
+    }
+
+    /**
+     * Updates item
+     *
+     * @param p Point to be drawn a line to
+     */
+    public void update(Point p) {
+        ((GeneralPath) shape).lineTo(p.x, p.y);
+        canvas.repaint();
+    }
+
+    /**
+     * Move path item on moving the panel by dx and dy
+     *
+     * @param dx
+     * @param dy
+     */
+    public void move(int dx, int dy) {
+        AffineTransform at = new AffineTransform();
+        at.translate(dx, dy);
+
+        ((GeneralPath) shape).transform(at);
+
+        canvas.repaint();
+    }
+
+    //Getters and setters 
+    //=========================
     public int getThickness() {
         return thickness;
     }
@@ -76,37 +122,6 @@ public class PathItem extends DrawableItem {
 
     public void setHidden(boolean hidden) {
         this.hidden = hidden;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public DrawableItem duplicate() {
-        return canvas.addItem(new PathItem(this));
-    }
-
-    /**
-     *
-     * @param p
-     */
-    public void update(Point p) {
-        ((GeneralPath) shape).lineTo(p.x, p.y);
-        canvas.repaint();
-    }
-
-    /**
-     *
-     * @param dx
-     * @param dy
-     */
-    public void move(int dx, int dy) {
-        AffineTransform at = new AffineTransform();
-        at.translate(dx, dy);
-
-        ((GeneralPath) shape).transform(at);
-
-        canvas.repaint();
     }
 
 }

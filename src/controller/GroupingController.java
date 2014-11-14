@@ -9,16 +9,19 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 /**
+ * Controller for grouping and alignment, not finished
  *
  * @author Osman
  */
 public class GroupingController {
-/**
- * 
- * @param width
- * @param height
- * @return 
- */
+
+    /**
+     * Splits the canvas into 9 distinctive points and returns them
+     *  
+     * @param width width of canvas
+     * @param height height of canvas
+     * @return List of anchor/distinctive points
+     */
     public ArrayList<Point> getDistinctivePoints(int width, int height) {
 
         int xstep = width / 3;
@@ -33,15 +36,14 @@ public class GroupingController {
         }
         return temp;
     }
-/**
- * 
- * @param p
- * @param points
- * @param width
- * @param height
- * @return 
- */
-    public Point getClosestAnchor(Point p, ArrayList<Point> points, int width, int height) {
+
+    /**
+     *  Gets closest anchor/distinctive point to a given point
+     * @param p the point inspected
+     * @param points All the anchor points
+     * @return Closest anchor to inspected point
+     */
+    public Point getClosestAnchor(Point p, ArrayList<Point> points) {
         double smallest = Double.MAX_VALUE;
         Point index = new Point();
         ArrayList<Integer> finished = new ArrayList<>();

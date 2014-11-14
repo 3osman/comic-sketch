@@ -8,6 +8,8 @@ package models;
 import java.util.ArrayList;
 
 /**
+ * Class to handle layers, note that layers are not drawable objects, so they
+ * don't extend DrawableItem
  *
  * @author Osman
  */
@@ -19,6 +21,13 @@ public class Layer {
     boolean active;
     boolean deleted;
     boolean hidden;
+
+    /**
+     * Constructor
+     *
+     * @param p panel that layer belongs to
+     * @param isB Blue ink layer or not
+     */
     public Layer(Panel p, boolean isB) {
         this.parentPanel = p;
         if (p != null && isB == false) {
@@ -30,7 +39,29 @@ public class Layer {
         this.hidden = false;
         this.deleted = false;
     }
+/**
+     * Moves the layer with all its contents
+     *
+     * @param x
+     * @param y
+     */
+    public void moveLayer(int x, int y) {
+        for (PathItem pi : this.drawn) {
+            pi.move(x, y);
+        }
 
+    }
+
+    /**
+     * Add a new object to the layer
+     *
+     * @param pi Curve to be added
+     */
+    public void addObjectToLayer(PathItem pi) {
+        this.drawn.add(pi);
+    }
+    //Setters and getters 
+    //===================
     public boolean isActive() {
         return active;
     }
@@ -54,19 +85,7 @@ public class Layer {
     public void setHidden(boolean hidden) {
         this.hidden = hidden;
     }
-
-    public void moveLayer(int x, int y) {
-        for (PathItem pi : this.drawn) {
-            pi.move(x, y);
-        }
-
-    }
-
-    public void addObjectToLayer(PathItem pi) {
-        this.drawn.add(pi);
-    }
-
-    public boolean isIsBlueLayer() {
+       public boolean isIsBlueLayer() {
         return isBlueLayer;
     }
 
@@ -89,5 +108,8 @@ public class Layer {
     public void setParentPanel(Panel parentPanel) {
         this.parentPanel = parentPanel;
     }
+
+    
+ 
 
 }

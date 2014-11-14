@@ -8,7 +8,7 @@ package models;
 import java.awt.Point;
 
 /**
- *
+ * Class for setting an undoable item
  * @author Osman
  */
 public class UndoableItem {
@@ -20,6 +20,11 @@ public class UndoableItem {
     private int y;
     private int actionType; //0 add, 1 delete, 2 move, 3 resize
     private Point initialP;
+    /**
+     * Constructor
+     * @param di the drawable item
+     * @param at Action type: 0 add, 1 delete, 2 move, 3 resize
+     */
     public UndoableItem(DrawableItem di, int at) {
         this.ditem = di;
         this.isLayer = false;

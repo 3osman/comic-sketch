@@ -17,6 +17,7 @@ import models.SizedStack;
 import models.UndoableItem;
 
 /**
+ * Undo controller for the undo/redo process
  *
  * @author Osman
  */
@@ -26,22 +27,36 @@ public class UndoController {
     SizedStack<UndoableItem> redoStack;
     LayersController lc = new LayersController();
 
+    /**
+     * Constructor limits size to 25
+     */
     public UndoController() {
         undoStack = new SizedStack<>(25);
         redoStack = new SizedStack<>(25);
     }
 
+    /**
+     * Add undoable item to undo stack
+     *
+     * @param udi Item to be added
+     */
     public void addItemtoUndo(UndoableItem udi) {
         undoStack.push(udi);
     }
 
+    /**
+     * Add undoable item to redo stack
+     *
+     * @param udi item to be added
+     */
     public void addItemtoRedo(UndoableItem udi) {
         redoStack.push(udi);
     }
 
     /**
+     * Undo process
      *
-     * @param canvas
+     * @param canvas canvas to draw/delete/move/resize the popped item in
      */
     public void undoProcess(PersistentCanvas canvas) {
         ArrayList<UndoableItem> toUndo = this.undoFunction();
@@ -87,7 +102,7 @@ public class UndoController {
                         canvas.removeItem(ui.getDitem());
                         if (ui.getDitem() instanceof PathItem) {
                             ((PathItem) ui.getDitem()).setHidden(true);
-                           
+
                         }
                     }
                 } else if (toUndo.get(0).getActionType() == 3) {
@@ -107,8 +122,9 @@ public class UndoController {
     }
 
     /**
+     * Redo process
      *
-     * @param canvas
+     * @param canvas canvas to draw/delete/move/resize the popped item in
      */
     public void redoProcess(PersistentCanvas canvas) {
         ArrayList<UndoableItem> toUndo = this.redoFunction();
@@ -152,7 +168,7 @@ public class UndoController {
                         if (ui.getDitem() instanceof PathItem) {
 
                             ((PathItem) ui.getDitem()).setHidden(true);
-                            
+
                         }
                     }
                 } else if (toUndo.get(0).getActionType() == 3) {
@@ -170,8 +186,10 @@ public class UndoController {
     }
 
     /**
+     * Saves the resize operation to undo, as it keeps track of the original
+     * size of the object, and ignores the dragging in between
      *
-     * @param selection
+     * @param selection Item to be saved
      */
     public void saveResizeToUndo(DrawableItem selection) {
         UndoableItem ud = new UndoableItem(selection, 3);
@@ -191,8 +209,10 @@ public class UndoController {
     }
 
     /**
+     * Saves the move to the undo, ignoring all the positions in between the
+     * click and raise
      *
-     * @param selection
+     * @param selection item to be saved
      */
     public void saveMoveToUndo(DrawableItem selection) {
         UndoableItem ud = new UndoableItem(selection, 2);
@@ -206,8 +226,9 @@ public class UndoController {
     }
 
     /**
+     * Undo function that gets the items to be undone
      *
-     * @return
+     * @return Item that needs undoing
      */
     public ArrayList<UndoableItem> undoFunction() {
         ArrayList<UndoableItem> toReturn = new ArrayList<>();
@@ -233,8 +254,9 @@ public class UndoController {
     }
 
     /**
+     * Redo function that gets the items to be redone
      *
-     * @return
+     * @return Item that needs redoing
      */
     public ArrayList<UndoableItem> redoFunction() {
         ArrayList<UndoableItem> toReturn = new ArrayList<>();

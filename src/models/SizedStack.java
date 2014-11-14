@@ -6,6 +6,7 @@
 package models;
 
 /**
+ * Class for sized stack for undo/redo
  *
  * @author Osman
  */
@@ -20,6 +21,12 @@ public class SizedStack<T> extends Stack<T> {
         this.maxSize = size;
     }
 
+    /**
+     * Overrides the push function of stack to handle only maxSize items
+     *
+     * @param object Object to be added
+     * @return object added
+     */
     @Override
     public Object push(Object object) {
         //If the stack is too big, remove elements until it's the right size.
