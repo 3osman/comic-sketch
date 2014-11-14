@@ -24,6 +24,7 @@ public class UndoController {
 
     SizedStack<UndoableItem> undoStack;
     SizedStack<UndoableItem> redoStack;
+    LayersController lc = new LayersController();
 
     public UndoController() {
         undoStack = new SizedStack<>(25);
@@ -38,16 +39,42 @@ public class UndoController {
         redoStack.push(udi);
     }
 
+    /**
+     *
+     * @param canvas
+     */
     public void undoProcess(PersistentCanvas canvas) {
         ArrayList<UndoableItem> toUndo = this.undoFunction();
         if (toUndo != null) {
             if (toUndo.get(0).isLayer()) {
-                toUndo.get(0).getLayer().setActive(false);
+
+                if (toUndo.get(0).getActionType() == 0) {
+                    lc.setActiveLayer(toUndo.get(0).getLayer(), false);
+                    toUndo.get(0).getLayer().setDeleted(true);
+                    for (PathItem pi : toUndo.get(0).getLayer().getDrawn()) {
+                        pi.setHiddenWithLayer(true);
+                        canvas.removeItem(pi);
+                    }
+                } else if (toUndo.get(0).getActionType() == 1) {
+                    lc.setActiveLayer(toUndo.get(0).getLayer(), true);
+                    toUndo.get(0).getLayer().setDeleted(false);
+                    for (PathItem pi : toUndo.get(0).getLayer().getDrawn()) {
+
+                        pi.setHiddenWithLayer(false);
+                        if (!pi.isHidden()) {
+
+                            canvas.addItem(pi);
+                        }
+                    }
+                }
+
             } else {
                 if (toUndo.get(0).getActionType() == 1) {
                     for (UndoableItem ui : toUndo) {
-                        if (ui.getDitem() instanceof PathItem && ((PathItem) ui.getDitem()).getLayer().isActive()) {
-                            canvas.addItem(ui.getDitem());
+                        if (ui.getDitem() instanceof PathItem && (!((PathItem) ui.getDitem()).getLayer().isDeleted())) {
+                            if (!((PathItem) ui.getDitem()).isHiddenWithLayer()) {
+                                canvas.addItem(ui.getDitem());
+                            }
 
                             ((PathItem) ui.getDitem()).setHidden(false);
 
@@ -60,22 +87,14 @@ public class UndoController {
                         canvas.removeItem(ui.getDitem());
                         if (ui.getDitem() instanceof PathItem) {
                             ((PathItem) ui.getDitem()).setHidden(true);
-                            boolean active = false;
-                            for (PathItem pi : ((PathItem) ui.getDitem()).getLayer().getDrawn()) {
-                                if (!pi.isHidden()) {
-                                    active = true;
-                                }
-                            }
-
-                            ((PathItem) ui.getDitem()).getLayer().setActive(active);
+                           
                         }
                     }
                 } else if (toUndo.get(0).getActionType() == 3) {
                     for (UndoableItem ui : toUndo) {
                         if (ui.getDitem() instanceof Panel) {
                             Panel temp = (Panel) ui.getDitem();
-                            temp.moveAnchor(toUndo.get(0).getInitialP().x, toUndo.get(0).getInitialP().y);
-                            (temp).resize(toUndo.get(0).getX(), toUndo.get(0).getY());
+                            temp.moveAnchor(toUndo.get(0).getInitialP().x, toUndo.get(0).getInitialP().y, toUndo.get(0).getX(), toUndo.get(0).getY());
                         }
                     }
                 } else {
@@ -87,17 +106,40 @@ public class UndoController {
         }
     }
 
+    /**
+     *
+     * @param canvas
+     */
     public void redoProcess(PersistentCanvas canvas) {
         ArrayList<UndoableItem> toUndo = this.redoFunction();
         if (toUndo != null) {
             if (toUndo.get(0).isLayer()) {
-                toUndo.get(0).getLayer().setActive(false);
+
+                if (toUndo.get(0).getActionType() == 0) {
+                    lc.setActiveLayer(toUndo.get(0).getLayer(), true);
+                    toUndo.get(0).getLayer().setDeleted(false);
+                    for (PathItem pi : toUndo.get(0).getLayer().getDrawn()) {
+                        pi.setHiddenWithLayer(false);
+                        if (!pi.isHidden()) {
+                            canvas.addItem(pi);
+                        }
+                    }
+                } else if (toUndo.get(0).getActionType() == 1) {
+                    lc.setActiveLayer(toUndo.get(0).getLayer(), false);
+                    toUndo.get(0).getLayer().setDeleted(true);
+                    for (PathItem pi : toUndo.get(0).getLayer().getDrawn()) {
+                        pi.setHiddenWithLayer(true);
+                        canvas.removeItem(pi);
+                    }
+                }
+
             } else {
                 if (toUndo.get(0).getActionType() == 0) {
                     for (UndoableItem ui : toUndo) {
-                        if (ui.getDitem() instanceof PathItem && ((PathItem) ui.getDitem()).getLayer().isActive()) {
-                            canvas.addItem(ui.getDitem());
-
+                        if (ui.getDitem() instanceof PathItem && (!((PathItem) ui.getDitem()).getLayer().isDeleted())) {
+                            if (!((PathItem) ui.getDitem()).isHiddenWithLayer()) {
+                                canvas.addItem(ui.getDitem());
+                            }
                             ((PathItem) ui.getDitem()).setHidden(false);
                         } else {
                             canvas.addItem(ui.getDitem());
@@ -110,14 +152,7 @@ public class UndoController {
                         if (ui.getDitem() instanceof PathItem) {
 
                             ((PathItem) ui.getDitem()).setHidden(true);
-                            boolean active = false;
-                            for (PathItem pi : ((PathItem) ui.getDitem()).getLayer().getDrawn()) {
-                                if (!pi.isHidden()) {
-                                    active = true;
-                                }
-                            }
-
-                            ((PathItem) ui.getDitem()).getLayer().setActive(active);
+                            
                         }
                     }
                 } else if (toUndo.get(0).getActionType() == 3) {
@@ -134,6 +169,10 @@ public class UndoController {
         }
     }
 
+    /**
+     *
+     * @param selection
+     */
     public void saveResizeToUndo(DrawableItem selection) {
         UndoableItem ud = new UndoableItem(selection, 3);
         Panel temp = (Panel) selection;
@@ -151,6 +190,10 @@ public class UndoController {
 
     }
 
+    /**
+     *
+     * @param selection
+     */
     public void saveMoveToUndo(DrawableItem selection) {
         UndoableItem ud = new UndoableItem(selection, 2);
         Panel temp = (Panel) selection;
@@ -162,6 +205,10 @@ public class UndoController {
         ((Panel) selection).setInitialPoint(new Point(((Rectangle) temp.getShape()).x, ((Rectangle) temp.getShape()).y));
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<UndoableItem> undoFunction() {
         ArrayList<UndoableItem> toReturn = new ArrayList<>();
         if (undoStack.isEmpty()) {
@@ -185,6 +232,10 @@ public class UndoController {
 
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<UndoableItem> redoFunction() {
         ArrayList<UndoableItem> toReturn = new ArrayList<>();
 

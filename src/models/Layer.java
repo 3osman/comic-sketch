@@ -17,6 +17,8 @@ public class Layer {
     Panel parentPanel;
     boolean isBlueLayer;
     boolean active;
+    boolean deleted;
+    boolean hidden;
     public Layer(Panel p, boolean isB) {
         this.parentPanel = p;
         if (p != null && isB == false) {
@@ -25,6 +27,8 @@ public class Layer {
         this.drawn = new ArrayList<>();
         this.isBlueLayer = isB;
         this.active = true;
+        this.hidden = false;
+        this.deleted = false;
     }
 
     public boolean isActive() {
@@ -33,6 +37,22 @@ public class Layer {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
     }
 
     public void moveLayer(int x, int y) {

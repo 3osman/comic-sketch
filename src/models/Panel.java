@@ -6,6 +6,7 @@
 package models;
 
 import UI.PersistentCanvas;
+import controller.LayersController;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -26,7 +27,7 @@ public class Panel extends DrawableItem {
     private int initialHeight;
     Rectangle firstCorner;
     Rectangle secondCorner;
-
+    LayersController lc = new LayersController();
     Rectangle thirdCorner;
 
     Rectangle fourthCorner;
@@ -37,8 +38,10 @@ public class Panel extends DrawableItem {
         type = 0;
         layers = new ArrayList<>();
         layers.add(new Layer(this, true));
+        Layer l = new Layer(this, false);
         new Layer(this, false);
-        new Layer(this, false);
+        lc.setActiveLayer(l, true);
+
         shape = new Rectangle(p.x, p.y, 0, 0);
         firstpoint = p;
         updateCornerRects();
@@ -162,10 +165,19 @@ public class Panel extends DrawableItem {
         canvas.repaint();
     }
 
-    public void moveAnchor(int x, int y) {
+    public void moveAnchor(int x, int y, int width, int height) {
         ((Rectangle) shape).x = x;
         ((Rectangle) shape).y = y;
+        ((Rectangle) shape).height += height;
+        ((Rectangle) shape).width += width;
+        updateCornerRects();
+        canvas.repaint();
 
+    }
+
+    public void moveA(int x, int y) {
+        ((Rectangle) shape).x = x;
+        ((Rectangle) shape).y = y;
         updateCornerRects();
         canvas.repaint();
 

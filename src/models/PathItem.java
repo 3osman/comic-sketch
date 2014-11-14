@@ -21,6 +21,7 @@ public class PathItem extends DrawableItem {
     int thickness;
     Point firstpoint;
     boolean hidden;
+    boolean hiddenWithLayer;
 
     public PathItem(PersistentCanvas c, Color o, Color f, Point p, Layer l) {
         super(c, o, f);
@@ -31,7 +32,7 @@ public class PathItem extends DrawableItem {
         ((GeneralPath) shape).moveTo(p.x, p.y);
         l.addObjectToLayer(this);
         hidden = false;
-
+        hiddenWithLayer = false;
         firstpoint = p;
     }
 
@@ -61,6 +62,14 @@ public class PathItem extends DrawableItem {
         this.layer = layer;
     }
 
+    public boolean isHiddenWithLayer() {
+        return hiddenWithLayer;
+    }
+
+    public void setHiddenWithLayer(boolean hiddenWithLayer) {
+        this.hiddenWithLayer = hiddenWithLayer;
+    }
+
     public boolean isHidden() {
         return hidden;
     }
@@ -69,15 +78,28 @@ public class PathItem extends DrawableItem {
         this.hidden = hidden;
     }
 
+    /**
+     *
+     * @return
+     */
     public DrawableItem duplicate() {
         return canvas.addItem(new PathItem(this));
     }
 
+    /**
+     *
+     * @param p
+     */
     public void update(Point p) {
         ((GeneralPath) shape).lineTo(p.x, p.y);
         canvas.repaint();
     }
 
+    /**
+     *
+     * @param dx
+     * @param dy
+     */
     public void move(int dx, int dy) {
         AffineTransform at = new AffineTransform();
         at.translate(dx, dy);

@@ -23,13 +23,18 @@ public class PersistentCanvas extends Component {
         dic = dicon;
     }
 
+    /**
+     *
+     * @param p
+     * @return
+     */
     public DrawableItem getItemAt(Point p) {
 
         DrawableItem item = null;
 
         for (DrawableItem i : items) {
             if (i instanceof Panel) {
-               Point anchor = ((Panel) i).getKnobContainingPoint(p);
+                Point anchor = ((Panel) i).getKnobContainingPoint(p);
 
                 if (dic.contains(i, p) || anchor != null) {
                     ((Panel) i).setAnchor(anchor);
@@ -41,6 +46,11 @@ public class PersistentCanvas extends Component {
         return item;
     }
 
+    /**
+     *
+     * @param item
+     * @return
+     */
     public DrawableItem addItem(DrawableItem item) {
         if (item == null) {
             return null;
@@ -51,12 +61,15 @@ public class PersistentCanvas extends Component {
 
             ((PathItem) item).getLayer().setActive(true);
 
-
         }
         repaint();
         return item;
     }
 
+    /**
+     *
+     * @param item
+     */
     public void removeItem(DrawableItem item) {
         if (item == null) {
             return;
@@ -76,11 +89,18 @@ public class PersistentCanvas extends Component {
         repaint();
     }
 
+    /**
+     *
+     */
     public void clear() {
         items.clear();
         repaint();
     }
 
+    /**
+     *
+     * @param graphics
+     */
     public void paint(Graphics graphics) {
         Graphics2D g = (Graphics2D) graphics;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -94,6 +114,14 @@ public class PersistentCanvas extends Component {
                 dic.paintPath(item, g);
             }
         }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public ArrayList<DrawableItem> getItems() {
+        return items;
     }
 
 }
