@@ -166,7 +166,7 @@ public class GraphicalEditor extends JFrame {
         AbstractAction addPanelAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Panel item = new Panel(canvas, Color.BLACK, Color.WHITE, new Point(10, 10));
+                Panel item = new Panel(canvas, Color.BLACK, new Color(255,255,255, 128), new Point(10, 10));
                 ((Panel) item).setInitialPoint(new Point(10, 10));
                 ((Panel) item).setInitialResizePoint(new Point(10, 10));
                 Rectangle thisRect = (Rectangle) (((Panel) item).getShape());
@@ -590,7 +590,7 @@ public class GraphicalEditor extends JFrame {
                     if (o == null) {
                         o = Color.BLACK;
                     }
-                    Color f = Color.WHITE;
+                    Color f = new Color(255, 255, 255, 128);
                     if (mode.equals("Rectangle")) {
                         item = new Panel(canvas, o, f, p);
                         ((Panel) item).setInitialPoint(p);
