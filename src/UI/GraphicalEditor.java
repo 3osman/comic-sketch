@@ -148,7 +148,22 @@ public class GraphicalEditor extends JFrame {
                     try {
                         ImageIO.write(image, "png", new File(chooser.getSelectedFile() + ".png"));
                         ArrayList<DrawableItem> allItems = canvas.getItems();
+                        //====================================
+                        //+++++++++++++++++++++++++++++++++++
+
+                        
+                        
+                        
+                        //Call the function of save here
                         sc.save(allItems, chooser.getSelectedFile().getAbsolutePath());
+                        
+                        
+                        
+                        
+                        
+
+                        //++++++++++++++++++++++++++++++++++++++
+                        //=======================================
                     } catch (IOException ex) {
                         //System.out.println("eror");
                     }
@@ -170,7 +185,7 @@ public class GraphicalEditor extends JFrame {
         AbstractAction addPanelAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Panel item = new Panel(canvas, Color.BLACK, new Color(255,255,255, 128), new Point(10, 10));
+                Panel item = new Panel(canvas, Color.BLACK, new Color(255, 255, 255, 128), new Point(10, 10));
                 ((Panel) item).setInitialPoint(new Point(10, 10));
                 ((Panel) item).setInitialResizePoint(new Point(10, 10));
                 Rectangle thisRect = (Rectangle) (((Panel) item).getShape());

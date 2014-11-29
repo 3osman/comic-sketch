@@ -23,44 +23,14 @@ import models.Panel;
 public class SavingController {
     
     public boolean save(ArrayList<DrawableItem> drawings, String name) {
-        try {
-            FileOutputStream fos = new FileOutputStream(name);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            
-            for (DrawableItem di : drawings) {
-                oos.writeObject(di);
-                if (di instanceof Panel) {
-                    for (Layer l : ((Panel) di).getLayers()) {
-                        oos.writeObject(l);
-                    }
-                }
-            }
-            
-            oos.close();
-            fos.close();
-        } catch (IOException ex) {
-            return false;
-        }
-        return true;
+        //todo
+        return false;
         
     }
     
     public ArrayList<DrawableItem> load(String path) {
-        ArrayList<DrawableItem> toRet = new ArrayList<>();
-        try {
-            FileInputStream fis = new FileInputStream(new File(path));
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            this.games = (HashMap<Game,GameStatus>)ois.readObject();
-            this.bookedTickets = (HashSet<Ticket>)ois.readObject();
-                this.baggage = (HashMap<Ticket,ArrayList<Object>>)ois.readObject();
-            ois.close();
-            fis.close();
-        } catch (IOException e) {
-            return false;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-        return true;
+        //to-do
+        return null;
     }
     
 }
