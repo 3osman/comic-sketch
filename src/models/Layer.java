@@ -5,6 +5,7 @@
  */
 package models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -13,7 +14,7 @@ import java.util.ArrayList;
  *
  * @author Osman
  */
-public class Layer {
+public class Layer implements Serializable{
 
     ArrayList<PathItem> drawn;
     Panel parentPanel;

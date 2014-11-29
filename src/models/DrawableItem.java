@@ -9,6 +9,7 @@ import UI.PersistentCanvas;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Shape;
+import java.io.Serializable;
 
 /**
  * Drawable item is an abstract class that has all the basic drawing
@@ -16,7 +17,7 @@ import java.awt.Shape;
  *
  * @author Osman
  */
-public abstract class DrawableItem {
+public abstract class DrawableItem implements Serializable{
 
     protected PersistentCanvas canvas;
     protected Color outline, fill;

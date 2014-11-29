@@ -2,6 +2,16 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwing/src/controller/DrawableItemController.java</file>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwing/src/controller/GroupingController.java</file>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwing/src/controller/SavingController.java</file>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwing/src/models/SizedStack.java</file>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwing/src/models/DrawableItem.java</file>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwing/src/models/Panel.java</file>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwing/src/models/Layer.java</file>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwing/src/models/UndoableItem.java</file>
+            <file>file:/C:/Users/Osman/Documents/NetBeansProjects/SketchAppSwing/src/UI/GraphicalEditor.java</file>
+        </group>
     </open-files>
 </project-private>

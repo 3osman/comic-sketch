@@ -3,6 +3,7 @@ package UI;
 import controller.DrawableItemController;
 import controller.GroupingController;
 import controller.LayersController;
+import controller.SavingController;
 import controller.UndoController;
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
@@ -86,6 +87,7 @@ public class GraphicalEditor extends JFrame {
     UndoController udc = new UndoController(); //undo controller
     GroupingController gc = new GroupingController(); //grouping, not finished
     LayersController lc = new LayersController(); //layers controller
+    SavingController sc = new SavingController();
     private JToggleButton jcb; //checkbox for blue ink
     private boolean isMoving; //is currently moving
     private String mode;  // Mode of interaction
@@ -145,6 +147,8 @@ public class GraphicalEditor extends JFrame {
 
                     try {
                         ImageIO.write(image, "png", new File(chooser.getSelectedFile() + ".png"));
+                        ArrayList<DrawableItem> allItems = canvas.getItems();
+                        sc.save(allItems, chooser.getSelectedFile().getAbsolutePath());
                     } catch (IOException ex) {
                         //System.out.println("eror");
                     }
