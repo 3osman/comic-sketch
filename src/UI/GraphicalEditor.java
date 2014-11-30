@@ -48,6 +48,7 @@ import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import models.DrawableItem;
 import models.Layer;
 import models.Panel;
@@ -107,7 +108,6 @@ public class GraphicalEditor extends JFrame {
     public GraphicalEditor(int width, int height) {
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-            // UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -138,6 +138,7 @@ public class GraphicalEditor extends JFrame {
                 chooser.setDialogTitle("Save As File");
 
                 chooser.setAcceptAllFileFilterUsed(false);
+                chooser.addChoosableFileFilter(new FileNameExtensionFilter("Comico", "comico"));
                 //    
                 if (chooser.showSaveDialog(canvas) == JFileChooser.APPROVE_OPTION) {
                     BufferedImage image = new BufferedImage(canvas.getWidth(), canvas.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -151,16 +152,8 @@ public class GraphicalEditor extends JFrame {
                         //====================================
                         //+++++++++++++++++++++++++++++++++++
 
-                        
-                        
-                        
                         //Call the function of save here
                         sc.save(allItems, chooser.getSelectedFile().getAbsolutePath());
-                        
-                        
-                        
-                        
-                        
 
                         //++++++++++++++++++++++++++++++++++++++
                         //=======================================
@@ -539,8 +532,10 @@ public class GraphicalEditor extends JFrame {
                     } else if (e.getKeyCode() == 17) {
                         mode = "Select/Move";
                     } else if (e.getKeyCode() == 65) {
-                        anchorP = gc.getDistinctivePoints(width, height);
-                        dic.allign(canvas, gc, anchorP, width, height);
+                       // anchorP = gc.getDistinctivePoints(width, height);
+                        //dic.allign(canvas, gc, anchorP, width, height);
+                        gc.allign(true, canvas.getItems());
+                        gc.allign(false, canvas.getItems());
                     }
                     if (mode.equals("Select/Move")) {
                         if (e.getExtendedKeyCode() == 90) {
@@ -876,6 +871,8 @@ public class GraphicalEditor extends JFrame {
                     }
                     JPanel panel3 = new JPanel();
                     panel3.setLayout(new FlowLayout());
+                    panel3.setPreferredSize(new Dimension(200, 200));
+
                     JPanel panel4 = new JPanel();
                     panel4.setLayout(new GridLayout(3, 1));//buttons for layer
 
@@ -916,12 +913,13 @@ public class GraphicalEditor extends JFrame {
                         panel2.add(label);
                     }
                     panel2.add(panel3);
-                    JSeparator separator1 = new JSeparator(JSeparator.HORIZONTAL);
+                   JSeparator separator1 = new JSeparator(JSeparator.HORIZONTAL);
                     Dimension size = new Dimension(
                             separator1.getMaximumSize().width,
                             separator1.getMaximumSize().height);
                     separator1.setMaximumSize(size);
                     panel2.add(separator1);
+
                 }
             }
             i++;
