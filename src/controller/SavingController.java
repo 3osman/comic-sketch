@@ -22,7 +22,7 @@ import models.Panel;
  */
 public class SavingController {
     
-    private static final string EXTENSION = ".comico";
+    private static final String EXTENSION = ".comico";
 
     public boolean save(ArrayList<DrawableItem> drawings, String name) {
         //todo
@@ -39,7 +39,7 @@ public class SavingController {
         	FileOutputStream saveFile = new FileOutputStream(file);
         	ObjectOutputStream saveObject = new ObjectOutputStream(saveFile);
         	
-        	for (DrawableItem item in drawings) {
+        	for (DrawableItem item : drawings) {
         		saveObject.writeObject(item);
         	}
         	saveObject.close();
