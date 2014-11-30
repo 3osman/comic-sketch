@@ -22,8 +22,32 @@ import models.Panel;
  */
 public class SavingController {
     
+    private static final string EXTENSION = ".comico";
+
     public boolean save(ArrayList<DrawableItem> drawings, String name) {
         //todo
+
+        //open the file
+        try{
+        	File file = new File(name + EXTENSION);
+
+        	// if file doesn't exists, then create it
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+
+        	FileOutputStream saveFile = new FileOutputStream(file);
+        	ObjectOutputStream saveObject = new ObjectOutputStream(saveFile);
+        	
+        	for (DrawableItem item in drawings) {
+        		saveObject.writeObject(item);
+        	}
+        	saveObject.close();
+
+        }catch(Exception e)
+        {
+        	e.printStackTrace();
+        }
         return false;
         
     }
