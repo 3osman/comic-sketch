@@ -29,7 +29,9 @@ public class ThumbnailLayer {
     public void setLines() {
         lines = new ArrayList<>();
         for (PathItem pi : this.l.getDrawn()) {
-            lines.add((GeneralPath) ((GeneralPath) (pi.getShape())).clone());
+            if (!pi.hidden) {
+                lines.add((GeneralPath) ((GeneralPath) (pi.getShape())).clone());
+            }
         }
 
     }

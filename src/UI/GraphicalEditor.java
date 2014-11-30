@@ -79,6 +79,7 @@ public class GraphicalEditor extends JFrame {
     private JButton redoButton;
     private JButton styleButton;
     private JButton saveButton;
+    private JButton loadButton;
     private JScrollPane scroller;
     private Container pane;//main container
     private Color o; //color
@@ -138,7 +139,7 @@ public class GraphicalEditor extends JFrame {
                 chooser.setDialogTitle("Save As File");
 
                 chooser.setAcceptAllFileFilterUsed(false);
-                chooser.addChoosableFileFilter(new FileNameExtensionFilter("Comico", "comico"));
+                chooser.addChoosableFileFilter(new FileNameExtensionFilter("Comico", SavingController.EXTENSION));
                 //    
                 if (chooser.showSaveDialog(canvas) == JFileChooser.APPROVE_OPTION) {
                     BufferedImage image = new BufferedImage(canvas.getWidth(), canvas.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -146,25 +147,50 @@ public class GraphicalEditor extends JFrame {
 
                     canvas.paint(g);
 
-                    try {
-                        ImageIO.write(image, "png", new File(chooser.getSelectedFile() + ".png"));
-                        ArrayList<DrawableItem> allItems = canvas.getItems();
+                    // try {
+                    //  ImageIO.write(image, "png", new File(chooser.getSelectedFile() + ".png"));
+                    ArrayList<DrawableItem> allItems = canvas.getItems();
                         //====================================
-                        //+++++++++++++++++++++++++++++++++++
+                    //+++++++++++++++++++++++++++++++++++
 
-                        //Call the function of save here
-                        sc.save(allItems, chooser.getSelectedFile().getAbsolutePath());
+                    //Call the function of save here
+                    sc.save(allItems, chooser.getSelectedFile().getAbsolutePath());
 
-                        //++++++++++++++++++++++++++++++++++++++
-                        //=======================================
-                    } catch (IOException ex) {
-                        //System.out.println("eror");
-                    }
+                    //++++++++++++++++++++++++++++++++++++++
+                    //=======================================
+                    // } catch (IOException ex) {
+                    //System.out.println("eror");
+                    // }
                 }
 
             }
         };
         saveButton.setAction(saveCanvas);
+
+        loadButton = new JButton();
+        AbstractAction loadCanvas = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser chooser = new JFileChooser();
+                chooser.setCurrentDirectory(new java.io.File("."));
+                chooser.setDialogTitle("Open File");
+
+                chooser.setAcceptAllFileFilterUsed(false);
+                chooser.addChoosableFileFilter(new FileNameExtensionFilter("Comico", SavingController.EXTENSION));
+                //    
+                int result = chooser.showOpenDialog(canvas);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    canvas.clear();
+                    for (DrawableItem di : sc.load(chooser.getSelectedFile().getAbsolutePath())) {
+                        canvas.addItem(di);
+                        //sc.save(allItems, chooser.getSelectedFile().getAbsolutePath());
+                    }
+                }
+
+            }
+        };
+        loadButton.setAction(loadCanvas);
+
         oneButton = new JToggleButton();
 
         oneButton.setSelected(
@@ -249,6 +275,7 @@ public class GraphicalEditor extends JFrame {
         setToggleButtonImage("/4s.gif", fourButton);
         setButtonImage("/addPanel.png", addPanel);
         setButtonImage("/save-icon.png", saveButton);
+        setButtonImage("/load.png", loadButton);
 
         AbstractAction undoAction = new AbstractAction() {
             @Override
@@ -402,6 +429,7 @@ public class GraphicalEditor extends JFrame {
         canvasOpsPanel.setLayout(new FlowLayout());
         canvasOpsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         canvasOpsPanel.setPreferredSize(new Dimension((5 * width) / 6, height / 12));
+        canvasOpsPanel.add(loadButton);
         canvasOpsPanel.add(saveButton);
         canvasOpsPanel.add(addPanel);
         canvasOpsPanel.add(oneButton);
@@ -535,11 +563,6 @@ public class GraphicalEditor extends JFrame {
                         mode = "Rectangle";
                     } else if (e.getKeyCode() == 17) {
                         mode = "Select/Move";
-                    } else if (e.getKeyCode() == 65) {
-                        // anchorP = gc.getDistinctivePoints(width, height);
-                        //dic.allign(canvas, gc, anchorP, width, height);
-                        gc.allign(true, canvas.getItems());
-                        gc.allign(false, canvas.getItems());
                     }
                     if (mode.equals("Select/Move")) {
                         if (e.getExtendedKeyCode() == 90) {
@@ -564,6 +587,11 @@ public class GraphicalEditor extends JFrame {
                         } else if (e.getExtendedKeyCode() == 37) { //left
                             ((Panel) selection).resize(-2, 0);
                             udc.saveResizeToUndo(selection);
+                        } else if (e.getKeyCode() == 65) {
+                        // anchorP = gc.getDistinctivePoints(width, height);
+                            //dic.allign(canvas, gc, anchorP, width, height);
+                            gc.allign(true, canvas.getItems());
+                            gc.allign(false, canvas.getItems());
                         }
 
                     }

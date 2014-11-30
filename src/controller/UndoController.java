@@ -60,6 +60,7 @@ public class UndoController {
      */
     public boolean undoProcess(PersistentCanvas canvas) {
         ArrayList<UndoableItem> toUndo = this.undoFunction();
+        boolean toret = false;
         if (toUndo != null) {
             if (toUndo.get(0).isLayer()) {
 
@@ -105,7 +106,7 @@ public class UndoController {
                             ((PathItem) ui.getDitem()).setHidden(true);
 
                         } else {
-                            return true;
+                            toret = true;
                         }
                     }
                 } else if (toUndo.get(0).getActionType() == 3) {
@@ -122,7 +123,7 @@ public class UndoController {
                 }
             }
         }
-        return false;
+        return toret;
     }
 
     /**
@@ -132,6 +133,8 @@ public class UndoController {
      */
     public boolean redoProcess(PersistentCanvas canvas) {
         ArrayList<UndoableItem> toUndo = this.redoFunction();
+        boolean toret = false;
+
         if (toUndo != null) {
             if (toUndo.get(0).isLayer()) {
 
@@ -174,7 +177,7 @@ public class UndoController {
                             ((PathItem) ui.getDitem()).setHidden(true);
 
                         } else {
-                            return true;
+                            toret = true;
                         }
                     }
                 } else if (toUndo.get(0).getActionType() == 3) {
@@ -189,7 +192,7 @@ public class UndoController {
                 }
             }
         }
-        return false;
+        return toret;
     }
 
     /**
