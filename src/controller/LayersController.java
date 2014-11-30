@@ -6,6 +6,7 @@
 package controller;
 
 import UI.PersistentCanvas;
+import java.io.Serializable;
 import models.Layer;
 import models.Panel;
 import models.PathItem;
@@ -15,7 +16,7 @@ import models.PathItem;
  *
  * @author Osman
  */
-public class LayersController {
+public class LayersController implements Serializable{
 
     /**
      * add drawn item to layer

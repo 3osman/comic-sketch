@@ -58,7 +58,7 @@ public class UndoController {
      *
      * @param canvas canvas to draw/delete/move/resize the popped item in
      */
-    public void undoProcess(PersistentCanvas canvas) {
+    public boolean undoProcess(PersistentCanvas canvas) {
         ArrayList<UndoableItem> toUndo = this.undoFunction();
         if (toUndo != null) {
             if (toUndo.get(0).isLayer()) {
@@ -97,12 +97,15 @@ public class UndoController {
                             canvas.addItem(ui.getDitem());
                         }
                     }
+                    return false;
                 } else if (toUndo.get(0).getActionType() == 0) {
                     for (UndoableItem ui : toUndo) {
                         canvas.removeItem(ui.getDitem());
                         if (ui.getDitem() instanceof PathItem) {
                             ((PathItem) ui.getDitem()).setHidden(true);
 
+                        } else {
+                            return true;
                         }
                     }
                 } else if (toUndo.get(0).getActionType() == 3) {
@@ -119,6 +122,7 @@ public class UndoController {
                 }
             }
         }
+        return false;
     }
 
     /**
@@ -126,7 +130,7 @@ public class UndoController {
      *
      * @param canvas canvas to draw/delete/move/resize the popped item in
      */
-    public void redoProcess(PersistentCanvas canvas) {
+    public boolean redoProcess(PersistentCanvas canvas) {
         ArrayList<UndoableItem> toUndo = this.redoFunction();
         if (toUndo != null) {
             if (toUndo.get(0).isLayer()) {
@@ -169,6 +173,8 @@ public class UndoController {
 
                             ((PathItem) ui.getDitem()).setHidden(true);
 
+                        } else {
+                            return true;
                         }
                     }
                 } else if (toUndo.get(0).getActionType() == 3) {
@@ -183,6 +189,7 @@ public class UndoController {
                 }
             }
         }
+        return false;
     }
 
     /**

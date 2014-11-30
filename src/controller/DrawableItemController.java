@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import java.awt.Rectangle;
+import java.io.Serializable;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -35,7 +36,7 @@ import models.PathItem;
  * Controller for drawable items (Panels, Lines)
  * @author Osman
  */
-public class DrawableItemController {
+public class DrawableItemController implements Serializable{
    
     
 

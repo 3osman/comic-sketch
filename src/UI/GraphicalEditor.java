@@ -253,8 +253,12 @@ public class GraphicalEditor extends JFrame {
         AbstractAction undoAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                udc.undoProcess(canvas);
-                resetLayerPanel((Panel) selection);
+
+                if (!udc.undoProcess(canvas) && selection != null) {
+                    resetLayerPanel((Panel) selection);
+                } else {
+                    emptyLayerPanel();
+                }
 
             }
         };
@@ -532,15 +536,19 @@ public class GraphicalEditor extends JFrame {
                     } else if (e.getKeyCode() == 17) {
                         mode = "Select/Move";
                     } else if (e.getKeyCode() == 65) {
-                       // anchorP = gc.getDistinctivePoints(width, height);
+                        // anchorP = gc.getDistinctivePoints(width, height);
                         //dic.allign(canvas, gc, anchorP, width, height);
                         gc.allign(true, canvas.getItems());
                         gc.allign(false, canvas.getItems());
                     }
                     if (mode.equals("Select/Move")) {
                         if (e.getExtendedKeyCode() == 90) {
-                            udc.undoProcess(canvas);
-                            resetLayerPanel((Panel) selection);
+
+                            if (!udc.undoProcess(canvas) && selection != null) {
+                                resetLayerPanel((Panel) selection);
+                            } else {
+                                emptyLayerPanel();
+                            }
                         } else if (e.getExtendedKeyCode() == 89) {
                             udc.redoProcess(canvas);
                             resetLayerPanel((Panel) selection);
@@ -913,7 +921,7 @@ public class GraphicalEditor extends JFrame {
                         panel2.add(label);
                     }
                     panel2.add(panel3);
-                   JSeparator separator1 = new JSeparator(JSeparator.HORIZONTAL);
+                    JSeparator separator1 = new JSeparator(JSeparator.HORIZONTAL);
                     Dimension size = new Dimension(
                             separator1.getMaximumSize().width,
                             separator1.getMaximumSize().height);
