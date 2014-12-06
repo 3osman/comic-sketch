@@ -112,6 +112,7 @@ public class GraphicalEditor extends JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
 
         pane = getContentPane();
 
@@ -142,13 +143,14 @@ public class GraphicalEditor extends JFrame {
                 chooser.addChoosableFileFilter(new FileNameExtensionFilter("Comico", SavingController.EXTENSION));
                 //    
                 if (chooser.showSaveDialog(canvas) == JFileChooser.APPROVE_OPTION) {
-                    BufferedImage image = new BufferedImage(canvas.getWidth(), canvas.getHeight(), BufferedImage.TYPE_INT_ARGB);
-                    Graphics g = image.getGraphics();
+                   // BufferedImage image = new BufferedImage(canvas.getWidth(), canvas.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                   // Graphics g = image.getGraphics();
 
-                    canvas.paint(g);
+                 //   canvas.paint(g);
 
                     // try {
                     //  ImageIO.write(image, "png", new File(chooser.getSelectedFile() + ".png"));
+                    select(null);
                     ArrayList<DrawableItem> allItems = canvas.getItems();
                         //====================================
                     //+++++++++++++++++++++++++++++++++++
@@ -588,7 +590,7 @@ public class GraphicalEditor extends JFrame {
                             ((Panel) selection).resize(-2, 0);
                             udc.saveResizeToUndo(selection);
                         } else if (e.getKeyCode() == 65) {
-                        // anchorP = gc.getDistinctivePoints(width, height);
+                            // anchorP = gc.getDistinctivePoints(width, height);
                             //dic.allign(canvas, gc, anchorP, width, height);
                             gc.allign(true, canvas.getItems());
                             gc.allign(false, canvas.getItems());
@@ -798,6 +800,7 @@ public class GraphicalEditor extends JFrame {
      * Empties the panel of the layers, called when nothing is selected
      */
     private void emptyLayerPanel() {
+
         pane.remove(panel2);
         pane.remove(scroller);
         panel2.removeAll();
@@ -815,7 +818,10 @@ public class GraphicalEditor extends JFrame {
         panel2.add(buttonspanel);
 
         pane.add(panel2);
-        pack();
+        //this.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
+
+        //pack();
+        validate();
         repaint();
 
     }
@@ -826,6 +832,7 @@ public class GraphicalEditor extends JFrame {
      * @param p selected panel
      */
     private void resetLayerPanel(Panel p) {
+
         pane.remove(panel2);
         pane.remove(scroller);
         panel2.removeAll();
@@ -964,8 +971,12 @@ public class GraphicalEditor extends JFrame {
         pane.add(panel2);
         scroller = new JScrollPane(panel2);
         pane.add(scroller, BorderLayout.CENTER);
-        pack();
+        //this.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
+
+        //pack();
+        validate();
         repaint();
+
     }
 
     /**
@@ -1063,6 +1074,7 @@ public class GraphicalEditor extends JFrame {
 
     public static void main(String[] args) {
         GraphicalEditor editor = new GraphicalEditor(1500, 1000);
+
         editor.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
