@@ -19,16 +19,18 @@ import java.util.ArrayList;
  * @author Osman
  */
 public class Panel extends DrawableItem {
-
+    
     Point firstpoint;
-    ArrayList<Layer> layers;
+    ArrayList<PathItem> lines;
+    Layer parentLayer;
+    
     private Point initialPoint;
     private Point initialResizePoint;
     private int initialWidth;
     private int initialHeight;
     Rectangle firstCorner;
     Rectangle secondCorner;
-    LayersController lc = new LayersController();
+    //LayersController lc = new LayersController();
     Rectangle thirdCorner;
     Rectangle fourthCorner;
     Point anchor;
@@ -41,26 +43,29 @@ public class Panel extends DrawableItem {
      * @param f Fill color
      * @param p Starting point
      */
-    public Panel(PersistentCanvas c, Color o, Color f, Point p) {
+    public Panel(PersistentCanvas c, Color o, Color f, Point p, Layer parentL) {
         super(c, o, f);
         type = 0;
-        layers = new ArrayList<>();
-        layers.add(new Layer(this, true));
-        Layer l = new Layer(this, false);
-        new Layer(this, false);
-        lc.setActiveLayer(l, true);
+        lines = new ArrayList<>();
+        //layers.add(new Layer(this, true));
+        if (parentL != null) {
+            parentL.addPanelToLayer(this);
+            parentLayer = parentL;
+        }
+        // lc.setActiveLayer(l, true);
 
         shape = new Rectangle(p.x, p.y, 0, 0);
         firstpoint = p;
         updateCornerRects();
     }
-
+    
     public Panel(Panel other) {
         super(other.canvas, other.outline, other.fill);
         shape = new Rectangle((Rectangle) other.shape);
         type = 0;
         isSelected = false;
-        layers = other.layers;
+        lines = other.lines;
+        parentLayer = other.parentLayer;
         firstpoint = other.firstpoint;
     }
 
@@ -96,7 +101,9 @@ public class Panel extends DrawableItem {
     public void move(int dx, int dy) {
         ((Rectangle) shape).x += dx;
         ((Rectangle) shape).y += dy;
-
+        for (PathItem pi : this.getLines()) {
+            pi.move(dx, dy);
+        }
         updateCornerRects();
         canvas.repaint();
     }
@@ -116,7 +123,7 @@ public class Panel extends DrawableItem {
         ((Rectangle) shape).width += width;
         updateCornerRects();
         canvas.repaint();
-
+        
     }
 
     /**
@@ -130,7 +137,7 @@ public class Panel extends DrawableItem {
         ((Rectangle) shape).y = y;
         updateCornerRects();
         canvas.repaint();
-
+        
     }
 
     /**
@@ -166,20 +173,20 @@ public class Panel extends DrawableItem {
      * @return point of Knob
      */
     public Point getKnobContainingPoint(Point pt) {
-
+        
         if (firstCorner.contains(pt)) {
             return new Point(((Rectangle) shape).x + ((Rectangle) shape).width, ((Rectangle) shape).y + ((Rectangle) shape).height);
-
+            
         } else if (secondCorner.contains(pt)) {
             return new Point(((Rectangle) shape).x, ((Rectangle) shape).y + ((Rectangle) shape).height);
         } else if (thirdCorner.contains(pt)) {
             return new Point(((Rectangle) shape).x, ((Rectangle) shape).y);
-
+            
         } else if (fourthCorner.contains(pt)) {
             return new Point(((Rectangle) shape).x + ((Rectangle) shape).width, ((Rectangle) shape).y);
         }
         return null;
-
+        
     }
 
     /**
@@ -203,89 +210,97 @@ public class Panel extends DrawableItem {
     public Rectangle getFirstCorner() {
         return firstCorner;
     }
-
+    
     public Point getAnchor() {
         return anchor;
     }
-
+    
     public void setAnchor(Point anchor) {
         this.anchor = anchor;
     }
-
+    
     public void setFirstCorner(Rectangle firstCorner) {
         this.firstCorner = firstCorner;
     }
-
+    
     public Rectangle getSecondCorner() {
         return secondCorner;
     }
-
+    
     public void setSecondCorner(Rectangle secondCorner) {
         this.secondCorner = secondCorner;
     }
-
+    
     public Rectangle getThirdCorner() {
         return thirdCorner;
     }
-
+    
     public void setThirdCorner(Rectangle thirdCorner) {
         this.thirdCorner = thirdCorner;
     }
-
+    
     public Rectangle getFourthCorner() {
         return fourthCorner;
     }
-
+    
     public void setFourthCorner(Rectangle fourthCorner) {
         this.fourthCorner = fourthCorner;
     }
-
+    
     public int getInitialWidth() {
         return initialWidth;
     }
-
+    
     public void setInitialWidth(int initialWidth) {
         this.initialWidth = initialWidth;
     }
-
+    
     public int getInitialHeight() {
         return initialHeight;
     }
-
+    
     public void setInitialHeight(int initialHeight) {
         this.initialHeight = initialHeight;
     }
-
+    
     public Point getInitialPoint() {
         return initialPoint;
     }
-
+    
     public Point getInitialResizePoint() {
         return initialResizePoint;
     }
-
+    
     public void setInitialResizePoint(Point initialResizePoint) {
         this.initialResizePoint = initialResizePoint;
     }
-
+    
     public void setInitialPoint(Point initialPoint) {
         this.initialPoint = initialPoint;
     }
-
+    
     public Point getFirstpoint() {
         return firstpoint;
     }
-
-    public ArrayList<Layer> getLayers() {
-        return layers;
+    
+    public ArrayList<PathItem> getLines() {
+        return lines;
     }
-
-    public void setLayers(ArrayList<Layer> layers) {
-        this.layers = layers;
+    
+    public void setLines(ArrayList<PathItem> lines) {
+        this.lines = lines;
     }
-
-    public void addToLayers(Layer l) {
-        layers.add(l);
+    
+    public void addToLines(PathItem l) {
+        lines.add(l);
     }
-
+    
+    public Layer getParentLayer() {
+        return parentLayer;
+    }
+    
+    public void setParentLayer(Layer parentLayer) {
+        this.parentLayer = parentLayer;
+    }
+    
 }

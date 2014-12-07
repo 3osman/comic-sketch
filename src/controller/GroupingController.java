@@ -94,9 +94,7 @@ public class GroupingController {
                     //animate the view
 
                     ((Panel) (di)).move(horizontal ? 0 : nearDifference, horizontal ? nearDifference : 0);
-                    for (Layer la : ((Panel) di).getLayers()) {
-                        la.moveLayer(horizontal ? 0 : nearDifference, horizontal ? nearDifference : 0);
-                    }
+                        //la.moveLayer(horizontal ? 0 : nearDifference, horizontal ? nearDifference : 0);
 
                     //at the end update the values for all the y1 not in the first round
                     value[0] = value[3];

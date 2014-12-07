@@ -72,11 +72,11 @@ public class PersistentCanvas extends Component {
         }
         items.add(item);
 
-        if (item instanceof PathItem) {
+        /*    if (item instanceof PathItem) {
 
-            ((PathItem) item).getLayer().setActive(true);
+         ((PathItem) item).getLayer().setActive(true);
 
-        }
+         }*/
         repaint();
         return item;
     }
@@ -92,14 +92,15 @@ public class PersistentCanvas extends Component {
         }
         if (item instanceof PathItem) {
             boolean active = false;
-            for (PathItem pi : ((PathItem) item).getLayer().getDrawn()) {
-                if (!pi.isHidden()) {
-                    active = true;
+            if (((PathItem) item).getPanel() != null) {
+                for (PathItem pi : ((PathItem) item).getPanel().getLines()) {
+                    if (!pi.isHidden()) {
+                        active = true;
+                    }
                 }
             }
 
-            ((PathItem) item).getLayer().setActive(active);
-
+           // ((PathItem) item).getLayer().setActive(active);
         }
         items.remove(item);
         repaint();
@@ -133,7 +134,6 @@ public class PersistentCanvas extends Component {
         }
     }
 
-   
     /**
      * Returns all items in canvas
      *

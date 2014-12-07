@@ -16,8 +16,8 @@ import java.util.ArrayList;
  */
 public class Layer implements Serializable{
 
-    ArrayList<PathItem> drawn;
-    Panel parentPanel;
+    ArrayList<DrawableItem> ditems;
+    
     boolean isBlueLayer;
     boolean active;
     boolean deleted;
@@ -29,14 +29,11 @@ public class Layer implements Serializable{
      * @param p panel that layer belongs to
      * @param isB Blue ink layer or not
      */
-    public Layer(Panel p, boolean isB) {
-        this.parentPanel = p;
-        if (p != null && isB == false) {
-            this.parentPanel.addToLayers(this);
-        }
-        this.drawn = new ArrayList<>();
+    public Layer(boolean isB) {
+       
+        this.ditems = new ArrayList<>();
         this.isBlueLayer = isB;
-        this.active = true;
+        this.active = false;
         this.hidden = false;
         this.deleted = false;
     }
@@ -47,7 +44,7 @@ public class Layer implements Serializable{
      * @param y
      */
     public void moveLayer(int x, int y) {
-        for (PathItem pi : this.drawn) {
+        for (DrawableItem pi : this.ditems) {
             pi.move(x, y);
         }
 
@@ -58,8 +55,13 @@ public class Layer implements Serializable{
      *
      * @param pi Curve to be added
      */
-    public void addObjectToLayer(PathItem pi) {
-        this.drawn.add(pi);
+    public void addPanelToLayer(Panel pi) {
+        this.ditems.add(pi);
+    }
+    
+    
+    public void addItemToLayer(PathItem pi) {
+        this.ditems.add(pi);
     }
     //Setters and getters 
     //===================
@@ -94,22 +96,15 @@ public class Layer implements Serializable{
         this.isBlueLayer = isBlueLayer;
     }
 
-    public ArrayList<PathItem> getDrawn() {
-        return drawn;
+    public ArrayList<DrawableItem> getDrawable() {
+        return ditems;
     }
 
-    public void setDrawn(ArrayList<PathItem> drawn) {
-        this.drawn = drawn;
+    public void setDrawable(ArrayList<DrawableItem> drawn) {
+        this.ditems = drawn;
     }
 
-    public Panel getParentPanel() {
-        return parentPanel;
-    }
-
-    public void setParentPanel(Panel parentPanel) {
-        this.parentPanel = parentPanel;
-    }
-
+    
     
  
 

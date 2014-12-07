@@ -18,7 +18,7 @@ import java.awt.geom.GeneralPath;
  */
 public class PathItem extends DrawableItem {
 
-    protected Layer layer;
+    protected Panel panel;
     int thickness;
     Point firstpoint;
     boolean hidden;
@@ -33,14 +33,16 @@ public class PathItem extends DrawableItem {
      * @param p Current end
      * @param l Layer it belongs to
      */
-    public PathItem(PersistentCanvas c, Color o, Color f, Point p, Layer l) {
+    public PathItem(PersistentCanvas c, Color o, Color f, Point p, Panel l) {
         super(c, o, f);
-        layer = l;
+        panel = l;
         type = 1;
         thickness = 2;
         shape = new GeneralPath();
         ((GeneralPath) shape).moveTo(p.x, p.y);
-        l.addObjectToLayer(this);
+        if (l != null) {
+            l.addToLines(this);
+        }
         hidden = false;
         hiddenWithLayer = false;
         firstpoint = p;
@@ -50,7 +52,7 @@ public class PathItem extends DrawableItem {
         super(other.canvas, other.outline, other.fill);
         //shape = new Rectangle((Rectangle) other.shape);
         isSelected = false;
-        layer = other.layer;
+        panel = other.panel;
         type = 1;
         hidden = other.hidden;
         firstpoint = other.firstpoint;
@@ -100,12 +102,12 @@ public class PathItem extends DrawableItem {
         this.thickness = thickness;
     }
 
-    public Layer getLayer() {
-        return layer;
+    public Panel getPanel() {
+        return panel;
     }
 
-    public void setLayer(Layer layer) {
-        this.layer = layer;
+    public void setPanel(Panel p) {
+        this.panel = p;
     }
 
     public boolean isHiddenWithLayer() {

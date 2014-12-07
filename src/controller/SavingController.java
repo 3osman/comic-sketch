@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import models.DrawableItem;
+import models.Layer;
 
 /**
  *
@@ -22,7 +23,7 @@ public class SavingController {
 
     public static final String EXTENSION = "comico";
 
-    public boolean save(ArrayList<DrawableItem> drawings, String name) {
+    public boolean save(ArrayList<Layer> drawings, String name) {
         //todo
 
         //open the file
@@ -37,7 +38,7 @@ public class SavingController {
             FileOutputStream saveFile = new FileOutputStream(file);
             ObjectOutputStream saveObject = new ObjectOutputStream(saveFile);
 
-            for (DrawableItem item : drawings) {
+            for (Layer item : drawings) {
                 saveObject.writeObject(item);
             }
             saveObject.close();
@@ -50,9 +51,9 @@ public class SavingController {
 
     }
 
-    public ArrayList<DrawableItem> load(String path) {
+    public ArrayList<Layer> load(String path) {
         //to-do
-        ArrayList<DrawableItem> itemList = new ArrayList<>();
+        ArrayList<Layer> itemList = new ArrayList<>();
 
         try {
             FileInputStream inputFile = new FileInputStream(path);
@@ -60,8 +61,8 @@ public class SavingController {
 
             Object item = null;
             while ((item = inputObject.readObject()) != null) {
-                if (item instanceof DrawableItem) {
-                    itemList.add((DrawableItem) item);
+                if (item instanceof Layer) {
+                    itemList.add((Layer) item);
                 }
             }
         } catch (EOFException e) {
