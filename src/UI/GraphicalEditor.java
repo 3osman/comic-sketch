@@ -438,7 +438,7 @@ public class GraphicalEditor extends JFrame {
         //==========================================
         canvasPanel.setLayout(new BoxLayout(canvasPanel, BoxLayout.PAGE_AXIS));
         canvasPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        canvasPanel.setPreferredSize(new Dimension((5 * width) / 6, height));
+        //canvasPanel.setPreferredSize(new Dimension((5 * width) / 6, height));
 
         JPanel canvasOpsPanel = new JPanel();
         canvasOpsPanel.setLayout(new FlowLayout());
@@ -461,7 +461,7 @@ public class GraphicalEditor extends JFrame {
 
         canvas = new PersistentCanvas(dic);
         canvas.setBackground(Color.WHITE);
-        canvas.setPreferredSize(new Dimension((width - 5 * (width / 6)), height));
+        canvas.setPreferredSize(new Dimension(1200,900));
         canvasPanel.add(canvasOpsPanel, BorderLayout.PAGE_START);
         JSeparator separator2 = new JSeparator(JSeparator.HORIZONTAL);
         Dimension size2 = new Dimension(
@@ -469,7 +469,7 @@ public class GraphicalEditor extends JFrame {
                 separator2.getMaximumSize().height);
         separator2.setMaximumSize(size2);
         canvasPanel.add(separator2);
-        canvasPanel.add(canvas, BorderLayout.CENTER);
+        canvasPanel.add(new JScrollPane(canvas), BorderLayout.CENTER);
         pane.add(canvasPanel);
         globalLayer = new Layer(false);
         globalLayer.setActive(true);
