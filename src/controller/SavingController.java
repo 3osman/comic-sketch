@@ -14,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import models.DrawableItem;
 import models.Layer;
+import models.Variables;
 
 /**
  *
@@ -21,14 +22,14 @@ import models.Layer;
  */
 public class SavingController {
 
-    public static final String EXTENSION = "comico";
+   
 
     public boolean save(ArrayList<Layer> drawings, String name) {
         //todo
 
         //open the file
         try {
-            File file = new File(name + "." + EXTENSION);
+            File file = new File(name + "." + Variables.EXTENSION);
 
             // if file doesn't exists, then create it
             if (!file.exists()) {

@@ -39,6 +39,7 @@ public class PathItem extends DrawableItem {
         type = 1;
         thickness = 2;
         shape = new GeneralPath();
+        
         ((GeneralPath) shape).moveTo(p.x, p.y);
         if (l != null) {
             l.addToLines(this);

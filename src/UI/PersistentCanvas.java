@@ -48,16 +48,31 @@ public class PersistentCanvas extends Component {
 
         for (DrawableItem i : items) {
             if (i instanceof Panel) {
+               // int[] ind = {0};
                 Point anchor = ((Panel) i).getKnobContainingPoint(p);
 
                 if (dic.contains(i, p) || anchor != null) {
                     ((Panel) i).setAnchor(anchor);
+                    //setAnchorForSelected(i, allSelected, ind);
                     item = i;
                     break;
                 }
             }
         }
         return item;
+    }
+
+    public void setAnchorForSelected(DrawableItem di, ArrayList<DrawableItem> allSelected, int[] indexOfAnchor) {
+
+        for (DrawableItem i : allSelected) {
+            if (i instanceof Panel && !di.equals(i)) {
+
+                Point anchor = ((Panel) i).getKnobFromIndex(indexOfAnchor[0]);
+
+                ((Panel) i).setAnchor(anchor);
+
+            }
+        }
     }
 
     /**
@@ -100,7 +115,7 @@ public class PersistentCanvas extends Component {
                 }
             }
 
-           // ((PathItem) item).getLayer().setActive(active);
+            // ((PathItem) item).getLayer().setActive(active);
         }
         items.remove(item);
         repaint();

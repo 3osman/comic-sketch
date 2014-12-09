@@ -12,7 +12,9 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
 import models.DrawableItem;
@@ -27,8 +29,9 @@ import models.PathItem;
 
 public class ThumbNailCanvas extends Component {
 
-    private ArrayList<GeneralPath> items;
+    private ArrayList<Shape> items;
     private DrawableItemController dic;
+   // private ArrayList<Rectangle> panels;
 
     /**
      * Constructor for the canvas
@@ -36,7 +39,8 @@ public class ThumbNailCanvas extends Component {
      * @param dicon Controller for drawing objects
      */
     ThumbNailCanvas(DrawableItemController dicon) {
-        items = new ArrayList<GeneralPath>();
+        items = new ArrayList<>();
+        //panels =new ArrayList<>();
         dic = dicon;
     }
 
@@ -46,7 +50,7 @@ public class ThumbNailCanvas extends Component {
      * @param item item to add
      * @return the same item, null otherwise
      */
-    public GeneralPath addItem(GeneralPath item) {
+    public Shape addItem(Shape item) {
         if (item == null) {
             return null;
         }
@@ -71,10 +75,11 @@ public class ThumbNailCanvas extends Component {
         g.setStroke(new BasicStroke(2));
 
         
-        for (GeneralPath gp : items) {
+        for (Shape gp : items) {
             g.setColor(Color.BLACK);
             g.draw(gp);
         }
+       
 
     }
 

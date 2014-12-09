@@ -19,7 +19,8 @@ import java.util.ArrayList;
 public class ThumbnailLayer {
 
     ArrayList<GeneralPath> lines;
-    Panel p;
+    ArrayList<Rectangle> panels;
+    // Panel p;
     Layer l;
 
     public ArrayList<GeneralPath> getLines() {
@@ -28,20 +29,21 @@ public class ThumbnailLayer {
 
     public void setLines() {
         lines = new ArrayList<>();
-        for (PathItem pi : this.p.getLines()) {
-            if (!pi.hidden) {
+        panels = new ArrayList<>();
+        for (DrawableItem pi : this.l.getDrawable()) {
+            if (pi instanceof PathItem && !((PathItem) pi).hidden) {
                 lines.add((GeneralPath) ((GeneralPath) (pi.getShape())).clone());
             }
         }
 
     }
 
-    public Panel getP() {
-        return p;
+    public ArrayList<Rectangle> getPanels() {
+        return panels;
     }
 
-    public void setP(Panel p) {
-        this.p = p;
+    public void setPanels(ArrayList<Rectangle> panels) {
+        this.panels = panels;
     }
 
     public Layer getL() {
@@ -57,19 +59,48 @@ public class ThumbnailLayer {
      *
      * @return Point of anchor
      */
-    public Point getPanelAnchor() {
-        return new Point(((Rectangle) (this.p.getShape())).x, ((Rectangle) (this.p.getShape())).y);
+    public Point getPanelAnchor(Panel p) {
+        return new Point(((Rectangle) (p.getShape())).x, ((Rectangle) (p.getShape())).y);
     }
 
     /**
      * Translates all drawings to 0,0
      */
     public void translateAll() {
-        Point p = getPanelAnchor();
-        AffineTransform at = new AffineTransform();
-        at.translate(p.x * -1, p.y * -1);
-        for (GeneralPath pp : this.lines) {
-            pp.transform(at);
+
+        for (DrawableItem pa : l.getDrawable()) {
+            if (pa instanceof Panel) {
+                Point p = getPanelAnchor((Panel) pa);
+                double hfactor = (p.x - ((Variables.THUMBNAIL_WIDTH * p.x) / Variables.CANVAS_WIDTH)) * -1;
+                double wfactor = (p.y - ((Variables.THUMBNAIL_HEIGHT * p.y) / Variables.CANVAS_HEIGHT)) * -1;
+                Rectangle newRect = (Rectangle) ((Rectangle) ((Panel) pa).getShape()).clone();
+                newRect.translate((int) hfactor, (int) wfactor);
+                panels.add(newRect);
+                for (GeneralPath pp : this.lines) {
+                  //  hfactor = (pp.getCurrentPoint().getX() - ((150 * pp.getCurrentPoint().getX()) / Variables.CANVAS_WIDTH)) * -1;
+                    // wfactor = (pp.getCurrentPoint().getY() - ((150 * pp.getCurrentPoint().getY()) / Variables.CANVAS_HEIGHT)) * -1;
+                    AffineTransform at = new AffineTransform();
+                    at.translate(Variables.THUMBNAIL_WIDTH * pp.getCurrentPoint().getX() / Variables.CANVAS_WIDTH, Variables.THUMBNAIL_HEIGHT * pp.getCurrentPoint().getY() / Variables.CANVAS_HEIGHT);
+                    pp.transform(at);
+                }
+
+            } else if (l.isBlueLayer) {
+                if (((PathItem) pa).getPanel() != null) {
+
+                    Point p = getPanelAnchor(((PathItem) pa).getPanel());
+                    double hfactor = (p.x - ((Variables.THUMBNAIL_WIDTH * p.x) / Variables.CANVAS_WIDTH)) * -1;
+                    double wfactor = (p.y - ((Variables.THUMBNAIL_HEIGHT * p.y) / Variables.CANVAS_HEIGHT)) * -1;
+                    AffineTransform at = new AffineTransform();
+                    at.translate((int) hfactor, (int) wfactor);
+                    for (GeneralPath pp : this.lines) {
+                        // pp.getCurrentPoint();
+                        pp.transform(at);
+                    }
+                    // Rectangle newRect = (Rectangle) ((Rectangle) ((Panel) pa).getShape()).clone();
+                    //  newRect.translate(p.x * -1, p.y * -1);
+                    // panels.add(newRect);
+                }
+            }
         }
     }
 
@@ -80,17 +111,24 @@ public class ThumbnailLayer {
         double hfactor = 0.5;
         double wfactor = 0.5;
         try {
-            hfactor = 150.0 / ((Rectangle) (this.p.getShape())).height;
-            wfactor = 150.0 / ((Rectangle) (this.p.getShape())).width;
+            hfactor = Variables.THUMBNAIL_HEIGHT / Variables.CANVAS_HEIGHT;
+            wfactor = Variables.THUMBNAIL_WIDTH / Variables.CANVAS_WIDTH;
         } catch (Exception e) {
             hfactor = 0.5;
             wfactor = 0.5;
         }
-        AffineTransform at = new AffineTransform();
-        at.scale(wfactor, hfactor);
-        for (GeneralPath pp : this.lines) {
-            pp.transform(at);
-        }
+        for (GeneralPath pi : lines) {
 
+            AffineTransform at = new AffineTransform();
+            at.scale(wfactor, hfactor);
+
+            pi.transform(at);
+
+        }
+        for (Rectangle re : panels) {
+
+            re.resize((int) ((double) re.width * wfactor), (int) ((double) re.height * hfactor));
+
+        }
     }
 }
