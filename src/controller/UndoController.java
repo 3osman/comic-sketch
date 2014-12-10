@@ -88,7 +88,7 @@ public class UndoController {
             if (toUndo.get(0).getActionType() == 1) {
                 for (UndoableItem ui : toUndo) {
                     if (ui.getDitem() instanceof PathItem) {
-                        if (!((PathItem) ui.getDitem()).isHiddenWithLayer()) {
+                        if (!((PathItem) ui.getDitem()).isHiddenWithPanel()) {
                             canvas.addItem(ui.getDitem());
                         }
 
@@ -97,6 +97,9 @@ public class UndoController {
                     } else {
                         if ((!((Panel) ui.getDitem()).getParentLayer().isDeleted())) {
                             canvas.addItem(ui.getDitem());
+                            for (PathItem pi : ((Panel) ui.getDitem()).getLines()) {
+                                pi.setHiddenWithPanel(false);
+                            }
                         }
                     }
                 }
@@ -109,6 +112,9 @@ public class UndoController {
 
                     } else {
                         toret = true;
+                        for (PathItem pi : ((Panel) ui.getDitem()).getLines()) {
+                            pi.setHiddenWithPanel(true);
+                        }
                     }
                 }
             } else if (toUndo.get(0).getActionType() == 3) {
@@ -162,13 +168,16 @@ public class UndoController {
             if (toUndo.get(0).getActionType() == 0) {
                 for (UndoableItem ui : toUndo) {
                     if (ui.getDitem() instanceof PathItem) {
-                        if (!((PathItem) ui.getDitem()).isHiddenWithLayer()) {
+                        if (!((PathItem) ui.getDitem()).isHiddenWithPanel()) {
                             canvas.addItem(ui.getDitem());
                         }
                         ((PathItem) ui.getDitem()).setHidden(false);
                     } else {
                         if ((!((Panel) ui.getDitem()).getParentLayer().isDeleted())) {
                             canvas.addItem(ui.getDitem());
+                            for (PathItem pi : ((Panel) ui.getDitem()).getLines()) {
+                                pi.setHiddenWithPanel(false);
+                            }
                         }
                     }
                 }
@@ -182,12 +191,17 @@ public class UndoController {
 
                     } else {
                         toret = true;
+                        for (PathItem pi : ((Panel) ui.getDitem()).getLines()) {
+                            pi.setHiddenWithPanel(true);
+                        }
                     }
                 }
             } else if (toUndo.get(0).getActionType() == 3) {
                 for (UndoableItem ui : toUndo) {
-                    Panel temp = (Panel) ui.getDitem();
-                    (temp).resize(toUndo.get(0).getX() * -1, toUndo.get(0).getY() * -1);
+                    if (ui.getDitem() instanceof Panel) {
+                        Panel temp = (Panel) ui.getDitem();
+                        (temp).resize(toUndo.get(0).getX() * -1, toUndo.get(0).getY() * -1);
+                    }
                 }
             } else {
                 for (UndoableItem ui : toUndo) {

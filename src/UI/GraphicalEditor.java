@@ -20,7 +20,10 @@ import java.awt.Image;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
@@ -142,34 +145,7 @@ public class GraphicalEditor extends JFrame {
         AbstractAction saveCanvas = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser chooser = new JFileChooser();
-                chooser.setCurrentDirectory(new java.io.File("."));
-                chooser.setDialogTitle("Save As File");
-
-                chooser.setAcceptAllFileFilterUsed(false);
-                chooser.addChoosableFileFilter(new FileNameExtensionFilter("Comico", Variables.EXTENSION));
-                //    
-                if (chooser.showSaveDialog(canvas) == JFileChooser.APPROVE_OPTION) {
-                   // BufferedImage image = new BufferedImage(canvas.getWidth(), canvas.getHeight(), BufferedImage.TYPE_INT_ARGB);
-                    // Graphics g = image.getGraphics();
-
-                    //   canvas.paint(g);
-                    // try {
-                    //  ImageIO.write(image, "png", new File(chooser.getSelectedFile() + ".png"));
-                    select(null, false);
-                    ArrayList<DrawableItem> allItems = canvas.getItems();
-                        //====================================
-                    //+++++++++++++++++++++++++++++++++++
-
-                    //Call the function of save here
-                    sc.save(allLayers, chooser.getSelectedFile().getAbsolutePath());
-
-                    //++++++++++++++++++++++++++++++++++++++
-                    //=======================================
-                    // } catch (IOException ex) {
-                    //System.out.println("eror");
-                    // }
-                }
+                saveCanvasFn();
 
             }
         };
@@ -179,29 +155,7 @@ public class GraphicalEditor extends JFrame {
         AbstractAction loadCanvas = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser chooser = new JFileChooser();
-                chooser.setCurrentDirectory(new java.io.File("."));
-                chooser.setDialogTitle("Open File");
-
-                chooser.setAcceptAllFileFilterUsed(false);
-                chooser.addChoosableFileFilter(new FileNameExtensionFilter("Comico", Variables.EXTENSION));
-                //    
-                int result = chooser.showOpenDialog(canvas);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    canvas.clear();
-                    allLayers.clear();
-                    udc.clearAll();
-
-                    for (Layer di : sc.load(chooser.getSelectedFile().getAbsolutePath())) {
-                        // canvas.addItem(di);
-                        allLayers.add(di);
-                        for (DrawableItem dii : di.getDrawable()) {
-                            canvas.addItem(dii);
-                        }
-                        //sc.save(allItems, chooser.getSelectedFile().getAbsolutePath());
-                    }
-                }
-
+                loadCanvasFn();
             }
         };
         loadButton.setAction(loadCanvas);
@@ -461,7 +415,7 @@ public class GraphicalEditor extends JFrame {
 
         canvas = new PersistentCanvas(dic);
         canvas.setBackground(Color.WHITE);
-        canvas.setPreferredSize(new Dimension(1200,900));
+        canvas.setPreferredSize(new Dimension(1200, 900));
         canvasPanel.add(canvasOpsPanel, BorderLayout.PAGE_START);
         JSeparator separator2 = new JSeparator(JSeparator.HORIZONTAL);
         Dimension size2 = new Dimension(
@@ -565,6 +519,7 @@ public class GraphicalEditor extends JFrame {
                 .put(KeyStroke.getKeyStroke("DELETE"), "DELETE");
         canvasPanel.getActionMap()
                 .put("DELETE", deleteAction);
+
         canvasPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(KeyStroke.getKeyStroke("UP"), "UP");
         canvasPanel.getActionMap()
@@ -585,11 +540,13 @@ public class GraphicalEditor extends JFrame {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
                 if (e.getID() == KeyEvent.KEY_PRESSED) {
-
+                    //System.out.println(e.getExtendedKeyCode());
                     if (e.getKeyCode() == 18) {
                         mode = "Rectangle";
                     } else if (e.getKeyCode() == 17) {
                         mode = "Select/Move";
+                    } else if (e.getKeyCode() == 16) {
+                        mode = "Gesture";
                     }
                     if (mode.equals("Select/Move")) {
                         if (e.getExtendedKeyCode() == 90) {
@@ -620,11 +577,23 @@ public class GraphicalEditor extends JFrame {
                                 ((Panel) di).resize(-2, 0);
                             }
                             udc.saveResizeToUndo(selection);
-                        } else if (e.getKeyCode() == 65) {
-                            // anchorP = gc.getDistinctivePoints(width, height);
-                            //dic.allign(canvas, gc, anchorP, width, height);
+                        } else if (e.getKeyCode() == 65) {//select all
+
+                            for (DrawableItem di : canvas.getItems()) {
+                                if (di instanceof Panel) {
+
+                                    select(di, true);
+
+                                }
+                            }
+
+                        } else if (e.getKeyCode() == 76) { //allign
                             gc.allign(true, canvas.getItems());
                             gc.allign(false, canvas.getItems());
+                        } else if (e.getKeyCode() == 83) { //save
+                            saveCanvasFn();
+                        } else if (e.getKeyCode() == 79) { //open
+                            loadCanvasFn();
                         }
 
                     }
@@ -653,7 +622,7 @@ public class GraphicalEditor extends JFrame {
                 } else if (mode.equals("Res")) {
                     mode = "Path";
                     ((Panel) selection).setAnchor(null);
-                    
+
                 } else if (selection instanceof PathItem) {
                     selection = ((PathItem) selection).getPanel();
                     if (selection != null) {
@@ -789,7 +758,7 @@ public class GraphicalEditor extends JFrame {
                     selectionAll.clear();
                     select(selection, false);
                     ((Panel) selection).resize(((Panel) selection).getAnchor(), e.getPoint());
-                   
+
                     udc.saveResizeToUndo(selection);
                 } else {
                     selection.update(e.getPoint());
@@ -869,32 +838,73 @@ public class GraphicalEditor extends JFrame {
         setVisible(true);
     }
 
-    //functions for managing UI, not drawable items
-    /**
-     * Empties the panel of the layers, called when nothing is selected
-     */
-    private void emptyLayerPanel() {
+    public void loadCanvasFn() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new java.io.File("."));
+        chooser.setDialogTitle("Open File");
 
-        /* pane.remove(panel2);
-         pane.remove(scroller);
-         panel2.removeAll();
-         panel2 = new JPanel();
-         JPanel buttonspanel = new JPanel();
-         buttonspanel.setLayout(new FlowLayout());
-         buttonspanel.setPreferredSize(new Dimension(globalWidth / 6, globalHeight / 12));
-         panel2.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-         panel2.setPreferredSize(new Dimension(globalWidth / 6, globalHeight));
-         panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
-         buttonspanel.add(addLayer);
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter("Comico", Variables.EXTENSION));
+        //    
+        int result = chooser.showOpenDialog(canvas);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            canvas.clear();
+            allLayers.clear();
+            udc.clearAll();
 
-         addLayer.setEnabled(false);
+            for (Layer di : sc.load(chooser.getSelectedFile().getAbsolutePath())) {
+                // canvas.addItem(di);
+                allLayers.add(di);
+                for (DrawableItem dii : di.getDrawable()) {
+                    canvas.addItem(dii);
+                }
+                //sc.save(allItems, chooser.getSelectedFile().getAbsolutePath());
+            }
+        }
+    }
 
-         panel2.add(buttonspanel);
+    public void saveAsImage() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new java.io.File("."));
+        chooser.setDialogTitle("Save As File");
 
-         pane.add(panel2);
-       
-         validate();
-         repaint();*/
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter("Comico", Variables.EXTENSION));
+
+        if (chooser.showSaveDialog(canvas) == JFileChooser.APPROVE_OPTION) {
+            BufferedImage image = new BufferedImage(canvas.getWidth(), canvas.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics g = image.getGraphics();
+
+            canvas.paint(g);
+            try {
+                ImageIO.write(image, "png", new File(chooser.getSelectedFile() + ".png"));
+                select(null, false);
+                selectionAll = new ArrayList<>();
+
+            } catch (IOException ex) {
+                System.out.println("eror");
+            }
+        }
+    }
+
+    public void saveCanvasFn() {
+
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new java.io.File("."));
+        chooser.setDialogTitle("Save As File");
+
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter("Comico", Variables.EXTENSION));
+
+        if (chooser.showSaveDialog(canvas) == JFileChooser.APPROVE_OPTION) {
+
+            select(null, false);
+            selectionAll = new ArrayList<>();
+
+            sc.save(allLayers, chooser.getSelectedFile().getAbsolutePath());
+
+        }
+
     }
 
     /**
@@ -906,25 +916,35 @@ public class GraphicalEditor extends JFrame {
 
         pane.remove(panel2);
         pane.remove(scroller);
-        panel2.removeAll();
         panel2 = new JPanel();
         JPanel buttonspanel = new JPanel();
-        buttonspanel.setLayout(new GridLayout(1, 0));
-        //buttonspanel.setMaximumSize(new Dimension(100, 100));
-        //buttonspanel.setPreferredSize(new Dimension(globalWidth / 6, globalHeight / 12));
-        // panel2.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        //panel2.setPreferredSize(new Dimension(globalWidth / 6, globalHeight));
-        panel2.setLayout(new GridLayout(0, 1));
-        buttonspanel.add(addLayer);
+        buttonspanel.setLayout(new GridBagLayout());
+
+        panel2.setLayout(new GridBagLayout());
+
+        GridBagConstraints costraintsForButtonPanel = new GridBagConstraints();
+        GridBagConstraints costraintsForPanel2 = new GridBagConstraints();
+
+        costraintsForPanel2.fill = GridBagConstraints.BOTH;
+        costraintsForButtonPanel.gridx = 0;
+        costraintsForButtonPanel.gridy = 0;
+        buttonspanel.add(addLayer, costraintsForButtonPanel);
 
         addLayer.setEnabled(true);
 
-        buttonspanel.add(mergeLayer);
+        costraintsForButtonPanel.gridx = Variables.BUTTON_HEIGHT;
+        costraintsForButtonPanel.gridy = 0;
+        buttonspanel.add(mergeLayer, costraintsForButtonPanel);
         mergeLayer.setEnabled(true);
 
-        //mergeLayer.setPreferredSize(new Dimension(10, 10));
-        //   addLayer.setPreferredSize(new Dimension(10, 10));
-        panel2.add(buttonspanel);
+        costraintsForPanel2.anchor = GridBagConstraints.PAGE_START;
+        costraintsForPanel2.gridx = 0;
+        costraintsForPanel2.gridy = 0;
+        costraintsForPanel2.gridwidth = Variables.BUTTON_WIDHT;
+        costraintsForPanel2.gridheight = Variables.BUTTON_HEIGHT;
+        costraintsForPanel2.anchor = GridBagConstraints.CENTER;
+        panel2.add(buttonspanel, costraintsForPanel2);
+
         int i = 0;
         for (Layer l : allLayers) {
             if (i != 2) {
@@ -988,7 +1008,7 @@ public class GraphicalEditor extends JFrame {
                             l.setDeleted(true);
                             for (DrawableItem pi : l.getDrawable()) {
                                 if (pi instanceof PathItem) {
-                                    ((PathItem) pi).setHiddenWithLayer(true);
+                                    ((PathItem) pi).setHiddenWithPanel(true);
                                 }
                                 canvas.removeItem(pi);
                             }
@@ -1000,16 +1020,24 @@ public class GraphicalEditor extends JFrame {
                     if (i == 0 || i == 1) { //for blue and ground
                         deleteButton.setEnabled(false);
                     }
-                    // JPanel panel3 = new JPanel();
-                    //  panel3.setLayout(new GridLayout(1, 0));
-                    //panel3.setPreferredSize(new Dimension(200, 200));
 
                     JPanel panel4 = new JPanel();
-                    panel4.setLayout(new GridLayout(3, 1));//buttons for layer
-
-                    panel4.add(select);
-                    panel4.add(show);
-                    panel4.add(deleteButton);
+                    panel4.setLayout(new GridBagLayout());//buttons for layer
+                    costraintsForButtonPanel.gridheight = 1;
+                    costraintsForButtonPanel.gridwidth = 1;
+                    costraintsForButtonPanel.gridx = 0;
+                    costraintsForButtonPanel.gridy = 1;
+                    panel4.add(show, costraintsForButtonPanel);
+                    costraintsForButtonPanel.gridheight = 1;
+                    costraintsForButtonPanel.gridwidth = 1;
+                    costraintsForButtonPanel.gridx = 1;
+                    costraintsForButtonPanel.gridy = 1;
+                    panel4.add(deleteButton, costraintsForButtonPanel);
+                    costraintsForButtonPanel.gridheight = 1;
+                    costraintsForButtonPanel.gridwidth = 2;
+                    costraintsForButtonPanel.gridx = 0;
+                    costraintsForButtonPanel.gridy = 0;
+                    panel4.add(select, costraintsForButtonPanel);
 
                     JPanel panel5 = new JPanel();
                     //panel5.setPreferredSize(new Dimension(150, 100));
@@ -1037,18 +1065,63 @@ public class GraphicalEditor extends JFrame {
 
                     setButtonImage("/delete.png", deleteButton);
 
-                    //panel3.setPreferredSize(new Dimension(globalWidth / 6, globalHeight / 12));
                     if (i == 0) {
                         JLabel label = new JLabel("<html><b><font size=\"4\" color=\"0000ff\">Blue layer</font><b></html>");
-
-                        panel2.add(label);
+                        costraintsForPanel2.gridx = 0;
+                        costraintsForPanel2.gridy = Variables.BUTTON_HEIGHT;
+                        costraintsForPanel2.gridwidth = Variables.LABEL_WIDTH;
+                        costraintsForPanel2.gridheight = Variables.LABEL_HEIGHT;
+                        panel2.add(label, costraintsForPanel2);
                     } else if (i == 1) {
                         JLabel label = new JLabel("<html><b><font size=\"4\" color=\"000000\">Ground layer</font><b></html>");
-                        panel2.add(label);
+                        costraintsForPanel2.gridx = 0;
+                        costraintsForPanel2.gridy = Variables.BUTTON_HEIGHT + Variables.LABEL_HEIGHT + Variables.PANEL_4_HEIGHT + Variables.PANEL_5_HEIGHT + Variables.SEPARATOR_HEIGTH;
+                        costraintsForPanel2.gridwidth = Variables.LABEL_WIDTH;
+                        costraintsForPanel2.gridheight = Variables.LABEL_HEIGHT;
+                        panel2.add(label, costraintsForPanel2);
                     }
-                    panel2.add(panel5);
-                    panel2.add(panel4);//each layer}
-                    //panel2.add(panel3);
+
+                    costraintsForPanel2.gridx = 0;
+                    if (i == 0) {
+                        costraintsForPanel2.gridy = Variables.BUTTON_HEIGHT + Variables.LABEL_HEIGHT;
+                    } else {
+                        if (i == 1) {
+                            costraintsForPanel2.gridy = Variables.BUTTON_HEIGHT + Variables.LABEL_HEIGHT + Variables.PANEL_4_HEIGHT + Variables.PANEL_5_HEIGHT;
+                            costraintsForPanel2.gridheight = Variables.SEPARATOR_HEIGTH;
+                            costraintsForPanel2.gridwidth = Variables.SEPARATOR_WIDTH;
+                            costraintsForPanel2.insets = new Insets(10, 0, 0, 0);
+                            panel2.add(new JSeparator(), costraintsForPanel2);
+                            costraintsForPanel2.insets = new Insets(0, 0, 0, 0);
+                            costraintsForPanel2.gridy = Variables.BUTTON_HEIGHT + 2 * Variables.LABEL_HEIGHT + Variables.PANEL_4_HEIGHT + Variables.PANEL_5_HEIGHT + Variables.SEPARATOR_HEIGTH;
+                        } else {
+                            costraintsForPanel2.gridy = Variables.BUTTON_HEIGHT + 2 * Variables.LABEL_HEIGHT + 2 * Variables.PANEL_4_HEIGHT + 2 * Variables.PANEL_5_HEIGHT + Variables.SEPARATOR_HEIGTH + (i - 2) * (Variables.SEPARATOR_HEIGTH + Variables.PANEL_5_HEIGHT + Variables.PANEL_4_HEIGHT) + Variables.SEPARATOR_HEIGTH;
+                        }
+                    }
+                    costraintsForPanel2.gridwidth = Variables.PANEL_5_WIDTH;
+                    costraintsForPanel2.gridheight = Variables.PANEL_5_WIDTH;
+                    panel2.add(panel5, costraintsForPanel2);
+
+                    costraintsForPanel2.gridx = 0;
+                    if (i == 0) {
+                        costraintsForPanel2.gridy = Variables.BUTTON_HEIGHT + Variables.LABEL_HEIGHT + Variables.PANEL_5_HEIGHT;
+                    } else {
+                        if (i == 1) {
+                            costraintsForPanel2.gridy = Variables.BUTTON_HEIGHT + 2 * Variables.LABEL_HEIGHT + Variables.PANEL_4_HEIGHT + 2 * Variables.PANEL_5_HEIGHT + Variables.SEPARATOR_HEIGTH;
+                        } else {
+                            costraintsForPanel2.gridy = Variables.BUTTON_HEIGHT + 2 * Variables.LABEL_HEIGHT + 2 * Variables.PANEL_4_HEIGHT + 2 * Variables.PANEL_5_HEIGHT + 2 * Variables.SEPARATOR_HEIGTH + Variables.PANEL_5_HEIGHT + (i - 2) * (Variables.SEPARATOR_HEIGTH + Variables.PANEL_5_HEIGHT + Variables.PANEL_4_HEIGHT);
+                        }
+                    }
+                    costraintsForPanel2.gridwidth = Variables.PANEL_4_WIDTH;
+                    costraintsForPanel2.gridheight = Variables.PANEL_4_HEIGHT;
+                    panel2.add(panel4, costraintsForPanel2);
+                    if (i > 1) {
+                        costraintsForPanel2.gridy = Variables.BUTTON_HEIGHT + 2 * Variables.LABEL_HEIGHT + 2 * Variables.PANEL_4_HEIGHT + 2 * Variables.PANEL_5_HEIGHT + Variables.SEPARATOR_HEIGTH + (i - 2) * (Variables.SEPARATOR_HEIGTH + Variables.PANEL_5_HEIGHT + Variables.PANEL_4_HEIGHT);
+                        costraintsForPanel2.gridheight = Variables.SEPARATOR_HEIGTH;
+                        costraintsForPanel2.gridwidth = Variables.SEPARATOR_WIDTH;
+                        costraintsForPanel2.insets = new Insets(10, 0, 0, 0);
+                        panel2.add(new JSeparator(), costraintsForPanel2);
+                        costraintsForPanel2.insets = new Insets(0, 0, 0, 0);
+                    }
 
                     panel2.revalidate();
 
@@ -1057,7 +1130,7 @@ public class GraphicalEditor extends JFrame {
             i++;
         }
 
-        pane.add(panel2);
+        pane.add(panel2, BorderLayout.PAGE_START);
         scroller = new JScrollPane(panel2);
         pane.add(scroller, BorderLayout.CENTER);
 
@@ -1173,6 +1246,7 @@ public class GraphicalEditor extends JFrame {
                     for (PathItem pi : ((Panel) di).getLines()) {
                         canvas.removeItem(pi);
                     }
+                    dic.deselect(di);
                     // }
                 }
             }

@@ -12,6 +12,7 @@ import java.awt.Stroke;
 import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
 import models.DrawableItem;
+import models.Gesture;
 import models.Panel;
 import models.PathItem;
 
@@ -25,6 +26,7 @@ public class PersistentCanvas extends Component {
 
     private ArrayList<DrawableItem> items;
     private DrawableItemController dic;
+    private Gesture gest;
 
     /**
      * Constructor for the canvas
@@ -32,9 +34,19 @@ public class PersistentCanvas extends Component {
      * @param dicon Controller for drawing objects
      */
     PersistentCanvas(DrawableItemController dicon) {
-        items = new ArrayList<DrawableItem>();
+        items = new ArrayList<>();
+        gest = new Gesture();
         dic = dicon;
     }
+
+    public Gesture getGest() {
+        return gest;
+    }
+
+    public void setGest(Gesture gest) {
+        this.gest = gest;
+    }
+    
 
     /**
      * Returns the item in which the point lies
@@ -147,6 +159,7 @@ public class PersistentCanvas extends Component {
                 dic.paintPath(item, g);
             }
         }
+        
     }
 
     /**

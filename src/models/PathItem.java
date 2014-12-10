@@ -22,7 +22,7 @@ public class PathItem extends DrawableItem {
     int thickness;
     Point firstpoint;
     boolean hidden;
-    boolean hiddenWithLayer;
+    boolean hiddenWithPanel;
 
     /**
      * Constructor
@@ -45,7 +45,7 @@ public class PathItem extends DrawableItem {
             l.addToLines(this);
         }
         hidden = false;
-        hiddenWithLayer = false;
+        hiddenWithPanel = false;
         firstpoint = p;
     }
 
@@ -111,12 +111,12 @@ public class PathItem extends DrawableItem {
         this.panel = p;
     }
 
-    public boolean isHiddenWithLayer() {
-        return hiddenWithLayer;
+    public boolean isHiddenWithPanel() {
+        return hiddenWithPanel;
     }
 
-    public void setHiddenWithLayer(boolean hiddenWithLayer) {
-        this.hiddenWithLayer = hiddenWithLayer;
+    public void setHiddenWithPanel(boolean hiddenWithPanel) {
+        this.hiddenWithPanel = hiddenWithPanel;
     }
 
     public boolean isHidden() {
