@@ -24,7 +24,6 @@ public class LayoutController {
 
     public ArrayList<DrawableItem> setLayoutPanels(int row, int[] column, Layer mainLayer, PersistentCanvas c) {
         ArrayList<DrawableItem> allPanels = new ArrayList<>();
-        //int widthOfPanel = (Variables.CANVAS_WIDTH / column) - 5;
         int heightOfPanel = (Variables.CANVAS_HEIGHT / row) - 10;
         for (int i = 0; i < row; i++) {
             int widthOfPanel = (Variables.CANVAS_WIDTH / column[i]) - 5;
@@ -39,7 +38,6 @@ public class LayoutController {
                 thisRect.height = heightOfPanel;
                 item.update(new Point(widthOfPanel + p.x, heightOfPanel + p.y));
                 allPanels.add(item);
-                //Panel tempPanel = new Panel(c,)
             }
         }
         return allPanels;

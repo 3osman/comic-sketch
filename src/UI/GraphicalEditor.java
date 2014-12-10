@@ -23,7 +23,6 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
@@ -388,14 +387,14 @@ public class GraphicalEditor extends JFrame {
 
         // Canvas Panel starts here
         //==========================================
-        canvasPanel.setLayout(new BoxLayout(canvasPanel, BoxLayout.PAGE_AXIS));
+        canvasPanel.setLayout(new BoxLayout(canvasPanel, BoxLayout.X_AXIS));
         canvasPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         //canvasPanel.setPreferredSize(new Dimension((5 * width) / 6, height));
 
         JPanel canvasOpsPanel = new JPanel();
-        canvasOpsPanel.setLayout(new FlowLayout());
+        canvasOpsPanel.setLayout(new BoxLayout(canvasOpsPanel, BoxLayout.Y_AXIS));
         canvasOpsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        canvasOpsPanel.setPreferredSize(new Dimension((5 * width) / 6, height / 12));
+       // canvasOpsPanel.setPreferredSize(new Dimension((5 * width) / 6, height / 12));
         canvasOpsPanel.add(loadButton);
         canvasOpsPanel.add(saveButton);
         canvasOpsPanel.add(addPanel);
@@ -414,7 +413,7 @@ public class GraphicalEditor extends JFrame {
         canvas = new PersistentCanvas(dic);
         canvas.setBackground(Color.WHITE);
         canvas.setPreferredSize(new Dimension(Variables.CANVAS_WIDTH, Variables.CANVAS_HEIGHT));
-        canvasPanel.add(canvasOpsPanel, BorderLayout.PAGE_START);
+       // canvasPanel.add(canvasOpsPanel, BorderLayout.PAGE_START);
         JSeparator separator2 = new JSeparator(JSeparator.HORIZONTAL);
         Dimension size2 = new Dimension(
                 separator2.getMaximumSize().width,
@@ -422,6 +421,7 @@ public class GraphicalEditor extends JFrame {
         separator2.setMaximumSize(size2);
         canvasPanel.add(separator2);
         canvasPanel.add(new JScrollPane(canvas), BorderLayout.CENTER);
+        pane.add(canvasOpsPanel);
         pane.add(canvasPanel);
         globalLayer = new Layer(false);
         globalLayer.setActive(true);
