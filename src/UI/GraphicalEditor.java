@@ -160,7 +160,7 @@ public class GraphicalEditor extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //loadCanvasFn();
-                int[] column = {3, 1, 1, 4};
+                int[] column = {2, 1, 2,4};
                 for (DrawableItem di : layc.setLayoutPanels(4, column, globalLayer, canvas)) {
                     canvas.addItem(di);
                 }
