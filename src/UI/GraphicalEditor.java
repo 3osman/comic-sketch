@@ -3,6 +3,7 @@ package UI;
 import controller.DrawableItemController;
 import controller.GroupingController;
 import controller.LayersController;
+import controller.LayoutController;
 import controller.SavingController;
 import controller.UndoController;
 import java.awt.BorderLayout;
@@ -96,6 +97,7 @@ public class GraphicalEditor extends JFrame {
     GroupingController gc = new GroupingController(); //grouping, not finished
     LayersController lc = new LayersController(); //layers controller
     SavingController sc = new SavingController();
+    LayoutController layc = new LayoutController();
     private JToggleButton jcb; //checkbox for blue ink
     private boolean isMoving; //is currently moving
     private String mode;  // Mode of interaction
@@ -157,7 +159,11 @@ public class GraphicalEditor extends JFrame {
         AbstractAction loadCanvas = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                loadCanvasFn();
+                //loadCanvasFn();
+                int[] column = {3, 1, 1, 4};
+                for (DrawableItem di : layc.setLayoutPanels(4, column, globalLayer, canvas)) {
+                    canvas.addItem(di);
+                }
             }
         };
         loadButton.setAction(loadCanvas);
@@ -175,17 +181,7 @@ public class GraphicalEditor extends JFrame {
         AbstractAction addPanelAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Panel item = new Panel(canvas, Color.BLACK, new Color(255, 255, 255, 128), new Point(10, 10), activeLayer);
-                ((Panel) item).setInitialPoint(new Point(10, 10));
-                ((Panel) item).setInitialResizePoint(new Point(10, 10));
-                Rectangle thisRect = (Rectangle) (((Panel) item).getShape());
-                thisRect.width = 200;
-                thisRect.height = 200;
-                item.update(new Point(210, 210));
-                canvas.addItem(item);
-                udc.addItemtoUndo(new UndoableItem(item, 0));
-
-                select(item, false);
+                createNewPanel(new Point(10, 10));
             }
         };
         AbstractAction oneAction = new AbstractAction() {
@@ -417,7 +413,7 @@ public class GraphicalEditor extends JFrame {
 
         canvas = new PersistentCanvas(dic);
         canvas.setBackground(Color.WHITE);
-        canvas.setPreferredSize(new Dimension(1200, 900));
+        canvas.setPreferredSize(new Dimension(Variables.CANVAS_WIDTH, Variables.CANVAS_HEIGHT));
         canvasPanel.add(canvasOpsPanel, BorderLayout.PAGE_START);
         JSeparator separator2 = new JSeparator(JSeparator.HORIZONTAL);
         Dimension size2 = new Dimension(
@@ -471,9 +467,7 @@ public class GraphicalEditor extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (selection instanceof Panel) {
                     if (selection != null) {
-                        //    for (Layer la : ((Panel) selection).getLayers()) {
-                        //       la.moveLayer(0, 2);
-                        //  }
+
                         for (DrawableItem di : selectionAll) {
                             di.move(0, 2);
                         }
@@ -635,22 +629,20 @@ public class GraphicalEditor extends JFrame {
                     //=============================
                     if (gesture.isGestureOk()) {
                         String gest = gesture.getGestureName();
-                        if (gest.equals("x")) {
-                            removeShape();
-                            selection = null;
-                            selectionAll = new ArrayList<>();
-                        } else if (gest.equals("check")) {
-                            Panel item = new Panel(canvas, Color.BLACK, new Color(255, 255, 255, 128), gesture.getFirstpoint(), activeLayer);
-                            ((Panel) item).setInitialPoint(gesture.getFirstpoint());
-                            ((Panel) item).setInitialResizePoint(gesture.getFirstpoint());
-                            Rectangle thisRect = (Rectangle) (((Panel) item).getShape());
-                            thisRect.width = 200;
-                            thisRect.height = 200;
-                            item.update(new Point(200 + gesture.getFirstpoint().x, 200 + gesture.getFirstpoint().y));
-                            canvas.addItem(item);
-                            udc.addItemtoUndo(new UndoableItem(item, 0));
+                        switch (gest) {
+                            case "x":
+                                removeShape();
+                                selection = null;
+                                selectionAll = new ArrayList<>();
+                                break;
+                            case "check":
+                                createNewPanel(gesture.getFirstpoint());
 
-                            select(item, false);
+                                break;
+                            case "v":
+                                gc.allign(true, selectionAll);
+                                gc.allign(false, selectionAll);
+                                break;
                         }
                     }
 
@@ -894,6 +886,19 @@ public class GraphicalEditor extends JFrame {
         setVisible(true);
     }
 
+    public void createNewPanel(Point p) {
+        Panel item = new Panel(canvas, Color.BLACK, new Color(255, 255, 255, 128), p, activeLayer);
+        ((Panel) item).setInitialPoint(p);
+        ((Panel) item).setInitialResizePoint(p);
+        Rectangle thisRect = (Rectangle) (((Panel) item).getShape());
+        thisRect.width = 200;
+        thisRect.height = 200;
+        item.update(new Point(200 + p.x, 200 + p.y));
+        canvas.addItem(item);
+        udc.addItemtoUndo(new UndoableItem(item, 0));
+        select(item, false);
+    }
+
     public void loadCanvasFn() {
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new java.io.File("."));
@@ -1102,6 +1107,9 @@ public class GraphicalEditor extends JFrame {
                     panel5.add(tempcanvas);
 
                     tempcanvas.setBackground(Color.WHITE);
+
+                    //here it set the objects inside the small canvas
+                    //============================================
                     ThumbnailLayer tl = new ThumbnailLayer();
 
                     tl.setL(l);
@@ -1114,6 +1122,7 @@ public class GraphicalEditor extends JFrame {
                     for (Rectangle gp : tl.getPanels()) {
                         tempcanvas.addItem(gp);
                     }
+
                     //panel3.add();
                     deleteButton.setToolTipText("Delete");
                     show.setToolTipText("On Top");
