@@ -106,6 +106,7 @@ public class GraphicalEditor extends JFrame {
     private int thickness; //thickness of drawing
     private ArrayList<DrawableItem> selectionAll; 	 // Stores the selected item
     private DrawableItem selection;
+    private PathItem gesture;
     private Layer globalLayer; //global layer without panel
     private Layer whiteLayer; // white layer
     private Layer blueInkLayer; //blue ink layer
@@ -127,6 +128,7 @@ public class GraphicalEditor extends JFrame {
         anchorP = gc.getDistinctivePoints(width, height);
         selectionAll = new ArrayList<>();
         selection = null;
+        gesture = null;
         isMoving = false;
         thickness = 2;
         o = Color.BLACK;
@@ -598,7 +600,7 @@ public class GraphicalEditor extends JFrame {
 
                     }
                 } else if (e.getID() == KeyEvent.KEY_RELEASED) {
-                    if (e.getKeyCode() == 18 || e.getKeyCode() == 17) {
+                    if (e.getKeyCode() == 18 || e.getKeyCode() == 17 || e.getKeyCode() == 16) {
                         mode = "Path";
                     }
 
@@ -623,12 +625,46 @@ public class GraphicalEditor extends JFrame {
                     mode = "Path";
                     ((Panel) selection).setAnchor(null);
 
+                }
+                if (mode.equals("Gesture")) {
+                    gesture.getDollar().pointerReleased(e.getX(), e.getY());
+                    if (gesture.getPanel() != null) {
+                        select(gesture.getPanel(), true);
+                    }
+
+                    //=============================
+                    if (gesture.isGestureOk()) {
+                        String gest = gesture.getGestureName();
+                        if (gest.equals("x")) {
+                            removeShape();
+                            selection = null;
+                            selectionAll = new ArrayList<>();
+                        } else if (gest.equals("check")) {
+                            Panel item = new Panel(canvas, Color.BLACK, new Color(255, 255, 255, 128), gesture.getFirstpoint(), activeLayer);
+                            ((Panel) item).setInitialPoint(gesture.getFirstpoint());
+                            ((Panel) item).setInitialResizePoint(gesture.getFirstpoint());
+                            Rectangle thisRect = (Rectangle) (((Panel) item).getShape());
+                            thisRect.width = 200;
+                            thisRect.height = 200;
+                            item.update(new Point(200 + gesture.getFirstpoint().x, 200 + gesture.getFirstpoint().y));
+                            canvas.addItem(item);
+                            udc.addItemtoUndo(new UndoableItem(item, 0));
+
+                            select(item, false);
+                        }
+                    }
+
+                    //=============================
+                    canvas.removeItem(gesture);
+                    select(null, false);
                 } else if (selection instanceof PathItem) {
+
                     selection = ((PathItem) selection).getPanel();
                     if (selection != null) {
 
                         select(selection, false);
                     }
+
                 }
                 resetLayerPanel();
             }
@@ -639,7 +675,7 @@ public class GraphicalEditor extends JFrame {
 
             public void mousePressed(MouseEvent e) {
                 Point p = e.getPoint();
-                if (!mode.equals("Select/Move")) {
+                if (!mode.equals("Select/Move") && !mode.equals("Gesture")) {
                     canvas.getItemAt(p);
                     if (selection != null && ((Panel) selection).getAnchor() != null) {
 
@@ -660,18 +696,18 @@ public class GraphicalEditor extends JFrame {
                             if (insidePanel == null) {
                                 if (!isBlue) {
                                     if (isWhite) {
-                                        item = new PathItem(canvas, Color.WHITE, f, p, null);
+                                        item = new PathItem(canvas, Color.WHITE, f, p, null, false);
                                         whiteLayer.addItemToLayer((PathItem) item);
                                         ((PathItem) item).setThickness(20);
 
                                     } else {
-                                        item = new PathItem(canvas, o, f, p, null);
+                                        item = new PathItem(canvas, o, f, p, null, false);
                                         globalLayer.addItemToLayer((PathItem) item);
 
                                         ((PathItem) item).setThickness(thickness);
                                     }
                                 } else {
-                                    item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, null);
+                                    item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, null, false);
                                     blueInkLayer.addItemToLayer((PathItem) item);
 
                                     ((PathItem) item).setThickness(thickness);
@@ -680,7 +716,7 @@ public class GraphicalEditor extends JFrame {
                             } else {
                                 if (!isBlue) {
                                     if (isWhite) {
-                                        item = new PathItem(canvas, Color.WHITE, f, p, insidePanel);
+                                        item = new PathItem(canvas, Color.WHITE, f, p, insidePanel, false);
                                         // insidePanel.getParentLayer().addItemToLayer((PathItem) item);
                                         whiteLayer.addItemToLayer((PathItem) item);
                                         ((PathItem) item).setThickness(20);
@@ -688,17 +724,17 @@ public class GraphicalEditor extends JFrame {
                                     } else {
                                         //  Layer l = lc.getActiveLayer(insidePanel);
                                         if (activeLayer.isIsBlueLayer()) {
-                                            item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, insidePanel);
+                                            item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, insidePanel, false);
 
                                         } else {
-                                            item = new PathItem(canvas, o, f, p, insidePanel);
+                                            item = new PathItem(canvas, o, f, p, insidePanel, false);
                                         }
                                         activeLayer.addItemToLayer((PathItem) item);
                                         ((PathItem) item).setThickness(thickness);
                                     }
 
                                 } else {
-                                    item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, insidePanel);
+                                    item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, insidePanel, false);
                                     ((PathItem) item).setThickness(thickness);
                                     blueInkLayer.addItemToLayer((PathItem) item);
                                 }
@@ -710,6 +746,22 @@ public class GraphicalEditor extends JFrame {
 
                         select(item, false);
                     }
+                } else if (mode.equals("Gesture")) {
+                    Panel insidePanel = (Panel) canvas.getItemAt(p);
+
+                    DrawableItem item = null;
+                    Color f = new Color(255, 255, 255, 128);
+
+                    if (insidePanel == null) {
+                        item = new PathItem(canvas, Color.BLACK, f, p, null, true);
+                    } else {
+                        item = new PathItem(canvas, Color.BLACK, f, p, insidePanel, true);
+                    }
+                    ((PathItem) item).setThickness(thickness);
+                    canvas.addItem(item);
+                    gesture = (PathItem) item;
+                    //select(item, false);
+
                 } else if (mode.equals("Select/Move")) {
 
                     DrawableItem item = canvas.getItemAt(p);
@@ -733,38 +785,42 @@ public class GraphicalEditor extends JFrame {
 
         canvas.addMouseMotionListener(new MouseMotionAdapter() {
             public void mouseDragged(MouseEvent e) {
-                if (selection == null) {
+                if (mode.equals("Gesture")) {
+                    gesture.update(e.getPoint());
+                    mousepos = e.getPoint();
+
+                } else if (selection == null) {
                     return;
-                }
-
-                if (mode.equals("Select/Move")) {
-
-                    isMoving = true;
-                    if (selection instanceof PathItem) {
-                        Panel item = ((PathItem) selection).getPanel();
-                        if (item != null) {
-                            select(item, true);
-
-                            selection = item;
-                        }
-                    }
-                    int dx = e.getX() - mousepos.x;
-                    int dy = e.getY() - mousepos.y;
-                    for (DrawableItem di : selectionAll) {
-                        di.move(dx, dy);
-                    }
-
-                } else if (mode.equals("Res")) {
-                    selectionAll.clear();
-                    select(selection, false);
-                    ((Panel) selection).resize(((Panel) selection).getAnchor(), e.getPoint());
-
-                    udc.saveResizeToUndo(selection);
                 } else {
-                    selection.update(e.getPoint());
+                    if (mode.equals("Select/Move")) {
 
+                        isMoving = true;
+                        if (selection instanceof PathItem) {
+                            Panel item = ((PathItem) selection).getPanel();
+                            if (item != null) {
+                                select(item, true);
+
+                                selection = item;
+                            }
+                        }
+                        int dx = e.getX() - mousepos.x;
+                        int dy = e.getY() - mousepos.y;
+                        for (DrawableItem di : selectionAll) {
+                            di.move(dx, dy);
+                        }
+
+                    } else if (mode.equals("Res")) {
+                        selectionAll.clear();
+                        select(selection, false);
+                        ((Panel) selection).resize(((Panel) selection).getAnchor(), e.getPoint());
+
+                        udc.saveResizeToUndo(selection);
+                    } else {
+                        selection.update(e.getPoint());
+
+                    }
+                    mousepos = e.getPoint();
                 }
-                mousepos = e.getPoint();
             }
 
         });

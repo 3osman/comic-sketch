@@ -63,6 +63,11 @@ public class Layer implements Serializable{
     public void addItemToLayer(PathItem pi) {
         this.ditems.add(pi);
     }
+    
+    
+    public void deleteItemFromLayer(PathItem pi) {
+        this.ditems.remove(pi);
+    }
     //Setters and getters 
     //===================
     public boolean isActive() {
