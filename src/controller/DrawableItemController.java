@@ -17,7 +17,6 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Stroke;
 import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import java.awt.Rectangle;
@@ -101,109 +100,7 @@ public class DrawableItemController implements Serializable {
         }
     }
 
-    /**
-     * Creates eraser cursor
-     *
-     * @return Cursor of the eraser
-     */
-    public Cursor createEraserCursor() {
-        ImageIcon image = new ImageIcon(this.getClass().getResource("/eraser-icon.png"));
-        Toolkit kit = Toolkit.getDefaultToolkit();
-
-        Image img = image.getImage();
-
-        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
-        Graphics g = bi.createGraphics();
-        g.drawImage(img, 0, 0, 15, 15, null);
-        ImageIcon newIcon = new ImageIcon(bi);
-        return kit.createCustomCursor(newIcon.getImage(), new Point(0, 15), "rubber");
-    }
-
-    public Cursor createGestureCursor() {
-        ImageIcon image = new ImageIcon(this.getClass().getResource("/gesture.png"));
-        Toolkit kit = Toolkit.getDefaultToolkit();
-
-        Image img = image.getImage();
-
-        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
-        Graphics g = bi.createGraphics();
-        g.drawImage(img, 0, 0, 30, 30, null);
-        ImageIcon newIcon = new ImageIcon(bi);
-        return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "gesture");
-    }
-
-    public Cursor createCtrlCursor() {
-        ImageIcon image = new ImageIcon(this.getClass().getResource("/HandOpen.png"));
-        Toolkit kit = Toolkit.getDefaultToolkit();
-
-        Image img = image.getImage();
-
-        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
-        Graphics g = bi.createGraphics();
-        g.drawImage(img, 0, 0, 20, 25, null);
-        ImageIcon newIcon = new ImageIcon(bi);
-        return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "handopen");
-    }
-
-    public Cursor createDragCursor() {
-        ImageIcon image = new ImageIcon(this.getClass().getResource("/HandClose.png"));
-        Toolkit kit = Toolkit.getDefaultToolkit();
-
-        Image img = image.getImage();
-
-        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
-        Graphics g = bi.createGraphics();
-        g.drawImage(img, 0, 0, 20, 25, null);
-        ImageIcon newIcon = new ImageIcon(bi);
-        return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "drag");
-    }
-
-    public Cursor createBlueCursor() {
-        ImageIcon image = new ImageIcon(this.getClass().getResource("/BluePen.png"));
-        Toolkit kit = Toolkit.getDefaultToolkit();
-
-        Image img = image.getImage();
-
-        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
-        Graphics g = bi.createGraphics();
-        g.drawImage(img, 0, 0, 15, 15, null);
-        ImageIcon newIcon = new ImageIcon(bi);
-        return kit.createCustomCursor(newIcon.getImage(), new Point(0, 0), "bluepen");
-    }
-
-    public Cursor createPathCursor() {
-        ImageIcon image = new ImageIcon(this.getClass().getResource("/BlackPen.png"));
-        Toolkit kit = Toolkit.getDefaultToolkit();
-
-        Image img = image.getImage();
-
-        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
-        Graphics g = bi.createGraphics();
-        g.drawImage(img, 0, 0, 15, 15, null);
-        ImageIcon newIcon = new ImageIcon(bi);
-        return kit.createCustomCursor(newIcon.getImage(), new Point(0, 0), "blackpen");
-    }
-
-    public Cursor createAddCursor() {
-        ImageIcon image = new ImageIcon(this.getClass().getResource("/plus.png"));
-        Toolkit kit = Toolkit.getDefaultToolkit();
-
-        Image img = image.getImage();
-
-        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
-        Graphics g = bi.createGraphics();
-        g.drawImage(img, 0, 0, 15, 15, null);
-        ImageIcon newIcon = new ImageIcon(bi);
-        return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "add");
-    }
-
+    
     /**
      * Paints a shape
      *

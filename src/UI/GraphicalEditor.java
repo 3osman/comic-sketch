@@ -28,6 +28,7 @@ import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -48,6 +49,7 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -128,7 +130,7 @@ public class GraphicalEditor extends JFrame {
     // Constructor of the Graphical Editor
     public GraphicalEditor(int width, int height) {
         try {
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -321,7 +323,7 @@ public class GraphicalEditor extends JFrame {
                         eraser.setSelected(false);
                         //canvas.setCursor(dic.createBlueCursor());
                     }
-                    canvas.setCursor(dic.createBlueCursor());
+                    canvas.setCursor(createBlueCursor());
 
                 } else if (ev.getStateChange() == ItemEvent.DESELECTED) {
                     isBlue = false;
@@ -329,7 +331,7 @@ public class GraphicalEditor extends JFrame {
                     lc.setActiveLayer(globalLayer, true, allLayers);
                     resetLayerPanel();
                     select(null, false);
-                    canvas.setCursor(dic.createPathCursor());
+                    canvas.setCursor(createPathCursor());
 
                     //canvas.setCursor(Cursor.getDefaultCursor());
                     //}
@@ -352,7 +354,7 @@ public class GraphicalEditor extends JFrame {
                     fourButton.setEnabled(false);
                     try {
 
-                        Cursor custom = dic.createEraserCursor();
+                        Cursor custom = createEraserCursor();
                         canvas.setCursor(custom);
                     } catch (Exception e) {
                     }
@@ -374,7 +376,7 @@ public class GraphicalEditor extends JFrame {
                         lc.setActiveLayer(globalLayer, true, allLayers);
                         select(null, false);
                     }
-                    canvas.setCursor(dic.createPathCursor());
+                    canvas.setCursor(createPathCursor());
                 }
             }
         });
@@ -487,7 +489,7 @@ public class GraphicalEditor extends JFrame {
         canvas.setPreferredSize(new Dimension(Variables.CANVAS_WIDTH, Variables.CANVAS_HEIGHT));
 
         canvasPanel.add(new JScrollPane(canvas), BorderLayout.CENTER);
-        canvas.setCursor(dic.createPathCursor());
+        canvas.setCursor(createPathCursor());
         pane.add(canvasPanel);
         globalLayer = new Layer(false);
         globalLayer.setActive(true);
@@ -604,14 +606,14 @@ public class GraphicalEditor extends JFrame {
                 if (e.getID() == KeyEvent.KEY_PRESSED) {
                     // System.out.println(e.getExtendedKeyCode());
                     if (e.getKeyCode() == 18) {
-                        canvas.setCursor(dic.createAddCursor());
+                        canvas.setCursor(createAddCursor());
                         mode = "Rectangle";
                     } else if (e.getKeyCode() == 17) {
                         mode = "Select/Move";
-                        canvas.setCursor(dic.createCtrlCursor());
+
                     } else if (e.getKeyCode() == 16) {
                         mode = "Gesture";
-                        canvas.setCursor(dic.createGestureCursor());
+                        canvas.setCursor(createGestureCursor());
                     }
                     if (mode.equals("Select/Move")) {
                         if (e.getExtendedKeyCode() == 90) {
@@ -668,7 +670,9 @@ public class GraphicalEditor extends JFrame {
                 } else if (e.getID() == KeyEvent.KEY_RELEASED) {
                     if (e.getKeyCode() == 18 || e.getKeyCode() == 17 || e.getKeyCode() == 16) {
                         mode = "Path";
-                        canvas.setCursor(dic.createPathCursor());
+                        canvas.setCursor(createPathCursor());
+                        canvas.removeItem(gesture);
+                        gesture = null;
 
                     }
 
@@ -687,13 +691,13 @@ public class GraphicalEditor extends JFrame {
                         udc.saveMoveToUndo(selection);
                     }
                     isMoving = false;
-                    canvas.setCursor(dic.createCtrlCursor());
+                    canvas.setCursor(createCtrlCursor());
 
                 } else if (mode.equals("Resize")) {
                     udc.saveResizeToUndo(selection);
                 } else if (mode.equals("Res")) {
                     mode = "Path";
-                    canvas.setCursor(dic.createPathCursor());
+                    canvas.setCursor(createPathCursor());
 
                     ((Panel) selection).setAnchor(null);
 
@@ -722,7 +726,7 @@ public class GraphicalEditor extends JFrame {
                                 gc.allign(true, selectionAll);
                                 gc.allign(false, selectionAll);
                                 break;
-                            case "pigTail":
+                            case "caret CW":
                                 panelColor();
                                 break;
                             case "leftSquareBracket":
@@ -742,8 +746,8 @@ public class GraphicalEditor extends JFrame {
 
                     //=============================
                     canvas.removeItem(gesture);
-                    gesture=null;
-                    
+                    gesture = null;
+
                 } else if (selection instanceof PathItem) {
 
                     selection = ((PathItem) selection).getPanel();
@@ -765,7 +769,7 @@ public class GraphicalEditor extends JFrame {
                 if (!mode.equals("Select/Move") && !mode.equals("Gesture")) {
                     canvas.getItemAt(p);
                     if (selection != null && ((Panel) selection).getAnchor() != null) {
-                        canvas.setCursor(dic.createAddCursor());
+                        canvas.setCursor(createAddCursor());
                         mode = "Res";
                     } else {
                         DrawableItem item = null;
@@ -851,12 +855,13 @@ public class GraphicalEditor extends JFrame {
                         item = new Gesture(canvas, Color.BLACK, f, p, insidePanel, true);
                     }
                     ((Gesture) item).setThickness(thickness);
-                    canvas.addItem(item);
+
                     gesture = (Gesture) item;
+                    canvas.addItem(gesture);
                     //select(item, false);
 
                 } else if (mode.equals("Select/Move")) {
-
+                    canvas.setCursor(createCtrlCursor());
                     DrawableItem item = canvas.getItemAt(p);
                     if (item != null) {
                         select(item, true);
@@ -886,7 +891,7 @@ public class GraphicalEditor extends JFrame {
                     return;
                 } else {
                     if (mode.equals("Select/Move")) {
-                        canvas.setCursor(dic.createDragCursor());
+                        canvas.setCursor(createDragCursor());
                         isMoving = true;
                         if (selection instanceof PathItem) {
                             Panel item = ((PathItem) selection).getPanel();
@@ -992,7 +997,7 @@ public class GraphicalEditor extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 jda.setVisible(false);
-                
+
                 clearAll();
             }
         };
@@ -1001,9 +1006,9 @@ public class GraphicalEditor extends JFrame {
         setButtonLayoutImage("/0.png", newCanvas);
         JPanel l = new JPanel(new GridLayout(2, 4));
         emp.add(newCanvas, BorderLayout.LINE_START);
-        addToLayouts(l);
-        jda.add(emp,BorderLayout.PAGE_START);
-        jda.add(l,BorderLayout.PAGE_END);
+        addToLayouts(l, jda);
+        jda.add(emp, BorderLayout.PAGE_START);
+        jda.add(l, BorderLayout.PAGE_END);
         jda.setPreferredSize(new Dimension(600, 400));
         jda.setModal(true);
         final int x = ((Variables.CANVAS_WIDTH - jda.getWidth()) / 2) - 100;
@@ -1055,7 +1060,7 @@ public class GraphicalEditor extends JFrame {
         jd.setVisible(true);
     }
 
-    public AbstractAction setAbsAction(int index, JPanel jda) {
+    public AbstractAction setAbsAction(int index, JDialog jda) {
         AbstractAction absAction = null;
         switch (index) {
             case 1:
@@ -1063,6 +1068,8 @@ public class GraphicalEditor extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {2, 2, 1};
+                        jda.setVisible(false);
+
                         loadTemplates(3, c);
 
                     }
@@ -1073,6 +1080,7 @@ public class GraphicalEditor extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {2, 1, 2};
+                        jda.setVisible(false);
                         loadTemplates(3, c);
 
                     }
@@ -1083,8 +1091,8 @@ public class GraphicalEditor extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {1, 2, 2};
+                        jda.setVisible(false);
                         loadTemplates(3, c);
-
                     }
                 };
                 break;
@@ -1093,8 +1101,8 @@ public class GraphicalEditor extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {1, 1, 2};
+                        jda.setVisible(false);
                         loadTemplates(3, c);
-
                     }
                 };
                 break;
@@ -1103,6 +1111,7 @@ public class GraphicalEditor extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {1, 1};
+                        jda.setVisible(false);
                         loadVerticalTemplates(c, 2);
 
                     }
@@ -1113,6 +1122,7 @@ public class GraphicalEditor extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {1, 2};
+                        jda.setVisible(false);
                         loadVerticalTemplates(c, 2);
 
                     }
@@ -1123,6 +1133,7 @@ public class GraphicalEditor extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {2, 1};
+                        jda.setVisible(false);
                         loadVerticalTemplates(c, 2);
 
                     }
@@ -1133,6 +1144,8 @@ public class GraphicalEditor extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {1, 2};
+                        jda.setVisible(false);
+
                         loadTemplates(2, c);
 
                     }
@@ -1142,7 +1155,7 @@ public class GraphicalEditor extends JFrame {
         return absAction;
     }
 
-    public void addToLayouts(JPanel jda) {
+    public void addToLayouts(JPanel jda, JDialog jd) {
 
         JButton first = new JButton();
         JButton second = new JButton();
@@ -1153,14 +1166,14 @@ public class GraphicalEditor extends JFrame {
         JButton seventh = new JButton();
         JButton eight = new JButton();
 
-        first.setAction(setAbsAction(1, jda));
-        second.setAction(setAbsAction(2, jda));
-        third.setAction(setAbsAction(3, jda));
-        fourth.setAction(setAbsAction(4, jda));
-        fifth.setAction(setAbsAction(5, jda));
-        sixth.setAction(setAbsAction(6, jda));
-        seventh.setAction(setAbsAction(7, jda));
-        eight.setAction(setAbsAction(8, jda));
+        first.setAction(setAbsAction(1, jd));
+        second.setAction(setAbsAction(2, jd));
+        third.setAction(setAbsAction(3, jd));
+        fourth.setAction(setAbsAction(4, jd));
+        fifth.setAction(setAbsAction(5, jd));
+        sixth.setAction(setAbsAction(6, jd));
+        seventh.setAction(setAbsAction(7, jd));
+        eight.setAction(setAbsAction(8, jd));
 
         setButtonLayoutImage("/1.png", first);
         setButtonLayoutImage("/2.png", second);
@@ -1248,9 +1261,13 @@ public class GraphicalEditor extends JFrame {
             canvas.clear();
             allLayers.clear();
             udc.clearAll();
-
+            int i = 0;
             for (Layer di : sc.load(chooser.getSelectedFile().getAbsolutePath())) {
                 allLayers.add(di);
+                if (i == 1) {
+                    activeLayer = di;
+                }
+                i++;
                 for (DrawableItem dii : di.getDrawable()) {
                     canvas.addItem(dii);
                 }
@@ -1298,9 +1315,13 @@ public class GraphicalEditor extends JFrame {
 
             select(null, false);
             selectionAll = new ArrayList<>();
-
-            sc.save(allLayers, chooser.getSelectedFile().getAbsolutePath());
-
+            canvas.setCursor(Cursor.getDefaultCursor());
+            if(!sc.save(allLayers, chooser.getSelectedFile().getAbsolutePath())){
+                JOptionPane.showMessageDialog(this, "File already exists");
+                saveCanvasFn();
+            }
+            resetLayerPanel();
+            canvas.setCursor(createPathCursor());
         }
 
     }
@@ -1367,10 +1388,10 @@ public class GraphicalEditor extends JFrame {
                                     jcb.setSelected(true);
                                     //if (selection != null) {
                                     lc.setActiveLayer(blueInkLayer, true, allLayers);
-                                    canvas.setCursor(dic.createBlueCursor());
+                                    canvas.setCursor(createBlueCursor());
                                 } else {
                                     isBlue = false;
-                                    canvas.setCursor(dic.createPathCursor());
+                                    canvas.setCursor(createPathCursor());
 
                                     //canvas.setCursor(Cursor.getDefaultCursor());
                                     jcb.setSelected(false);
@@ -1669,6 +1690,118 @@ public class GraphicalEditor extends JFrame {
             udc.addItemtoUndo(new UndoableItem(selection, 1));
             return true;
         }
+    }
+
+    /**
+     * Creates eraser cursor
+     *
+     * @return Cursor of the eraser
+     */
+    public Cursor createEraserCursor() {
+        ImageIcon image = new ImageIcon(this.getClass().getResource("/eraser-icon.png"));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+
+        Image img = image.getImage();
+
+        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = bi.createGraphics();
+        g.drawImage(img, 0, 0, 15, 15, null);
+        ImageIcon newIcon = new ImageIcon(bi);
+        return kit.createCustomCursor(newIcon.getImage(), new Point(0, 15), "rubber");
+
+    }
+
+    public Cursor createGestureCursor() {
+        ImageIcon image = new ImageIcon(this.getClass().getResource("/gesture.png"));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+
+        Image img = image.getImage();
+
+        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = bi.createGraphics();
+        g.drawImage(img, 0, 0, 30, 30, null);
+        ImageIcon newIcon = new ImageIcon(bi);
+        return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "gesture");
+    }
+
+    public Cursor createCtrlCursor() {
+
+        ImageIcon image = new ImageIcon(this.getClass().getResource("/HandOpen.png"));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+
+        Image img = image.getImage();
+
+        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = bi.createGraphics();
+        g.drawImage(img, 0, 0, 20, 25, null);
+        ImageIcon newIcon = new ImageIcon(bi);
+        return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "handopen");
+    }
+
+    public Cursor createDragCursor() {
+
+        ImageIcon image = new ImageIcon(this.getClass().getResource("/HandClose.png"));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+
+        Image img = image.getImage();
+
+        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = bi.createGraphics();
+        g.drawImage(img, 0, 0, 20, 25, null);
+        ImageIcon newIcon = new ImageIcon(bi);
+        return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "drag");
+
+    }
+
+    public Cursor createBlueCursor() {
+
+        ImageIcon image = new ImageIcon(this.getClass().getResource("/BluePen.png"));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+
+        Image img = image.getImage();
+
+        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = bi.createGraphics();
+        g.drawImage(img, 0, 0, 15, 15, null);
+        ImageIcon newIcon = new ImageIcon(bi);
+        return kit.createCustomCursor(newIcon.getImage(), new Point(0, 0), "bluepen");
+    }
+
+    public Cursor createPathCursor() {
+
+        ImageIcon image = new ImageIcon(this.getClass().getResource("/BlackPen.png"));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+
+        Image img = image.getImage();
+
+        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = bi.createGraphics();
+        g.drawImage(img, 0, 0, 15, 15, null);
+        ImageIcon newIcon = new ImageIcon(bi);
+        return kit.createCustomCursor(newIcon.getImage(), new Point(0, 0), "blackpen");
+
+    }
+
+    public Cursor createAddCursor() {
+
+        ImageIcon image = new ImageIcon(this.getClass().getResource("/plus.png"));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+
+        Image img = image.getImage();
+
+        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = bi.createGraphics();
+        g.drawImage(img, 0, 0, 15, 15, null);
+        ImageIcon newIcon = new ImageIcon(bi);
+        return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "add");
+
     }
 
     public static void main(String[] args) {

@@ -6,7 +6,6 @@
 package models;
 
 import UI.PersistentCanvas;
-import controller.LayersController;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;

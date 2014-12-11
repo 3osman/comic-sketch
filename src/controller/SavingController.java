@@ -14,6 +14,8 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import models.DrawableItem;
 import models.Layer;
+import models.Panel;
+import models.PathItem;
 import models.Variables;
 
 /**
@@ -21,8 +23,6 @@ import models.Variables;
  * @author Osman
  */
 public class SavingController {
-
-   
 
     public boolean save(ArrayList<Layer> drawings, String name) {
         //todo
@@ -34,13 +34,17 @@ public class SavingController {
             // if file doesn't exists, then create it
             if (!file.exists()) {
                 file.createNewFile();
+            } else {
+                return false;
             }
 
             FileOutputStream saveFile = new FileOutputStream(file);
             ObjectOutputStream saveObject = new ObjectOutputStream(saveFile);
 
             for (Layer item : drawings) {
+
                 saveObject.writeObject(item);
+
             }
             saveObject.close();
 
