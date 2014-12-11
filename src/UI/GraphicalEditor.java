@@ -1316,10 +1316,7 @@ public class GraphicalEditor extends JFrame {
             select(null, false);
             selectionAll = new ArrayList<>();
             canvas.setCursor(Cursor.getDefaultCursor());
-            if(!sc.save(allLayers, chooser.getSelectedFile().getAbsolutePath())){
-                JOptionPane.showMessageDialog(this, "File already exists");
-                saveCanvasFn();
-            }
+            sc.save(allLayers, chooser.getSelectedFile().getAbsolutePath());
             resetLayerPanel();
             canvas.setCursor(createPathCursor());
         }

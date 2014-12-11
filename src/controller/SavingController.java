@@ -35,7 +35,11 @@ public class SavingController {
             if (!file.exists()) {
                 file.createNewFile();
             } else {
-                return false;
+                int seq = 0;
+                while (file.exists()) {
+                    seq++;
+                    file = new File(name + "(" + seq + ")." + Variables.EXTENSION);
+                }
             }
 
             FileOutputStream saveFile = new FileOutputStream(file);
