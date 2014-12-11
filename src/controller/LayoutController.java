@@ -26,9 +26,30 @@ public class LayoutController {
         ArrayList<DrawableItem> allPanels = new ArrayList<>();
         int heightOfPanel = (Variables.CANVAS_HEIGHT / row) - 10;
         for (int i = 0; i < row; i++) {
-            int widthOfPanel = (Variables.CANVAS_WIDTH / column[i]) - 5;
+            int widthOfPanel = ((Variables.CANVAS_WIDTH - 50) / column[i]) - 5;
             for (int j = 0; j < column[i]; j++) {
                 Point p = new Point(10 + (widthOfPanel + 10) * j, 10 + (heightOfPanel + 10) * i);
+                Color f = new Color(255, 255, 255, 128);
+                Panel item = new Panel(c, Color.BLACK, f, p, mainLayer);
+                item.setInitialPoint(p);
+                item.setInitialResizePoint(p);
+                Rectangle thisRect = (Rectangle) (((Panel) item).getShape());
+                thisRect.width = widthOfPanel;
+                thisRect.height = heightOfPanel;
+                item.update(new Point(widthOfPanel + p.x, heightOfPanel + p.y));
+                allPanels.add(item);
+            }
+        }
+        return allPanels;
+    }
+
+    public ArrayList<DrawableItem> setLayoutVerticalPanels(int[] row, int column, Layer mainLayer, PersistentCanvas c) {
+        ArrayList<DrawableItem> allPanels = new ArrayList<>();
+        int widthOfPanel = ((Variables.CANVAS_WIDTH - 50) / column) - 10;
+        for (int i = 0; i < column; i++) {
+            int heightOfPanel = (Variables.CANVAS_HEIGHT / row[i]) - 5;
+            for (int j = 0; j < row[i]; j++) {
+                Point p = new Point(10 + (widthOfPanel + 10) * i, 10 + (heightOfPanel + 10) * j);
                 Color f = new Color(255, 255, 255, 128);
                 Panel item = new Panel(c, Color.BLACK, f, p, mainLayer);
                 item.setInitialPoint(p);
