@@ -56,6 +56,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import models.DrawableItem;
+import models.Gesture;
 import models.Layer;
 import models.Panel;
 import models.PathItem;
@@ -114,7 +115,7 @@ public class GraphicalEditor extends JFrame {
     private int thickness; //thickness of drawing
     private ArrayList<DrawableItem> selectionAll; 	 // Stores the selected item
     private DrawableItem selection;
-    private PathItem gesture;
+    private Gesture gesture;
     private Layer globalLayer; //global layer without panel
     private Layer whiteLayer; // white layer
     private Layer blueInkLayer; //blue ink layer
@@ -601,7 +602,7 @@ public class GraphicalEditor extends JFrame {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
                 if (e.getID() == KeyEvent.KEY_PRESSED) {
-                    System.out.println(e.getExtendedKeyCode());
+                    // System.out.println(e.getExtendedKeyCode());
                     if (e.getKeyCode() == 18) {
                         canvas.setCursor(dic.createAddCursor());
                         mode = "Rectangle";
@@ -655,99 +656,12 @@ public class GraphicalEditor extends JFrame {
                             gc.allign(true, canvas.getItems());
                             gc.allign(false, canvas.getItems());
                         } else if (e.getKeyCode() == 83) { //save
-                            jd = new JDialog(GraphicalEditor.this, "Save");
-                            jd.setLayout(new BorderLayout());
-                            jd.setModal(true);
-                            JButton savePng = new JButton();
-                            AbstractAction savePngA = new AbstractAction() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    jd.setVisible(false);
-                                    saveAsImage();
-                                }
-                            };
-
-                            savePng.setAction(savePngA);
-                            savePng.setLabel("Save as PNG");
-                            JButton saveFile = new JButton();
-
-                            AbstractAction saveFileA = new AbstractAction() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    jd.setVisible(false);
-                                    saveCanvasFn();
-
-                                }
-                            };
-
-                            saveFile.setAction(saveFileA);
-                            saveFile.setLabel("Save As File");
-                            jd.add(savePng, BorderLayout.LINE_START);
-                            jd.add(saveFile, BorderLayout.LINE_END);
-                            jd.setPreferredSize(new Dimension(205, 100));
-                            final int x = (Variables.CANVAS_WIDTH - jd.getWidth()) / 2;
-                            final int y = (Variables.CANVAS_HEIGHT - jd.getHeight()) / 2;
-                            jd.setLocation(x, y);
-
-                            jd.setResizable(false);
-                            jd.pack();
-                            jd.setVisible(true);
+                            saveOptions();
                             //  saveCanvasFn();
                         } else if (e.getKeyCode() == 79) { //open
                             loadCanvasFn();
                         } else if (e.getKeyCode() == 78) { //new
-                            jd = new JDialog(GraphicalEditor.this, "New");
-                            jd.setLayout(new BorderLayout());
-                            jd.setModal(true);
-                            JButton newCanvas = new JButton();
-                            AbstractAction newCanv = new AbstractAction() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    jd.setVisible(false);
-                                    canvas.clear();
-                                    for (int i = 2; i < allLayers.size(); i++) {
-                                        allLayers.remove(i);
-                                    }
-                                    udc.clearAll();
-                                    resetLayerPanel();
-                                }
-                            };
-
-                            newCanvas.setAction(newCanv);
-                            newCanvas.setLabel("Empty Page");
-                            JButton layouts = new JButton();
-
-                            AbstractAction layoutsA = new AbstractAction() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    jd.setVisible(false);
-                                    JDialog jda = new JDialog(GraphicalEditor.this, "Layouts");
-                                    jda.setLayout(new GridLayout(2, 4));
-                                    jda.setModal(true);
-                                    addToLayouts(jda);
-                                    jda.setPreferredSize(new Dimension(600, 300));
-                                    final int x = ((Variables.CANVAS_WIDTH - jda.getWidth()) / 2) - 100;
-                                    final int y = ((Variables.CANVAS_HEIGHT - jda.getHeight()) / 2) - 50;
-                                    jda.setLocation(x, y);
-                                    jda.setResizable(false);
-                                    jda.pack();
-                                    jda.setVisible(true);
-
-                                }
-                            };
-
-                            layouts.setAction(layoutsA);
-                            layouts.setLabel("Choose from Layouts");
-                            jd.add(newCanvas, BorderLayout.LINE_START);
-                            jd.add(layouts, BorderLayout.LINE_END);
-                            jd.setPreferredSize(new Dimension(250, 100));
-                            final int x = (Variables.CANVAS_WIDTH - jd.getWidth()) / 2;
-                            final int y = (Variables.CANVAS_HEIGHT - jd.getHeight()) / 2;
-                            jd.setLocation(x, y);
-
-                            jd.setResizable(false);
-                            jd.pack();
-                            jd.setVisible(true);
+                            newOptions();
                         }
 
                     }
@@ -798,6 +712,7 @@ public class GraphicalEditor extends JFrame {
                                 removeShape();
                                 selection = null;
                                 selectionAll = new ArrayList<>();
+                                select(null, false);
                                 break;
                             case "check":
                                 createNewPanel(gesture.getFirstpoint());
@@ -810,12 +725,25 @@ public class GraphicalEditor extends JFrame {
                             case "pigTail":
                                 panelColor();
                                 break;
+                            case "leftSquareBracket":
+                                saveOptions();
+                                break;
+                            case "rightSquareBracket":
+                                newOptions();
+                                select(null, false);
+                                break;
+
+                            case "circle CCW":
+                                loadCanvasFn();
+                                select(null, false);
+                                break;
                         }
                     }
 
                     //=============================
                     canvas.removeItem(gesture);
-                    select(null, false);
+                    gesture=null;
+                    
                 } else if (selection instanceof PathItem) {
 
                     selection = ((PathItem) selection).getPanel();
@@ -858,18 +786,18 @@ public class GraphicalEditor extends JFrame {
                             if (insidePanel == null) {
                                 if (!isBlue) {
                                     if (isWhite) {
-                                        item = new PathItem(canvas, Color.WHITE, f, p, null, false);
+                                        item = new PathItem(canvas, Color.WHITE, f, p, null);
                                         whiteLayer.addItemToLayer((PathItem) item);
                                         ((PathItem) item).setThickness(20);
 
                                     } else {
-                                        item = new PathItem(canvas, o, f, p, null, false);
+                                        item = new PathItem(canvas, o, f, p, null);
                                         globalLayer.addItemToLayer((PathItem) item);
 
                                         ((PathItem) item).setThickness(thickness);
                                     }
                                 } else {
-                                    item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, null, false);
+                                    item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, null);
                                     blueInkLayer.addItemToLayer((PathItem) item);
 
                                     ((PathItem) item).setThickness(thickness);
@@ -878,7 +806,7 @@ public class GraphicalEditor extends JFrame {
                             } else {
                                 if (!isBlue) {
                                     if (isWhite) {
-                                        item = new PathItem(canvas, Color.WHITE, f, p, insidePanel, false);
+                                        item = new PathItem(canvas, Color.WHITE, f, p, insidePanel);
                                         // insidePanel.getParentLayer().addItemToLayer((PathItem) item);
                                         whiteLayer.addItemToLayer((PathItem) item);
                                         ((PathItem) item).setThickness(20);
@@ -886,17 +814,17 @@ public class GraphicalEditor extends JFrame {
                                     } else {
                                         //  Layer l = lc.getActiveLayer(insidePanel);
                                         if (activeLayer.isIsBlueLayer()) {
-                                            item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, insidePanel, false);
+                                            item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, insidePanel);
 
                                         } else {
-                                            item = new PathItem(canvas, o, f, p, insidePanel, false);
+                                            item = new PathItem(canvas, o, f, p, insidePanel);
                                         }
                                         activeLayer.addItemToLayer((PathItem) item);
                                         ((PathItem) item).setThickness(thickness);
                                     }
 
                                 } else {
-                                    item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, insidePanel, false);
+                                    item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, insidePanel);
                                     ((PathItem) item).setThickness(thickness);
                                     blueInkLayer.addItemToLayer((PathItem) item);
                                 }
@@ -918,13 +846,13 @@ public class GraphicalEditor extends JFrame {
                     }
 
                     if (insidePanel == null) {
-                        item = new PathItem(canvas, Color.BLACK, f, p, null, true);
+                        item = new Gesture(canvas, Color.BLACK, f, p, null, true);
                     } else {
-                        item = new PathItem(canvas, Color.BLACK, f, p, insidePanel, true);
+                        item = new Gesture(canvas, Color.BLACK, f, p, insidePanel, true);
                     }
-                    ((PathItem) item).setThickness(thickness);
+                    ((Gesture) item).setThickness(thickness);
                     canvas.addItem(item);
-                    gesture = (PathItem) item;
+                    gesture = (Gesture) item;
                     //select(item, false);
 
                 } else if (mode.equals("Select/Move")) {
@@ -975,7 +903,7 @@ public class GraphicalEditor extends JFrame {
                         }
 
                     } else if (mode.equals("Res")) {
-                        selectionAll.clear();
+                        //selectionAll.clear();
                         select(selection, false);
                         ((Panel) selection).resize(((Panel) selection).getAnchor(), e.getPoint());
 
@@ -1054,7 +982,80 @@ public class GraphicalEditor extends JFrame {
         setVisible(true);
     }
 
-    public AbstractAction setAbsAction(int index, JDialog jda) {
+    public void newOptions() {
+
+        JDialog jda = new JDialog(GraphicalEditor.this, "New");
+        jda.setLayout(new BorderLayout());
+        JPanel emp = new JPanel(new BorderLayout());
+        JButton newCanvas = new JButton();
+        AbstractAction newCanv = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jda.setVisible(false);
+                
+                clearAll();
+            }
+        };
+        newCanvas.setAction(newCanv);
+        // newCanvas.setLabel("Empty Page");
+        setButtonLayoutImage("/0.png", newCanvas);
+        JPanel l = new JPanel(new GridLayout(2, 4));
+        emp.add(newCanvas, BorderLayout.LINE_START);
+        addToLayouts(l);
+        jda.add(emp,BorderLayout.PAGE_START);
+        jda.add(l,BorderLayout.PAGE_END);
+        jda.setPreferredSize(new Dimension(600, 400));
+        jda.setModal(true);
+        final int x = ((Variables.CANVAS_WIDTH - jda.getWidth()) / 2) - 100;
+        final int y = ((Variables.CANVAS_HEIGHT - jda.getHeight()) / 2) - 50;
+        jda.setLocation(x, y);
+        jda.setResizable(false);
+        jda.pack();
+        jda.setVisible(true);
+
+    }
+
+    public void saveOptions() {
+        jd = new JDialog(GraphicalEditor.this, "Save");
+        jd.setLayout(new BorderLayout());
+        jd.setModal(true);
+        JButton savePng = new JButton();
+        AbstractAction savePngA = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jd.setVisible(false);
+                saveAsImage();
+            }
+        };
+
+        savePng.setAction(savePngA);
+        savePng.setLabel("Save as PNG");
+        JButton saveFile = new JButton();
+
+        AbstractAction saveFileA = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jd.setVisible(false);
+                saveCanvasFn();
+
+            }
+        };
+
+        saveFile.setAction(saveFileA);
+        saveFile.setLabel("Save As File");
+        jd.add(savePng, BorderLayout.LINE_START);
+        jd.add(saveFile, BorderLayout.LINE_END);
+        jd.setPreferredSize(new Dimension(205, 100));
+        final int x = (Variables.CANVAS_WIDTH - jd.getWidth()) / 2;
+        final int y = (Variables.CANVAS_HEIGHT - jd.getHeight()) / 2;
+        jd.setLocation(x, y);
+
+        jd.setResizable(false);
+        jd.pack();
+        jd.setVisible(true);
+    }
+
+    public AbstractAction setAbsAction(int index, JPanel jda) {
         AbstractAction absAction = null;
         switch (index) {
             case 1:
@@ -1063,7 +1064,6 @@ public class GraphicalEditor extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {2, 2, 1};
                         loadTemplates(3, c);
-                        jda.setVisible(false);
 
                     }
                 };
@@ -1074,7 +1074,6 @@ public class GraphicalEditor extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {2, 1, 2};
                         loadTemplates(3, c);
-                        jda.setVisible(false);
 
                     }
                 };
@@ -1085,7 +1084,6 @@ public class GraphicalEditor extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {1, 2, 2};
                         loadTemplates(3, c);
-                        jda.setVisible(false);
 
                     }
                 };
@@ -1096,7 +1094,6 @@ public class GraphicalEditor extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {1, 1, 2};
                         loadTemplates(3, c);
-                        jda.setVisible(false);
 
                     }
                 };
@@ -1107,7 +1104,6 @@ public class GraphicalEditor extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {1, 1};
                         loadVerticalTemplates(c, 2);
-                        jda.setVisible(false);
 
                     }
                 };
@@ -1118,7 +1114,6 @@ public class GraphicalEditor extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {1, 2};
                         loadVerticalTemplates(c, 2);
-                        jda.setVisible(false);
 
                     }
                 };
@@ -1129,7 +1124,6 @@ public class GraphicalEditor extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {2, 1};
                         loadVerticalTemplates(c, 2);
-                        jda.setVisible(false);
 
                     }
                 };
@@ -1140,7 +1134,6 @@ public class GraphicalEditor extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         int[] c = {1, 2};
                         loadTemplates(2, c);
-                        jda.setVisible(false);
 
                     }
                 };
@@ -1149,7 +1142,7 @@ public class GraphicalEditor extends JFrame {
         return absAction;
     }
 
-    public void addToLayouts(JDialog jda) {
+    public void addToLayouts(JPanel jda) {
 
         JButton first = new JButton();
         JButton second = new JButton();

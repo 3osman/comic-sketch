@@ -26,7 +26,7 @@ public class PersistentCanvas extends Component {
 
     private ArrayList<DrawableItem> items;
     private DrawableItemController dic;
-    private Gesture gest;
+   
 
     /**
      * Constructor for the canvas
@@ -35,17 +35,11 @@ public class PersistentCanvas extends Component {
      */
     PersistentCanvas(DrawableItemController dicon) {
         items = new ArrayList<>();
-        gest = new Gesture();
+       // gest = new Gesture();
         dic = dicon;
     }
 
-    public Gesture getGest() {
-        return gest;
-    }
-
-    public void setGest(Gesture gest) {
-        this.gest = gest;
-    }
+  
     
 
     /**

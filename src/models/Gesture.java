@@ -1,113 +1,157 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package models;
 
-import java.applet.Applet;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.event.*;
+import UI.PersistentCanvas;
+import java.awt.Color;
+import java.awt.Point;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import lx.interaction.dollar.Dollar;
+import lx.interaction.dollar.DollarListener;
 
-import lx.interaction.dollar.*;
-import lx.interaction.touch.*;
+/**
+ * Class for sketching lines/curves
+ *
+ * @author Osman
+ */
+public class Gesture extends DrawableItem implements DollarListener {
 
-public class Gesture
-        extends Component
-        implements MouseListener, MouseMotionListener, DollarListener {
+    int thickness;
+    Point firstpoint;
 
-    int x;
-    int y;
-    int state;
-
+    String gestureName;
+    protected Panel panel;
+    boolean gestureOk;
+    boolean isGesture;
     Dollar dollar = new Dollar(Dollar.GESTURES_DEFAULT);
-    String name = "";
-    double score = 0;
-    boolean ok = false;
-    
-	
-	Image offScreen;
 
-    public void init() {
-        offScreen = createImage(getSize().width, getSize().height);
+    /**
+     * Constructor
+     *
+     * @param c canvas in which the line lies
+     * @param o Outline color
+     * @param f Fill color
+     * @param p Current end
+     * @param l Layer it belongs to
+     */
+    public Gesture(PersistentCanvas c, Color o, Color f, Point p, Panel l, boolean gesture) {
+        super(c, o, f);
+        panel = l;
+        type = 1;
+        thickness = 2;
+        shape = new GeneralPath();
 
-        addMouseListener(this);
-        addMouseMotionListener(this);
+        ((GeneralPath) shape).moveTo(p.x, p.y);
 
-        dollar.setListener(this);
-        dollar.setActive(true);
-    }
-
-    public void mouseEntered(MouseEvent e) //mouse entered canvas
-    {
-    }
-
-    public void mouseExited(MouseEvent e) //mouse left canvas
-    {
-    }
-
-    public void mouseClicked(MouseEvent e) //mouse pressed-depressed (no motion in between), if there's motion -> mouseDragged
-    {
-    }
-
-    public void update(MouseEvent e) {
-        x = e.getX();
-        y = e.getY();
-
-        repaint();
-        e.consume();
-    }
-
-    public void mousePressed(MouseEvent e) {
-        state = 1;
-        dollar.pointerPressed(e.getX(), e.getY());
-        update(e);
-    }
-
-    public void mouseReleased(MouseEvent e) {
-        state = 0;
-        dollar.pointerReleased(e.getX(), e.getY());
-        update(e);
-    }
-
-    public void mouseMoved(MouseEvent e) {
-        state = 0;
-        update(e);
-    }
-
-    public void mouseDragged(MouseEvent e) {
-        state = 2;
-        dollar.pointerDragged(e.getX(), e.getY());
-        update(e);
-    }
-
-    public void update(Graphics g) {
-        Graphics temp = offScreen.getGraphics();
-        temp.setColor(getBackground());
-        temp.fillRect(0, 0, getWidth(), getHeight());
-        temp.setColor(getForeground());
-
-        paint(temp);
-
-        temp.dispose();
-
-        g.drawImage(offScreen, 0, 0, null);
-    }
-
-    public void paint(Graphics g) {
-        g.drawLine(0, y, getWidth(), y);
-        g.drawLine(x, 0, x, getHeight());
-
-        g.drawString("[" + x + " " + y + "] [" + state + "]", 10, 20);
-
-        if (ok) {
-            g.drawString("gesture: " + name + " (" + score + ")", 10, 60);
+        firstpoint = p;
+        isGesture = gesture;
+        if (isGesture) {
+            dollar.setListener(this);
+            dollar.setActive(true);
+            dollar.pointerPressed(p.x, p.y);
         }
-
-        dollar.render(g);
     }
 
+    /**
+     * Updates item
+     *
+     * @param p Point to be drawn a line to
+     */
+    public void update(Point p) {
+        ((GeneralPath) shape).lineTo(p.x, p.y);
+        dollar.pointerDragged(p.x, p.y);
+        canvas.repaint();
+    }
+
+    /**
+     * Move path item on moving the panel by dx and dy
+     *
+     * @param dx
+     * @param dy
+     */
+    public void move(int dx, int dy) {
+        AffineTransform at = new AffineTransform();
+        at.translate(dx, dy);
+
+        ((GeneralPath) shape).transform(at);
+
+        canvas.repaint();
+    }
+
+    //Getters and setters 
+    //=========================
+    public int getThickness() {
+        return thickness;
+    }
+
+    public void setThickness(int thickness) {
+        this.thickness = thickness;
+    }
+
+    public boolean isGesture() {
+        return isGesture;
+    }
+
+    public void setIsGesture(boolean isGesture) {
+        this.isGesture = isGesture;
+    }
+
+    public Dollar getDollar() {
+        return dollar;
+    }
+
+    public void setDollar(Dollar dollar) {
+        this.dollar = dollar;
+    }
+
+    public String getGestureName() {
+        return gestureName;
+    }
+
+    public void setGestureName(String gestureName) {
+        this.gestureName = gestureName;
+    }
+
+    public boolean isGestureOk() {
+        return gestureOk;
+    }
+
+    public void setGestureOk(boolean gestureOk) {
+        this.gestureOk = gestureOk;
+    }
+
+    public Panel getPanel() {
+        return panel;
+    }
+
+    public void setPanel(Panel p) {
+        this.panel = p;
+    }
+
+    public Point getFirstpoint() {
+        return firstpoint;
+    }
+
+    public void setFirstpoint(Point firstpoint) {
+        this.firstpoint = firstpoint;
+    }
+
+    @Override
     public void dollarDetected(Dollar dollar) {
-        score = dollar.getScore();
-        name = dollar.getName();
 
-        ok = score > 0.80;
+        gestureName = dollar.getName();
+        System.out.println(gestureName);
+
+        gestureOk = dollar.getScore() > 0.80;
     }
+
+    @Override
+    public DrawableItem duplicate() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

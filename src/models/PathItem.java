@@ -10,25 +10,19 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
-import lx.interaction.dollar.Dollar;
-import lx.interaction.dollar.DollarListener;
 
 /**
  * Class for sketching lines/curves
  *
  * @author Osman
  */
-public class PathItem extends DrawableItem implements DollarListener {
+public class PathItem extends DrawableItem {
 
     protected Panel panel;
     int thickness;
     Point firstpoint;
     boolean hidden;
-    String gestureName;
     boolean hiddenWithPanel;
-    boolean gestureOk;
-    boolean isGesture;
-    Dollar dollar = new Dollar(Dollar.GESTURES_DEFAULT);
 
     /**
      * Constructor
@@ -39,7 +33,7 @@ public class PathItem extends DrawableItem implements DollarListener {
      * @param p Current end
      * @param l Layer it belongs to
      */
-    public PathItem(PersistentCanvas c, Color o, Color f, Point p, Panel l, boolean gesture) {
+    public PathItem(PersistentCanvas c, Color o, Color f, Point p, Panel l) {
         super(c, o, f);
         panel = l;
         type = 1;
@@ -53,12 +47,7 @@ public class PathItem extends DrawableItem implements DollarListener {
         hidden = false;
         hiddenWithPanel = false;
         firstpoint = p;
-        isGesture = gesture;
-        if (isGesture) {
-            dollar.setListener(this);
-            dollar.setActive(true);
-            dollar.pointerPressed(p.x, p.y);
-        }
+
     }
 
     public PathItem(PathItem other) {
@@ -87,7 +76,7 @@ public class PathItem extends DrawableItem implements DollarListener {
      */
     public void update(Point p) {
         ((GeneralPath) shape).lineTo(p.x, p.y);
-        dollar.pointerDragged(p.x, p.y);
+
         canvas.repaint();
     }
 
@@ -140,53 +129,12 @@ public class PathItem extends DrawableItem implements DollarListener {
         this.hidden = hidden;
     }
 
-    public boolean isGesture() {
-        return isGesture;
-    }
-
-    public void setIsGesture(boolean isGesture) {
-        this.isGesture = isGesture;
-    }
-
-    public Dollar getDollar() {
-        return dollar;
-    }
-
-    public void setDollar(Dollar dollar) {
-        this.dollar = dollar;
-    }
-
-    public String getGestureName() {
-        return gestureName;
-    }
-
-    public void setGestureName(String gestureName) {
-        this.gestureName = gestureName;
-    }
-
-    public boolean isGestureOk() {
-        return gestureOk;
-    }
-
-    public void setGestureOk(boolean gestureOk) {
-        this.gestureOk = gestureOk;
-    }
-
     public Point getFirstpoint() {
         return firstpoint;
     }
 
     public void setFirstpoint(Point firstpoint) {
         this.firstpoint = firstpoint;
-    }
-
-    @Override
-    public void dollarDetected(Dollar dollar) {
-
-        gestureName = dollar.getName();
-       // System.out.println(gestureName);
-
-        gestureOk = dollar.getScore() > 0.80;
     }
 
 }
