@@ -11,11 +11,11 @@ package models;
  */
 public class Variables {
 
-    public static final int THUMBNAIL_HEIGHT = 100;
-    public static final int THUMBNAIL_WIDTH = 135;
+    public static final int THUMBNAIL_HEIGHT = 150;
+    public static final int THUMBNAIL_WIDTH = 260;
 
     public static final int CANVAS_HEIGHT = 900;
-    public static final int CANVAS_WIDTH = 1200;
+    public static final int CANVAS_WIDTH = 1600;
 
     public static final String EXTENSION = "comico";
     public final static int PANEL_5_HEIGHT = 2;

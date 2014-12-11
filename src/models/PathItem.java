@@ -184,7 +184,7 @@ public class PathItem extends DrawableItem implements DollarListener {
     public void dollarDetected(Dollar dollar) {
 
         gestureName = dollar.getName();
-        System.out.println(gestureName);
+       // System.out.println(gestureName);
 
         gestureOk = dollar.getScore() > 0.80;
     }

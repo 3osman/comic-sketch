@@ -71,6 +71,7 @@ public class GraphicalEditor extends JFrame {
     //Global variables definition
     private JPanel panel2;
     //buttons
+    private JButton panelStyleButton;
     private JButton addLayer;
     private JButton mergeLayer;
     private JToggleButton eraser;
@@ -83,12 +84,14 @@ public class GraphicalEditor extends JFrame {
     private JToggleButton fourButton;
     private JButton redoButton;
     private JButton styleButton;
+
     private JButton saveButton;
     private JButton loadButton;
     private JScrollPane scroller;
     private ArrayList<Layer> allLayers;
     private Container pane;//main container
     private Color o; //color
+    private Color panelColor; //panel color
     private Point mousepos; // Stores the previous mouse position
     //controllers declaration
     DrawableItemController dic = new DrawableItemController(); //controls all drawing
@@ -114,6 +117,9 @@ public class GraphicalEditor extends JFrame {
     private int globalWidth; //width
     private int globalHeight; //height
     private Layer activeLayer;
+
+    private JPanel canvasOpsPanel;
+    private JPanel rightPanel;
 
     // Constructor of the Graphical Editor
     public GraphicalEditor(int width, int height) {
@@ -159,7 +165,7 @@ public class GraphicalEditor extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //loadCanvasFn();
-                int[] column = {2, 1, 2,4};
+                int[] column = {2, 1, 2, 4};
                 for (DrawableItem di : layc.setLayoutPanels(4, column, globalLayer, canvas)) {
                     canvas.addItem(di);
                 }
@@ -289,6 +295,20 @@ public class GraphicalEditor extends JFrame {
         setButtonImage("/color.png", styleButton);
         styleButton.setToolTipText("Color");
 
+        panelStyleButton = new JButton();
+        AbstractAction panelStyleAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panelColor();
+
+            }
+
+        };
+
+        panelStyleButton.setAction(panelStyleAction);
+
+        setButtonImage("/color.png", panelStyleButton);
+        panelStyleButton.setToolTipText("Panel Color");
         clearButton = new JButton();
 
         AbstractAction clearAction = new AbstractAction() {
@@ -378,50 +398,113 @@ public class GraphicalEditor extends JFrame {
         setToggleButtonImage("/eraser.png", eraser);
         eraser.setToolTipText("Eraser");
 
-        JSeparator separator1 = new JSeparator(JSeparator.VERTICAL);
-        Dimension size = new Dimension(
-                separator1.getMaximumSize().width,
-                separator1.getMaximumSize().height);
-        separator1.setMaximumSize(size);
-        pane.add(separator1);
-
         // Canvas Panel starts here
         //==========================================
         canvasPanel.setLayout(new BoxLayout(canvasPanel, BoxLayout.X_AXIS));
         canvasPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         //canvasPanel.setPreferredSize(new Dimension((5 * width) / 6, height));
 
-        JPanel canvasOpsPanel = new JPanel();
-        canvasOpsPanel.setLayout(new BoxLayout(canvasOpsPanel, BoxLayout.Y_AXIS));
+        canvasOpsPanel = new JPanel();
+        canvasOpsPanel.setLayout(new GridBagLayout());
         canvasOpsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-       // canvasOpsPanel.setPreferredSize(new Dimension((5 * width) / 6, height / 12));
-        canvasOpsPanel.add(loadButton);
-        canvasOpsPanel.add(saveButton);
-        canvasOpsPanel.add(addPanel);
-        canvasOpsPanel.add(oneButton);
-        canvasOpsPanel.add(twoButton);
-        canvasOpsPanel.add(threeButton);
-        canvasOpsPanel.add(fourButton);
-        canvasOpsPanel.add(styleButton);
-        canvasOpsPanel.add(jcb);
-        canvasOpsPanel.add(eraser);
 
-        canvasOpsPanel.add(clearButton);
-        canvasOpsPanel.add(undoButton);
-        canvasOpsPanel.add(redoButton);
+        //canvasOpsPanel.setMaximumSize(new Dimension((3 * width) / 6, height + 200));
+        //canvasOpsPanel.add(loadButton);
+        //canvasOpsPanel.add(saveButton);
+        GridBagConstraints costraintsForOperationPanel = new GridBagConstraints();
 
+        int currentX = 0, currentY = 0;
+        int buttonXDimension = 1, buttonYDimension = 1;
+
+        costraintsForOperationPanel.fill = GridBagConstraints.BOTH;
+        costraintsForOperationPanel.gridheight = buttonXDimension;
+        costraintsForOperationPanel.gridwidth = buttonYDimension * 2;
+        costraintsForOperationPanel.gridx = currentX;
+        costraintsForOperationPanel.gridy = currentY;
+        canvasOpsPanel.add(new JLabel("Panel"), costraintsForOperationPanel);
+        costraintsForOperationPanel.gridwidth = buttonYDimension;
+
+        currentY += buttonYDimension;
+        costraintsForOperationPanel.gridx = currentX;
+        costraintsForOperationPanel.gridy = currentY;
+        canvasOpsPanel.add(addPanel, costraintsForOperationPanel);
+
+        costraintsForOperationPanel.gridx = currentX + buttonXDimension;
+        canvasOpsPanel.add(panelStyleButton, costraintsForOperationPanel);
+
+        currentY += buttonYDimension;
+        costraintsForOperationPanel.gridx = currentX;
+        costraintsForOperationPanel.gridy = currentY;
+        costraintsForOperationPanel.gridwidth = buttonYDimension * 2;
+        costraintsForOperationPanel.insets = new Insets(10, 0, 0, 0);
+        canvasOpsPanel.add(new JSeparator(), costraintsForOperationPanel);
+        costraintsForOperationPanel.insets = new Insets(0, 0, 0, 0);
+
+        currentY += buttonYDimension;
+        costraintsForOperationPanel.gridwidth = buttonYDimension * 2;
+        costraintsForOperationPanel.gridx = currentX;
+        costraintsForOperationPanel.gridy = currentY;
+        canvasOpsPanel.add(new JLabel("Stroke"), costraintsForOperationPanel);
+        costraintsForOperationPanel.gridwidth = buttonYDimension;
+
+        currentY += buttonYDimension;
+        costraintsForOperationPanel.gridx = currentX;
+        costraintsForOperationPanel.gridy = currentY;
+        canvasOpsPanel.add(oneButton, costraintsForOperationPanel);
+
+        costraintsForOperationPanel.gridx = currentX + buttonXDimension;
+        canvasOpsPanel.add(twoButton, costraintsForOperationPanel);
+
+        currentY += buttonYDimension;
+        costraintsForOperationPanel.gridx = currentX;
+        costraintsForOperationPanel.gridy = currentY;
+        canvasOpsPanel.add(threeButton, costraintsForOperationPanel);
+
+        costraintsForOperationPanel.gridx = currentX + buttonXDimension;
+        canvasOpsPanel.add(fourButton, costraintsForOperationPanel);
+
+        currentY += buttonYDimension;
+        costraintsForOperationPanel.gridx = currentX;
+        costraintsForOperationPanel.gridy = currentY;
+        canvasOpsPanel.add(styleButton, costraintsForOperationPanel);
+
+        costraintsForOperationPanel.gridx = currentX + buttonXDimension;
+        canvasOpsPanel.add(jcb, costraintsForOperationPanel);
+
+        currentY += buttonYDimension;
+        costraintsForOperationPanel.gridx = currentX;
+        costraintsForOperationPanel.gridy = currentY;
+        costraintsForOperationPanel.gridwidth = 2;
+        costraintsForOperationPanel.insets = new Insets(10, 0, 0, 0);
+        canvasOpsPanel.add(new JSeparator(), costraintsForOperationPanel);
+        costraintsForOperationPanel.insets = new Insets(0, 0, 0, 0);
+
+        currentY += buttonYDimension;
+        costraintsForOperationPanel.gridwidth = buttonYDimension * 2;
+        costraintsForOperationPanel.gridx = currentX;
+        costraintsForOperationPanel.gridy = currentY;
+        canvasOpsPanel.add(new JLabel("Eraser"), costraintsForOperationPanel);
+        costraintsForOperationPanel.gridwidth = buttonYDimension;
+
+        currentY += buttonYDimension;
+        costraintsForOperationPanel.gridx = currentX;
+        costraintsForOperationPanel.gridy = currentY;
+        canvasOpsPanel.add(eraser, costraintsForOperationPanel);
+        currentY += buttonYDimension;
+        costraintsForOperationPanel.gridx = currentX;
+        costraintsForOperationPanel.gridy = currentY;
+        costraintsForOperationPanel.gridwidth = 2;
+        costraintsForOperationPanel.insets = new Insets(30, 0, 0, 0);
+        canvasOpsPanel.add(new JSeparator(), costraintsForOperationPanel);
+        //canvasOpsPanel.add(clearButton);
+        //canvasOpsPanel.add(undoButton);
+        //canvasOpsPanel.add(redoButton);
         canvas = new PersistentCanvas(dic);
         canvas.setBackground(Color.WHITE);
-        canvas.setPreferredSize(new Dimension(Variables.CANVAS_WIDTH, Variables.CANVAS_HEIGHT));
-       // canvasPanel.add(canvasOpsPanel, BorderLayout.PAGE_START);
-        JSeparator separator2 = new JSeparator(JSeparator.HORIZONTAL);
-        Dimension size2 = new Dimension(
-                separator2.getMaximumSize().width,
-                separator2.getMaximumSize().height);
-        separator2.setMaximumSize(size2);
-        canvasPanel.add(separator2);
+        canvas.setPreferredSize(new Dimension(Variables.CANVAS_WIDTH , Variables.CANVAS_HEIGHT));
+
         canvasPanel.add(new JScrollPane(canvas), BorderLayout.CENTER);
-        pane.add(canvasOpsPanel);
+
         pane.add(canvasPanel);
         globalLayer = new Layer(false);
         globalLayer.setActive(true);
@@ -643,6 +726,9 @@ public class GraphicalEditor extends JFrame {
                                 gc.allign(true, selectionAll);
                                 gc.allign(false, selectionAll);
                                 break;
+                            case "pigTail":
+                                panelColor();
+                                break;
                         }
                     }
 
@@ -677,7 +763,10 @@ public class GraphicalEditor extends JFrame {
                         if (o == null) {
                             o = Color.BLACK;
                         }
-                        Color f = new Color(255, 255, 255, 128);
+                        Color f = panelColor;
+                        if (panelColor == null) {
+                            f = new Color(255, 255, 255, 128);
+                        }
                         if (mode.equals("Rectangle")) {
                             item = new Panel(canvas, o, f, p, activeLayer);
                             ((Panel) item).setInitialPoint(p);
@@ -816,12 +905,6 @@ public class GraphicalEditor extends JFrame {
             }
 
         });
-        JSeparator separator = new JSeparator(JSeparator.VERTICAL);
-        Dimension size1 = new Dimension(
-                separator.getMaximumSize().width,
-                separator.getMaximumSize().height);
-        separator.setMaximumSize(size1);
-        pane.add(separator);
 
         //Layers panel start here
         //============================
@@ -869,16 +952,17 @@ public class GraphicalEditor extends JFrame {
         panel2 = new JPanel();
         buttonspanel.setLayout(new FlowLayout());
         buttonspanel.setPreferredSize(new Dimension(width / 6, height / 12));
-
         panel2.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         panel2.setPreferredSize(new Dimension(width / 6, height));
-        panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
         buttonspanel.add(addLayer);
         buttonspanel.add(mergeLayer);
 
-        panel2.add(buttonspanel);
-
-        pane.add(panel2);
+        rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+      //  rightPanel.setPreferredSize(new Dimension(width / 1000, height));
+        rightPanel.add(canvasOpsPanel);
+        panel2.setBackground(Color.BLACK);
+        pane.add(rightPanel);
         resetLayerPanel();
 
         pack();
@@ -887,7 +971,7 @@ public class GraphicalEditor extends JFrame {
     }
 
     public void createNewPanel(Point p) {
-        Panel item = new Panel(canvas, Color.BLACK, new Color(255, 255, 255, 128), p, activeLayer);
+        Panel item = new Panel(canvas, Color.BLACK, panelColor, p, activeLayer);
         ((Panel) item).setInitialPoint(p);
         ((Panel) item).setInitialResizePoint(p);
         Rectangle thisRect = (Rectangle) (((Panel) item).getShape());
@@ -897,6 +981,24 @@ public class GraphicalEditor extends JFrame {
         canvas.addItem(item);
         udc.addItemtoUndo(new UndoableItem(item, 0));
         select(item, false);
+    }
+
+    public void panelColor() {
+        panelColor = JColorChooser.showDialog(
+                canvas,
+                "Choose Color",
+                panelColor);
+        if (panelColor != null) {
+            panelColor = new Color(panelColor.getRed(), panelColor.getGreen(), panelColor.getBlue(), 128);
+            if (selectionAll != null) {
+                for (DrawableItem di : selectionAll) {
+                    ((Panel) di).setFill(panelColor);
+                }
+                repaint();
+            }
+        } else {
+            panelColor = new Color(255, 255, 255, 128);
+        }
     }
 
     public void loadCanvasFn() {
@@ -975,8 +1077,8 @@ public class GraphicalEditor extends JFrame {
      */
     private void resetLayerPanel() {
 
-        pane.remove(panel2);
-        pane.remove(scroller);
+        rightPanel.remove(panel2);
+        rightPanel.remove(scroller);
         panel2 = new JPanel();
         JPanel buttonspanel = new JPanel();
         buttonspanel.setLayout(new GridBagLayout());
@@ -998,13 +1100,12 @@ public class GraphicalEditor extends JFrame {
         buttonspanel.add(mergeLayer, costraintsForButtonPanel);
         mergeLayer.setEnabled(true);
 
-        costraintsForPanel2.anchor = GridBagConstraints.PAGE_START;
         costraintsForPanel2.gridx = 0;
         costraintsForPanel2.gridy = 0;
         costraintsForPanel2.gridwidth = Variables.BUTTON_WIDHT;
         costraintsForPanel2.gridheight = Variables.BUTTON_HEIGHT;
-        costraintsForPanel2.anchor = GridBagConstraints.CENTER;
-        panel2.add(buttonspanel, costraintsForPanel2);
+        rightPanel.add(buttonspanel);
+        //panel2.add(buttonspanel, costraintsForPanel2);
 
         int i = 0;
         for (Layer l : allLayers) {
@@ -1195,9 +1296,9 @@ public class GraphicalEditor extends JFrame {
             i++;
         }
 
-        pane.add(panel2, BorderLayout.PAGE_START);
+        rightPanel.add(panel2);
         scroller = new JScrollPane(panel2);
-        pane.add(scroller, BorderLayout.CENTER);
+        rightPanel.add(scroller);
 
         validate();
         repaint();

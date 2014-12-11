@@ -8,6 +8,7 @@ package controller;
 import UI.PersistentCanvas;
 import java.io.Serializable;
 import java.util.ArrayList;
+import models.DrawableItem;
 import models.Layer;
 import models.Panel;
 import models.PathItem;
@@ -28,17 +29,16 @@ public class LayersController implements Serializable {
     public void addToPanels(Layer l, Panel p) {
         l.getDrawable().add(p);
     }
-    /*
-    
-     public void bringToTop(Layer l, PersistentCanvas canvas) {
-     for (PathItem pi : l.getDrawn()) {
-     canvas.removeItem(pi);
-     }
 
-     for (PathItem pi : l.getDrawn()) {
-     canvas.addItem(pi);
-     }
-     }*/
+    public void bringToTop(Layer l, PersistentCanvas canvas) {
+        for (DrawableItem pi : l.getDrawable()) {
+            canvas.removeItem(pi);
+        }
+
+        for (DrawableItem pi : l.getDrawable()) {
+            canvas.addItem(pi);
+        }
+    }
 
     /**
      * Toggles activity of a layer
