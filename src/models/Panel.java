@@ -33,6 +33,8 @@ public class Panel extends DrawableItem {
     Rectangle thirdCorner;
     Rectangle fourthCorner;
     Point anchor;
+    boolean deleted;
+    boolean hiddenWithLayer;
 
     /**
      * Constructor
@@ -55,6 +57,8 @@ public class Panel extends DrawableItem {
 
         shape = new Rectangle(p.x, p.y, 0, 0);
         firstpoint = p;
+        deleted = false;
+        hiddenWithLayer = false;
         updateCornerRects();
     }
 
@@ -326,6 +330,22 @@ public class Panel extends DrawableItem {
 
     public void setParentLayer(Layer parentLayer) {
         this.parentLayer = parentLayer;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public boolean isHiddenWithLayer() {
+        return hiddenWithLayer;
+    }
+
+    public void setHiddenWithLayer(boolean hiddenWithLayer) {
+        this.hiddenWithLayer = hiddenWithLayer;
     }
 
 }

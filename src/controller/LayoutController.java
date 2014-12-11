@@ -7,19 +7,13 @@ package controller;
 
 import UI.PersistentCanvas;
 import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Graphics;
-import java.awt.Image;
+
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import javax.swing.ImageIcon;
 import models.DrawableItem;
 import models.Layer;
 import models.Panel;
-import models.UndoableItem;
 import models.Variables;
 
 /**

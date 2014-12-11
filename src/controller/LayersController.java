@@ -46,7 +46,7 @@ public class LayersController implements Serializable {
      * @param l Layer
      * @param active active or not
      */
-    public void setActiveLayer(Layer l, boolean active, ArrayList<Layer> layers) {
+    public Layer setActiveLayer(Layer l, boolean active, ArrayList<Layer> layers) {
         if (active) {
             for (Layer other : layers) {
 
@@ -54,11 +54,13 @@ public class LayersController implements Serializable {
 
             }
             l.setActive(true);
+            return l;
         } else {
 
             layers.get(1).setActive(true);
 
             l.setActive(false);
+            return layers.get(1);
         }
     }
 

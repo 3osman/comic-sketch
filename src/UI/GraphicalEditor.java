@@ -400,7 +400,7 @@ public class GraphicalEditor extends JFrame {
 
         int currentX = 0, currentY = 0;
         int buttonXDimension = 1, buttonYDimension = 1;
-
+costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
         costraintsForOperationPanel.fill = GridBagConstraints.BOTH;
         costraintsForOperationPanel.gridheight = buttonXDimension;
         costraintsForOperationPanel.gridwidth = buttonYDimension * 2;
@@ -421,9 +421,7 @@ public class GraphicalEditor extends JFrame {
         costraintsForOperationPanel.gridx = currentX;
         costraintsForOperationPanel.gridy = currentY;
         costraintsForOperationPanel.gridwidth = buttonYDimension * 2;
-        costraintsForOperationPanel.insets = new Insets(10, 0, 0, 0);
         canvasOpsPanel.add(new JSeparator(), costraintsForOperationPanel);
-        costraintsForOperationPanel.insets = new Insets(0, 0, 0, 0);
 
         currentY += buttonYDimension;
         costraintsForOperationPanel.gridwidth = buttonYDimension * 2;
@@ -460,9 +458,7 @@ public class GraphicalEditor extends JFrame {
         costraintsForOperationPanel.gridx = currentX;
         costraintsForOperationPanel.gridy = currentY;
         costraintsForOperationPanel.gridwidth = 2;
-        costraintsForOperationPanel.insets = new Insets(10, 0, 0, 0);
         canvasOpsPanel.add(new JSeparator(), costraintsForOperationPanel);
-        costraintsForOperationPanel.insets = new Insets(0, 0, 0, 0);
 
         currentY += buttonYDimension;
         costraintsForOperationPanel.gridwidth = buttonYDimension * 2;
@@ -510,6 +506,7 @@ public class GraphicalEditor extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 removeShape();
                 selection = null;
+                select(null, false);
                 selectionAll = new ArrayList<>();
             }
         };
@@ -524,7 +521,7 @@ public class GraphicalEditor extends JFrame {
                         for (DrawableItem di : selectionAll) {
                             di.move(0, -2);
                         }
-                        udc.saveMoveToUndo(selection);
+                        udc.saveMoveToUndo(selectionAll);
 
                     }
                 }
@@ -539,7 +536,7 @@ public class GraphicalEditor extends JFrame {
                         for (DrawableItem di : selectionAll) {
                             di.move(0, 2);
                         }
-                        udc.saveMoveToUndo(selection);
+                        udc.saveMoveToUndo(selectionAll);
 
                     }
                 }
@@ -556,7 +553,7 @@ public class GraphicalEditor extends JFrame {
                         for (DrawableItem di : selectionAll) {
                             di.move(-2, 0);
                         }
-                        udc.saveMoveToUndo(selection);
+                        udc.saveMoveToUndo(selectionAll);
 
                     }
                 }
@@ -573,7 +570,7 @@ public class GraphicalEditor extends JFrame {
                         for (DrawableItem di : selectionAll) {
                             di.move(2, 0);
                         }
-                        udc.saveMoveToUndo(selection);
+                        udc.saveMoveToUndo(selectionAll);
                     }
                 }
             }
@@ -619,31 +616,34 @@ public class GraphicalEditor extends JFrame {
                         if (e.getExtendedKeyCode() == 90) {
 
                             udc.undoProcess(canvas);
+                            canvas.repaint();
                             resetLayerPanel();
 
                         } else if (e.getExtendedKeyCode() == 89) {
                             udc.redoProcess(canvas);
+                            canvas.repaint();
+
                             resetLayerPanel();
                         } else if (e.getExtendedKeyCode() == 40) { //down
                             for (DrawableItem di : selectionAll) {
                                 ((Panel) di).resize(0, 2);
                             }
-                            udc.saveResizeToUndo(selection);
+                            udc.saveResizeToUndo(selectionAll);
                         } else if (e.getExtendedKeyCode() == 39) { //right
                             for (DrawableItem di : selectionAll) {
                                 ((Panel) di).resize(2, 0);
                             }
-                            udc.saveResizeToUndo(selection);
+                            udc.saveResizeToUndo(selectionAll);
                         } else if (e.getExtendedKeyCode() == 38) { //up
                             for (DrawableItem di : selectionAll) {
                                 ((Panel) di).resize(0, -2);
                             }
-                            udc.saveResizeToUndo(selection);
+                            udc.saveResizeToUndo(selectionAll);
                         } else if (e.getExtendedKeyCode() == 37) { //left
                             for (DrawableItem di : selectionAll) {
                                 ((Panel) di).resize(-2, 0);
                             }
-                            udc.saveResizeToUndo(selection);
+                            udc.saveResizeToUndo(selectionAll);
                         } else if (e.getKeyCode() == 65) {//select all
 
                             for (DrawableItem di : canvas.getItems()) {
@@ -688,13 +688,13 @@ public class GraphicalEditor extends JFrame {
             public void mouseReleased(MouseEvent e) {
                 if (isMoving) {
                     if (selection instanceof Panel) {
-                        udc.saveMoveToUndo(selection);
+                        udc.saveMoveToUndo(selectionAll);
                     }
                     isMoving = false;
                     canvas.setCursor(createCtrlCursor());
 
                 } else if (mode.equals("Resize")) {
-                    udc.saveResizeToUndo(selection);
+                    udc.saveResizeToUndo(selectionAll);
                 } else if (mode.equals("Res")) {
                     mode = "Path";
                     canvas.setCursor(createPathCursor());
@@ -796,7 +796,7 @@ public class GraphicalEditor extends JFrame {
 
                                     } else {
                                         item = new PathItem(canvas, o, f, p, null);
-                                        globalLayer.addItemToLayer((PathItem) item);
+                                        activeLayer.addItemToLayer((PathItem) item);
 
                                         ((PathItem) item).setThickness(thickness);
                                     }
@@ -836,7 +836,9 @@ public class GraphicalEditor extends JFrame {
                         }
 
                         canvas.addItem(item);
-                        udc.addItemtoUndo(new UndoableItem(item, 0));
+                        ArrayList<UndoableItem> uid = new ArrayList<>();
+                        uid.add(new UndoableItem(item, 0));
+                        udc.addItemtoUndo(uid);
 
                         select(item, false);
                     }
@@ -912,7 +914,7 @@ public class GraphicalEditor extends JFrame {
                         select(selection, false);
                         ((Panel) selection).resize(((Panel) selection).getAnchor(), e.getPoint());
 
-                        udc.saveResizeToUndo(selection);
+                        udc.saveResizeToUndo(selectionAll);
                     } else {
                         selection.update(e.getPoint());
 
@@ -934,36 +936,18 @@ public class GraphicalEditor extends JFrame {
                 allLayers.add(l);
                 lc.setActiveLayer(l, true, allLayers);
                 activeLayer = l;
+                isBlue = false;
+                jcb.setSelected(false);
                 resetLayerPanel();
-                udc.addItemtoUndo(new UndoableItem(l, 0));
+                // udc.addItemtoUndo(new UndoableItem(l, 0));
             }
         };
         addLayer.setAction(addLayerAction);
         addLayer.show(true);
         addLayer.setEnabled(true);
 
-        mergeLayer = new JButton();
-
-        AbstractAction mergeLayerAction = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Layer l = new Layer(false);
-                allLayers.add(l);
-                lc.setActiveLayer(l, true, allLayers);
-                activeLayer = l;
-                resetLayerPanel();
-                udc.addItemtoUndo(new UndoableItem(l, 0));
-            }
-        };
-        mergeLayer.setAction(mergeLayerAction);
-        mergeLayer.show(true);
-        mergeLayer.setEnabled(true);
-
         setButtonImage("/add.png", addLayer);
         addLayer.setToolTipText("Add Layer");
-
-        setButtonImage("/Merge_Icon.png", mergeLayer);
-        mergeLayer.setToolTipText("Merge Layer");
 
         JPanel buttonspanel = new JPanel();
         panel2 = new JPanel();
@@ -972,7 +956,6 @@ public class GraphicalEditor extends JFrame {
         panel2.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         panel2.setPreferredSize(new Dimension(width / 6, height));
         buttonspanel.add(addLayer);
-        buttonspanel.add(mergeLayer);
 
         rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
@@ -1225,7 +1208,9 @@ public class GraphicalEditor extends JFrame {
         thisRect.height = 200;
         item.update(new Point(200 + p.x, 200 + p.y));
         canvas.addItem(item);
-        udc.addItemtoUndo(new UndoableItem(item, 0));
+        ArrayList<UndoableItem> allItems = new ArrayList<>();
+        allItems.add(new UndoableItem(item, 0));
+        udc.addItemtoUndo(allItems);
         select(item, false);
     }
 
@@ -1348,11 +1333,6 @@ public class GraphicalEditor extends JFrame {
 
         addLayer.setEnabled(true);
 
-        costraintsForButtonPanel.gridx = Variables.BUTTON_HEIGHT;
-        costraintsForButtonPanel.gridy = 0;
-        buttonspanel.add(mergeLayer, costraintsForButtonPanel);
-        mergeLayer.setEnabled(true);
-
         costraintsForPanel2.gridx = 0;
         costraintsForPanel2.gridy = 0;
         costraintsForPanel2.gridwidth = Variables.BUTTON_WIDHT;
@@ -1368,8 +1348,10 @@ public class GraphicalEditor extends JFrame {
                     JToggleButton show = new JToggleButton();
 
                     JCheckBox select = new JCheckBox("Shown");
-                    if (l.isActive()) {
+                    if (l.equals(activeLayer)) {
                         show.setSelected(true);
+                    } else {
+                        l.setActive(false);
                     }
                     if (!l.isHidden()) {
                         select.setSelected(true);
@@ -1379,25 +1361,26 @@ public class GraphicalEditor extends JFrame {
 
                         public void itemStateChanged(ItemEvent ev) {
                             if (ev.getStateChange() == ItemEvent.SELECTED) {
-                                lc.setActiveLayer(l, true, allLayers);
                                 if (l.isIsBlueLayer()) {
                                     isBlue = true;
                                     jcb.setSelected(true);
                                     //if (selection != null) {
-                                    lc.setActiveLayer(blueInkLayer, true, allLayers);
+                                    activeLayer = lc.setActiveLayer(blueInkLayer, true, allLayers);
                                     canvas.setCursor(createBlueCursor());
                                 } else {
                                     isBlue = false;
                                     canvas.setCursor(createPathCursor());
-
-                                    //canvas.setCursor(Cursor.getDefaultCursor());
                                     jcb.setSelected(false);
+                                    activeLayer = lc.setActiveLayer(l, true, allLayers);
+
                                 }
                                 resetLayerPanel();
                             } else if (ev.getStateChange() == ItemEvent.DESELECTED) {
-                                lc.setActiveLayer(l, false, allLayers);
-                                resetLayerPanel();
+                                activeLayer = lc.setActiveLayer(l, false, allLayers);
+                                isBlue = false;
+                                jcb.setSelected(false);
 
+                                resetLayerPanel();
                             }
                         }
                     }
@@ -1410,29 +1393,34 @@ public class GraphicalEditor extends JFrame {
                                     canvas.removeItem(pi);
                                 }
 
-                                l.setHidden(false);
+                                l.setHidden(true);
                             } else {
                                 for (DrawableItem pi : l.getDrawable()) {
-                                    canvas.addItem(pi);
+                                    if (pi instanceof Panel && !((Panel) pi).isDeleted()) {
+                                        canvas.addItem(pi);
+                                    } else if (pi instanceof PathItem) {
+                                        canvas.addItem(pi);
+
+                                    }
                                 }
 
-                                l.setHidden(true);
+                                l.setHidden(false);
                             }
                         }
                     });
                     AbstractAction deleteLayer = new AbstractAction() { //delete layer action
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            lc.setActiveLayer(l, false, allLayers);
-                            l.setDeleted(true);
+                            activeLayer = lc.setActiveLayer(l, false, allLayers);
+                            // activeLayer = globalLayer;
+                            //l.setDeleted(true);
                             for (DrawableItem pi : l.getDrawable()) {
-                                if (pi instanceof PathItem) {
-                                    ((PathItem) pi).setHiddenWithPanel(true);
-                                }
+
                                 canvas.removeItem(pi);
                             }
+                            allLayers.remove(l);
                             resetLayerPanel();
-                            udc.addItemtoUndo(new UndoableItem(l, 1));
+                            //udc.addItemtoUndo(new UndoableItem(l, 1));
                         }
                     };
                     deleteButton.setAction(deleteLayer);
@@ -1670,21 +1658,27 @@ public class GraphicalEditor extends JFrame {
             return false;
         } else {
             //emptyLayerPanel();
+            ArrayList<UndoableItem> allDel = new ArrayList<>();
+
             for (DrawableItem di : selectionAll) {
                 canvas.removeItem(di);
                 if (di instanceof Panel) {
-
+                    ((Panel) di).setDeleted(true);
                     //   for (Layer li : ((Panel) selection).getLayers()) {
                     //  li.setActive(false);
                     for (PathItem pi : ((Panel) di).getLines()) {
                         canvas.removeItem(pi);
+                        pi.setHiddenWithPanel(true);
+                        ((Panel) di).getParentLayer().deleteItemFromLayer(pi);
+
                     }
                     dic.deselect(di);
+                    allDel.add(new UndoableItem(selection, 1));
                     // }
                 }
             }
             resetLayerPanel();
-            udc.addItemtoUndo(new UndoableItem(selection, 1));
+            udc.addItemtoUndo(allDel);
             return true;
         }
     }
