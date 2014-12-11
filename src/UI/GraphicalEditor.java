@@ -341,14 +341,19 @@ public class GraphicalEditor extends JFrame {
                     if (isWhite) {
                         isWhite = false;
                         eraser.setSelected(false);
-                        canvas.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                        //canvas.setCursor(dic.createBlueCursor());
                     }
+                    canvas.setCursor(dic.createBlueCursor());
+
                 } else if (ev.getStateChange() == ItemEvent.DESELECTED) {
                     isBlue = false;
                     //if (selection != null) {
                     lc.setActiveLayer(globalLayer, true, allLayers);
                     resetLayerPanel();
                     select(null, false);
+                    canvas.setCursor(dic.createPathCursor());
+
+                    //canvas.setCursor(Cursor.getDefaultCursor());
                     //}
                 }
             }
@@ -391,7 +396,7 @@ public class GraphicalEditor extends JFrame {
                         lc.setActiveLayer(globalLayer, true, allLayers);
                         select(null, false);
                     }
-                    canvas.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    canvas.setCursor(dic.createPathCursor());
                 }
             }
         });
@@ -501,10 +506,10 @@ public class GraphicalEditor extends JFrame {
         //canvasOpsPanel.add(redoButton);
         canvas = new PersistentCanvas(dic);
         canvas.setBackground(Color.WHITE);
-        canvas.setPreferredSize(new Dimension(Variables.CANVAS_WIDTH , Variables.CANVAS_HEIGHT));
+        canvas.setPreferredSize(new Dimension(Variables.CANVAS_WIDTH, Variables.CANVAS_HEIGHT));
 
         canvasPanel.add(new JScrollPane(canvas), BorderLayout.CENTER);
-
+        canvas.setCursor(dic.createPathCursor());
         pane.add(canvasPanel);
         globalLayer = new Layer(false);
         globalLayer.setActive(true);
@@ -621,11 +626,14 @@ public class GraphicalEditor extends JFrame {
                 if (e.getID() == KeyEvent.KEY_PRESSED) {
                     //System.out.println(e.getExtendedKeyCode());
                     if (e.getKeyCode() == 18) {
+                        canvas.setCursor(dic.createAddCursor());
                         mode = "Rectangle";
                     } else if (e.getKeyCode() == 17) {
                         mode = "Select/Move";
+                        canvas.setCursor(dic.createCtrlCursor());
                     } else if (e.getKeyCode() == 16) {
                         mode = "Gesture";
+                        canvas.setCursor(dic.createGestureCursor());
                     }
                     if (mode.equals("Select/Move")) {
                         if (e.getExtendedKeyCode() == 90) {
@@ -679,6 +687,8 @@ public class GraphicalEditor extends JFrame {
                 } else if (e.getID() == KeyEvent.KEY_RELEASED) {
                     if (e.getKeyCode() == 18 || e.getKeyCode() == 17 || e.getKeyCode() == 16) {
                         mode = "Path";
+                        canvas.setCursor(dic.createPathCursor());
+
                     }
 
                 }
@@ -696,10 +706,14 @@ public class GraphicalEditor extends JFrame {
                         udc.saveMoveToUndo(selection);
                     }
                     isMoving = false;
+                     canvas.setCursor(dic.createCtrlCursor());
+                   
                 } else if (mode.equals("Resize")) {
                     udc.saveResizeToUndo(selection);
                 } else if (mode.equals("Res")) {
                     mode = "Path";
+                    canvas.setCursor(dic.createPathCursor());
+
                     ((Panel) selection).setAnchor(null);
 
                 }
@@ -756,7 +770,7 @@ public class GraphicalEditor extends JFrame {
                 if (!mode.equals("Select/Move") && !mode.equals("Gesture")) {
                     canvas.getItemAt(p);
                     if (selection != null && ((Panel) selection).getAnchor() != null) {
-
+                        canvas.setCursor(dic.createAddCursor());
                         mode = "Res";
                     } else {
                         DrawableItem item = null;
@@ -831,7 +845,10 @@ public class GraphicalEditor extends JFrame {
                     Panel insidePanel = (Panel) canvas.getItemAt(p);
 
                     DrawableItem item = null;
-                    Color f = new Color(255, 255, 255, 128);
+                    Color f = panelColor;
+                    if (panelColor == null) {
+                        f = new Color(255, 255, 255, 128);
+                    }
 
                     if (insidePanel == null) {
                         item = new PathItem(canvas, Color.BLACK, f, p, null, true);
@@ -874,7 +891,7 @@ public class GraphicalEditor extends JFrame {
                     return;
                 } else {
                     if (mode.equals("Select/Move")) {
-
+                        canvas.setCursor(dic.createDragCursor());
                         isMoving = true;
                         if (selection instanceof PathItem) {
                             Panel item = ((PathItem) selection).getPanel();
@@ -959,7 +976,7 @@ public class GraphicalEditor extends JFrame {
 
         rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-      //  rightPanel.setPreferredSize(new Dimension(width / 1000, height));
+        //  rightPanel.setPreferredSize(new Dimension(width / 1000, height));
         rightPanel.add(canvasOpsPanel);
         panel2.setBackground(Color.BLACK);
         pane.add(rightPanel);
@@ -971,6 +988,9 @@ public class GraphicalEditor extends JFrame {
     }
 
     public void createNewPanel(Point p) {
+        if (panelColor == null) {
+            panelColor = new Color(255, 255, 255, 128);
+        }
         Panel item = new Panel(canvas, Color.BLACK, panelColor, p, activeLayer);
         ((Panel) item).setInitialPoint(p);
         ((Panel) item).setInitialResizePoint(p);
@@ -1132,8 +1152,12 @@ public class GraphicalEditor extends JFrame {
                                     jcb.setSelected(true);
                                     //if (selection != null) {
                                     lc.setActiveLayer(blueInkLayer, true, allLayers);
+                                    canvas.setCursor(dic.createBlueCursor());
                                 } else {
                                     isBlue = false;
+                                    canvas.setCursor(dic.createPathCursor());
+
+                                    //canvas.setCursor(Cursor.getDefaultCursor());
                                     jcb.setSelected(false);
                                 }
                                 resetLayerPanel();

@@ -34,34 +34,36 @@ import models.PathItem;
 
 /**
  * Controller for drawable items (Panels, Lines)
+ *
  * @author Osman
  */
-public class DrawableItemController implements Serializable{
-   
-    
+public class DrawableItemController implements Serializable {
 
     /**
      * Selects an item from the canvas
+     *
      * @param di the item to be selected
      */
     public void select(DrawableItem di) {
-        
+
         di.setIsSelected(true);
         di.getCanvas().repaint();
     }
 
     /**
      * Deselects an item from the canvas
+     *
      * @param di the item to be deselected
      */
     public void deselect(DrawableItem di) {
         di.setIsSelected(false);
-        
+
         di.getCanvas().repaint();
     }
 
     /**
-     *  Fills a panel
+     * Fills a panel
+     *
      * @param di panel
      * @param g graphics for filling
      */
@@ -72,11 +74,12 @@ public class DrawableItemController implements Serializable{
 
     /**
      * Draws a shape using graphics2D
+     *
      * @param di shape to be drawn
-     * @param g  graphics to draw
+     * @param g graphics to draw
      */
     protected void drawShape(DrawableItem di, Graphics2D g) {
-        
+
         Stroke oldstrk = null;
         if (di.getIsSelected()) {
             oldstrk = g.getStroke();
@@ -100,46 +103,133 @@ public class DrawableItemController implements Serializable{
 
     /**
      * Creates eraser cursor
+     *
      * @return Cursor of the eraser
      */
     public Cursor createEraserCursor() {
-        ImageIcon image = new ImageIcon(this.getClass().getResource("/rubber.gif"));
+        ImageIcon image = new ImageIcon(this.getClass().getResource("/eraser-icon.png"));
         Toolkit kit = Toolkit.getDefaultToolkit();
-        
+
         Image img = image.getImage();
-        
+
         BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-        
+
         Graphics g = bi.createGraphics();
-        g.drawImage(img, 0, 0, 10, 10, null);
+        g.drawImage(img, 0, 0, 15, 15, null);
         ImageIcon newIcon = new ImageIcon(bi);
-        return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "rubber");
+        return kit.createCustomCursor(newIcon.getImage(), new Point(0, 15), "rubber");
+    }
+
+    public Cursor createGestureCursor() {
+        ImageIcon image = new ImageIcon(this.getClass().getResource("/gesture.png"));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+
+        Image img = image.getImage();
+
+        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = bi.createGraphics();
+        g.drawImage(img, 0, 0, 30, 30, null);
+        ImageIcon newIcon = new ImageIcon(bi);
+        return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "gesture");
+    }
+
+    public Cursor createCtrlCursor() {
+        ImageIcon image = new ImageIcon(this.getClass().getResource("/HandOpen.png"));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+
+        Image img = image.getImage();
+
+        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = bi.createGraphics();
+        g.drawImage(img, 0, 0, 20, 25, null);
+        ImageIcon newIcon = new ImageIcon(bi);
+        return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "handopen");
+    }
+
+    public Cursor createDragCursor() {
+        ImageIcon image = new ImageIcon(this.getClass().getResource("/HandClose.png"));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+
+        Image img = image.getImage();
+
+        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = bi.createGraphics();
+        g.drawImage(img, 0, 0, 20, 25, null);
+        ImageIcon newIcon = new ImageIcon(bi);
+        return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "drag");
+    }
+
+    public Cursor createBlueCursor() {
+        ImageIcon image = new ImageIcon(this.getClass().getResource("/BluePen.png"));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+
+        Image img = image.getImage();
+
+        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = bi.createGraphics();
+        g.drawImage(img, 0, 0, 15, 15, null);
+        ImageIcon newIcon = new ImageIcon(bi);
+        return kit.createCustomCursor(newIcon.getImage(), new Point(0, 0), "bluepen");
+    }
+
+    public Cursor createPathCursor() {
+        ImageIcon image = new ImageIcon(this.getClass().getResource("/BlackPen.png"));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+
+        Image img = image.getImage();
+
+        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = bi.createGraphics();
+        g.drawImage(img, 0, 0, 15, 15, null);
+        ImageIcon newIcon = new ImageIcon(bi);
+        return kit.createCustomCursor(newIcon.getImage(), new Point(0, 0), "blackpen");
+    }
+
+    public Cursor createAddCursor() {
+        ImageIcon image = new ImageIcon(this.getClass().getResource("/plus.png"));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+
+        Image img = image.getImage();
+
+        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = bi.createGraphics();
+        g.drawImage(img, 0, 0, 15, 15, null);
+        ImageIcon newIcon = new ImageIcon(bi);
+        return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "add");
     }
 
     /**
      * Paints a shape
+     *
      * @param di shape to be painted
      * @param g graphics to paint
      */
     public void paint(DrawableItem di, Graphics2D g) {
-        
+
         fillShape(di, g);
         drawShape(di, g);
     }
 
     /**
      * Paints a curve/pathitem
+     *
      * @param di Curve to be painted
      * @param g Graphics to paint
      */
     public void paintPath(DrawableItem di, Graphics2D g) {
-        
+
         drawShape(di, g);
     }
-   
 
     /**
      * Checks if item contains a point
+     *
      * @param di Item or shape
      * @param p Point to be checked
      * @return
@@ -150,24 +240,25 @@ public class DrawableItemController implements Serializable{
 
     /**
      * Aligns panel on 9 anchors in the canvas, not finished
-     * @param canvas 
+     *
+     * @param canvas
      * @param gd
      * @param points
      * @param width
      * @param height
      */
     public void allign(PersistentCanvas canvas, GroupingController gd, ArrayList<Point> points, int width, int height) {
-        
+
         for (DrawableItem di : canvas.getItems()) {
             if (di instanceof Panel) {
                 Rectangle t = ((Rectangle) (((Panel) di).getShape()));
-                
+
                 Point temp = gd.getClosestAnchor(new Point(t.x, t.y), points);
                 ((Panel) di).moveA(temp.x, temp.y);
-                
+
             }
         }
-        
+
     }
-    
+
 }
