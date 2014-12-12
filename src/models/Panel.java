@@ -112,6 +112,20 @@ public class Panel extends DrawableItem {
     }
 
     /**
+     * Moves the panel
+     *
+     * @param dx Horizontal difference
+     * @param dy Vertical difference
+     */
+    public void moveUndo(int dx, int dy) {
+        ((Rectangle) shape).x += dx;
+        ((Rectangle) shape).y += dy;
+        
+        updateCornerRects();
+        canvas.repaint();
+    }
+
+    /**
      * Moves the anchor point of the rectangle and updates width/height
      *
      * @param x New x position
@@ -178,18 +192,18 @@ public class Panel extends DrawableItem {
     public Point getKnobContainingPoint(Point pt) {
 
         if (firstCorner.contains(pt)) {
-           // index[0] = 0;
+            // index[0] = 0;
             return new Point(((Rectangle) shape).x + ((Rectangle) shape).width, ((Rectangle) shape).y + ((Rectangle) shape).height);
 
         } else if (secondCorner.contains(pt)) {
-           // index[0] = 1;
+            // index[0] = 1;
             return new Point(((Rectangle) shape).x, ((Rectangle) shape).y + ((Rectangle) shape).height);
         } else if (thirdCorner.contains(pt)) {
-           // index[0] = 2;
+            // index[0] = 2;
             return new Point(((Rectangle) shape).x, ((Rectangle) shape).y);
 
         } else if (fourthCorner.contains(pt)) {
-          //  index[0] = 3;
+            //  index[0] = 3;
             return new Point(((Rectangle) shape).x + ((Rectangle) shape).width, ((Rectangle) shape).y);
         }
         return null;

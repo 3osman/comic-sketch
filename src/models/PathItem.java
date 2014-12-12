@@ -23,6 +23,7 @@ public class PathItem extends DrawableItem {
     Point firstpoint;
     boolean hidden;
     boolean hiddenWithPanel;
+    Layer layer;
 
     @Override
     public Object clone() {
@@ -38,13 +39,13 @@ public class PathItem extends DrawableItem {
      * @param p Current end
      * @param l Layer it belongs to
      */
-    public PathItem(PersistentCanvas c, Color o, Color f, Point p, Panel l) {
+    public PathItem(PersistentCanvas c, Color o, Color f, Point p, Panel l, Layer la) {
         super(c, o, f);
         panel = l;
         type = 1;
         thickness = 2;
         shape = new GeneralPath();
-
+        layer = la;
         ((GeneralPath) shape).moveTo(p.x, p.y);
         if (l != null) {
             l.addToLines(this);
@@ -140,6 +141,14 @@ public class PathItem extends DrawableItem {
 
     public void setFirstpoint(Point firstpoint) {
         this.firstpoint = firstpoint;
+    }
+
+    public Layer getLayer() {
+        return layer;
+    }
+
+    public void setLayer(Layer layer) {
+        this.layer = layer;
     }
 
 }

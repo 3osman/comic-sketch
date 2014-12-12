@@ -87,7 +87,6 @@ public class GraphicalEditor extends JFrame {
     private JToggleButton fourButton;
     private JButton styleButton;
 
-   
     private JScrollPane scroller;
     private ArrayList<Layer> allLayers;
     private Container pane;//main container
@@ -218,12 +217,7 @@ public class GraphicalEditor extends JFrame {
         setToggleButtonImage("/3s.gif", threeButton);
         setToggleButtonImage("/4s.gif", fourButton);
         setButtonImage("/addPanel.png", addPanel);
-        
-
-       
-        
-
-        
+        addPanel.setToolTipText("Add Panel");
 
         styleButton = new JButton();
         AbstractAction styleAction = new AbstractAction() {
@@ -758,7 +752,7 @@ public class GraphicalEditor extends JFrame {
                             if (insidePanel == null) {
                                 if (!isBlue) {
                                     if (isWhite) {
-                                        item = new PathItem(canvas, Color.WHITE, f, p, null);
+                                        item = new PathItem(canvas, Color.WHITE, f, p, null, whiteLayer);
                                         whiteLayer.addItemToLayer((PathItem) item);
                                         for (Layer l : allLayers) {
                                             l.addItemToLayer((PathItem) item);
@@ -767,13 +761,13 @@ public class GraphicalEditor extends JFrame {
                                         ((PathItem) item).setThickness(20);
 
                                     } else {
-                                        item = new PathItem(canvas, o, f, p, null);
+                                        item = new PathItem(canvas, o, f, p, null, activeLayer);
                                         activeLayer.addItemToLayer((PathItem) item);
 
                                         ((PathItem) item).setThickness(thickness);
                                     }
                                 } else {
-                                    item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, null);
+                                    item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, null, blueInkLayer);
                                     blueInkLayer.addItemToLayer((PathItem) item);
 
                                     ((PathItem) item).setThickness(thickness);
@@ -782,7 +776,7 @@ public class GraphicalEditor extends JFrame {
                             } else {
                                 if (!isBlue) {
                                     if (isWhite) {
-                                        item = new PathItem(canvas, Color.WHITE, f, p, insidePanel);
+                                        item = new PathItem(canvas, Color.WHITE, f, p, insidePanel, whiteLayer);
                                         // insidePanel.getParentLayer().addItemToLayer((PathItem) item);
                                         whiteLayer.addItemToLayer((PathItem) item);
                                         for (Layer l : allLayers) {
@@ -794,17 +788,17 @@ public class GraphicalEditor extends JFrame {
                                     } else {
                                         //  Layer l = lc.getActiveLayer(insidePanel);
                                         if (activeLayer.isIsBlueLayer()) {
-                                            item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, insidePanel);
+                                            item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, insidePanel, blueInkLayer);
 
                                         } else {
-                                            item = new PathItem(canvas, o, f, p, insidePanel);
+                                            item = new PathItem(canvas, o, f, p, insidePanel, insidePanel.getParentLayer());
                                         }
                                         activeLayer.addItemToLayer((PathItem) item);
                                         ((PathItem) item).setThickness(thickness);
                                     }
 
                                 } else {
-                                    item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, insidePanel);
+                                    item = new PathItem(canvas, Color.BLUE.brighter().brighter().brighter(), f, p, insidePanel, insidePanel.getParentLayer());
                                     ((PathItem) item).setThickness(thickness);
                                     blueInkLayer.addItemToLayer((PathItem) item);
                                 }
@@ -1706,7 +1700,7 @@ public class GraphicalEditor extends JFrame {
 
                     }
                     dic.deselect(di);
-                    allDel.add(new UndoableItem(selection, 1));
+                    allDel.add(new UndoableItem(di, 1));
                     // }
                 }
             }
