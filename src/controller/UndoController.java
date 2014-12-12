@@ -57,6 +57,7 @@ public class UndoController {
      * Undo process
      *
      * @param canvas canvas to draw/delete/move/resize the popped item in
+     * @return Undo successful
      */
     public boolean undoProcess(PersistentCanvas canvas) {
         ArrayList<UndoableItem> toUndo = this.undoFunction();
@@ -122,6 +123,7 @@ public class UndoController {
      * Redo process
      *
      * @param canvas canvas to draw/delete/move/resize the popped item in
+     * @return Redo successful
      */
     public boolean redoProcess(PersistentCanvas canvas) {
         ArrayList<UndoableItem> toUndo = this.redoFunction();
@@ -206,7 +208,7 @@ public class UndoController {
      * Saves the resize operation to undo, as it keeps track of the original
      * size of the object, and ignores the dragging in between
      *
-     * @param selection Item to be saved
+     * @param selected Items to be saved
      */
     public void saveResizeToUndo(ArrayList<DrawableItem> selected) {
         ArrayList<UndoableItem> toAdd = new ArrayList<>();
@@ -235,7 +237,7 @@ public class UndoController {
      * Saves the move to the undo, ignoring all the positions in between the
      * click and raise
      *
-     * @param selection item to be saved
+     * @param selected items to be saved
      */
     public void saveMoveToUndo(ArrayList<DrawableItem> selected) {
         ArrayList<UndoableItem> toAdd = new ArrayList<>();

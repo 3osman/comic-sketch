@@ -84,7 +84,7 @@ public class ThumbnailLayer {
                     double hfactor = -(p.x - (((double)Variables.THUMBNAIL_WIDTH * p.x) / (double)Variables.CANVAS_WIDTH));
                     double wfactor = -(p.y - (((double)Variables.THUMBNAIL_HEIGHT * p.y) / (double)Variables.CANVAS_HEIGHT));
                     AffineTransform at = new AffineTransform();
-                    at.translate((int) hfactor, (int) wfactor);
+                    at.translate((int) Math.ceil(hfactor), (int) Math.ceil(wfactor));
                 }
             }
         }

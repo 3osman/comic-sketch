@@ -135,27 +135,7 @@ public class DrawableItemController implements Serializable {
         return di.getShape().contains(p);
     }
 
-    /**
-     * Aligns panel on 9 anchors in the canvas, not finished
-     *
-     * @param canvas
-     * @param gd
-     * @param points
-     * @param width
-     * @param height
-     */
-    public void allign(PersistentCanvas canvas, GroupingController gd, ArrayList<Point> points, int width, int height) {
+  
 
-        for (DrawableItem di : canvas.getItems()) {
-            if (di instanceof Panel) {
-                Rectangle t = ((Rectangle) (((Panel) di).getShape()));
-
-                Point temp = gd.getClosestAnchor(new Point(t.x, t.y), points);
-                ((Panel) di).moveA(temp.x, temp.y);
-
-            }
-        }
-
-    }
 
 }

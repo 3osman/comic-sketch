@@ -49,8 +49,6 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
@@ -80,20 +78,16 @@ public class GraphicalEditor extends JFrame {
     //buttons
     private JButton panelStyleButton;
     private JButton addLayer;
-    private JButton mergeLayer;
     private JToggleButton eraser;
     private JButton clearButton;
-    private JButton undoButton;
     private JButton addPanel;
     private JToggleButton oneButton;
     private JToggleButton twoButton;
     private JToggleButton threeButton;
     private JToggleButton fourButton;
-    private JButton redoButton;
     private JButton styleButton;
 
-    private JButton saveButton;
-    private JButton loadButton;
+   
     private JScrollPane scroller;
     private ArrayList<Layer> allLayers;
     private Container pane;//main container
@@ -138,7 +132,6 @@ public class GraphicalEditor extends JFrame {
 
         pane = getContentPane();
 
-        anchorP = gc.getDistinctivePoints(width, height);
         selectionAll = new ArrayList<>();
         selection = null;
         gesture = null;
@@ -161,7 +154,6 @@ public class GraphicalEditor extends JFrame {
         threeButton = new JToggleButton();
         fourButton = new JToggleButton();
 
-        undoButton = new JButton();
         addPanel = new JButton();
         AbstractAction addPanelAction = new AbstractAction() {
             @Override
@@ -226,36 +218,12 @@ public class GraphicalEditor extends JFrame {
         setToggleButtonImage("/3s.gif", threeButton);
         setToggleButtonImage("/4s.gif", fourButton);
         setButtonImage("/addPanel.png", addPanel);
-        setButtonImage("/save-icon.png", saveButton);
-        setButtonImage("/load.png", loadButton);
+        
 
-        AbstractAction undoAction = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+       
+        
 
-                udc.undoProcess(canvas);
-                resetLayerPanel();
-
-            }
-        };
-
-        undoButton.setAction(undoAction);
-        setButtonImage("/Undo-icon.png", undoButton);
-        undoButton.setToolTipText("Undo");
-
-        redoButton = new JButton();
-
-        AbstractAction redoAction = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                udc.redoProcess(canvas);
-                resetLayerPanel();
-            }
-        };
-
-        redoButton.setAction(redoAction);
-        setButtonImage("/Redo-icon.png", redoButton);
-        redoButton.setToolTipText("Redo");
+        
 
         styleButton = new JButton();
         AbstractAction styleAction = new AbstractAction() {
@@ -400,7 +368,7 @@ public class GraphicalEditor extends JFrame {
 
         int currentX = 0, currentY = 0;
         int buttonXDimension = 1, buttonYDimension = 1;
-costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
+        costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
         costraintsForOperationPanel.fill = GridBagConstraints.BOTH;
         costraintsForOperationPanel.gridheight = buttonXDimension;
         costraintsForOperationPanel.gridwidth = buttonYDimension * 2;
@@ -792,6 +760,10 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
                                     if (isWhite) {
                                         item = new PathItem(canvas, Color.WHITE, f, p, null);
                                         whiteLayer.addItemToLayer((PathItem) item);
+                                        for (Layer l : allLayers) {
+                                            l.addItemToLayer((PathItem) item);
+
+                                        }
                                         ((PathItem) item).setThickness(20);
 
                                     } else {
@@ -813,6 +785,10 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
                                         item = new PathItem(canvas, Color.WHITE, f, p, insidePanel);
                                         // insidePanel.getParentLayer().addItemToLayer((PathItem) item);
                                         whiteLayer.addItemToLayer((PathItem) item);
+                                        for (Layer l : allLayers) {
+                                            l.addItemToLayer((PathItem) item);
+
+                                        }
                                         ((PathItem) item).setThickness(20);
 
                                     } else {
@@ -970,6 +946,9 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
         setVisible(true);
     }
 
+    /**
+     * Function for showing new dialog box after pressing ctrl+N
+     */
     public void newOptions() {
 
         JDialog jda = new JDialog(GraphicalEditor.this, "New");
@@ -1003,6 +982,9 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
 
     }
 
+    /**
+     * Show save options
+     */
     public void saveOptions() {
         jd = new JDialog(GraphicalEditor.this, "Save");
         jd.setLayout(new BorderLayout());
@@ -1043,6 +1025,13 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
         jd.setVisible(true);
     }
 
+    /**
+     * Setting action for predefined layout
+     *
+     * @param index Index of layout
+     * @param jda Dialog the buttons belongs to
+     * @return action
+     */
     public AbstractAction setAbsAction(int index, JDialog jda) {
         AbstractAction absAction = null;
         switch (index) {
@@ -1138,6 +1127,12 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
         return absAction;
     }
 
+    /**
+     * Add button layouts to panel
+     *
+     * @param jda the Panel the buttons belong to
+     * @param jd The open dialog
+     */
     public void addToLayouts(JPanel jda, JDialog jd) {
 
         JButton first = new JButton();
@@ -1178,6 +1173,12 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
 
     }
 
+    /**
+     * Loads a horizontal template into the canvas
+     *
+     * @param row number of rows
+     * @param column number of columns
+     */
     public void loadTemplates(int row, int[] column) {
         clearAll();
         for (DrawableItem di : layc.setLayoutPanels(row, column, globalLayer, canvas)) {
@@ -1187,6 +1188,12 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
         resetLayerPanel();
     }
 
+    /**
+     * Loads a vertical template into the canvas
+     *
+     * @param row number of rows
+     * @param column number of columns
+     */
     public void loadVerticalTemplates(int[] row, int column) {
         clearAll();
         for (DrawableItem di : layc.setLayoutVerticalPanels(row, column, globalLayer, canvas)) {
@@ -1196,6 +1203,11 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
         resetLayerPanel();
     }
 
+    /**
+     * Creates a new panel
+     *
+     * @param p Anchor point for the panel
+     */
     public void createNewPanel(Point p) {
         if (panelColor == null) {
             panelColor = new Color(255, 255, 255, 128);
@@ -1214,6 +1226,9 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
         select(item, false);
     }
 
+    /**
+     * Changes selected panels color
+     */
     public void panelColor() {
         panelColor = JColorChooser.showDialog(
                 canvas,
@@ -1232,6 +1247,9 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
         }
     }
 
+    /**
+     * Loads file into canvas
+     */
     public void loadCanvasFn() {
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new java.io.File("."));
@@ -1260,6 +1278,9 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
         }
     }
 
+    /**
+     * Saves canvas as image
+     */
     public void saveAsImage() {
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new java.io.File("."));
@@ -1287,6 +1308,9 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
 
     }
 
+    /**
+     * Saves canvas as file to load later
+     */
     public void saveCanvasFn() {
 
         JFileChooser chooser = new JFileChooser();
@@ -1311,7 +1335,6 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
     /**
      * Resets the layer side panel on any change
      *
-     * @param p selected panel
      */
     private void resetLayerPanel() {
 
@@ -1560,7 +1583,8 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
     /**
      * Selects a specific item
      *
-     * @param item DrawableItem to be selected
+     * @param item item to select
+     * @param addToSelection Whether to add it to selection array or not
      */
     private void select(DrawableItem item, boolean addToSelection) {
         // 
@@ -1583,6 +1607,9 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
         }
     }
 
+    /**
+     * Add it to all selections
+     */
     private void addToSelect() {
         if (!selectionAll.contains(selection) && selection instanceof Panel) {
             selectionAll.add(selection);
@@ -1624,6 +1651,12 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
         }
     }
 
+    /**
+     * Sets the icon for a button
+     *
+     * @param path path of icon
+     * @param toSet toggle button to be set
+     */
     public void setButtonLayoutImage(String path, JButton toSet) {
         Image img;
         try {
@@ -1703,6 +1736,11 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
 
     }
 
+    /**
+     * Creates gesture cursor
+     *
+     * @return Cursor of the gesture
+     */
     public Cursor createGestureCursor() {
         ImageIcon image = new ImageIcon(this.getClass().getResource("/gesture.png"));
         Toolkit kit = Toolkit.getDefaultToolkit();
@@ -1717,6 +1755,11 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
         return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "gesture");
     }
 
+    /**
+     * Creates control cursor
+     *
+     * @return Cursor of the controlling
+     */
     public Cursor createCtrlCursor() {
 
         ImageIcon image = new ImageIcon(this.getClass().getResource("/HandOpen.png"));
@@ -1732,6 +1775,11 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
         return kit.createCustomCursor(newIcon.getImage(), new Point(7, 7), "handopen");
     }
 
+    /**
+     * Creates drag cursor
+     *
+     * @return Cursor of the dragging
+     */
     public Cursor createDragCursor() {
 
         ImageIcon image = new ImageIcon(this.getClass().getResource("/HandClose.png"));
@@ -1748,6 +1796,11 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
 
     }
 
+    /**
+     * Creates blue ink cursor
+     *
+     * @return Cursor of the blue ink
+     */
     public Cursor createBlueCursor() {
 
         ImageIcon image = new ImageIcon(this.getClass().getResource("/BluePen.png"));
@@ -1763,6 +1816,11 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
         return kit.createCustomCursor(newIcon.getImage(), new Point(0, 0), "bluepen");
     }
 
+    /**
+     * Creates black ink cursor
+     *
+     * @return Cursor of the black ink
+     */
     public Cursor createPathCursor() {
 
         ImageIcon image = new ImageIcon(this.getClass().getResource("/BlackPen.png"));
@@ -1779,6 +1837,11 @@ costraintsForOperationPanel.insets = new Insets(10, 10, 0, 10);
 
     }
 
+    /**
+     * Creates add cursor
+     *
+     * @return Cursor of the add action
+     */
     public Cursor createAddCursor() {
 
         ImageIcon image = new ImageIcon(this.getClass().getResource("/plus.png"));

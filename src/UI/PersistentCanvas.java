@@ -67,7 +67,12 @@ public class PersistentCanvas extends Component {
         }
         return item;
     }
-
+/**
+ * Sets the anchors for selected panel
+ * @param di Selected panel
+ * @param allSelected all selected pane;s
+ * @param indexOfAnchor Anchor(corner) index 
+ */
     public void setAnchorForSelected(DrawableItem di, ArrayList<DrawableItem> allSelected, int[] indexOfAnchor) {
 
         for (DrawableItem i : allSelected) {

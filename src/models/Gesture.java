@@ -37,6 +37,7 @@ public class Gesture extends DrawableItem implements DollarListener {
      * @param f Fill color
      * @param p Current end
      * @param l Layer it belongs to
+     * @param gesture whether it is a gesture or not
      */
     public Gesture(PersistentCanvas c, Color o, Color f, Point p, Panel l, boolean gesture) {
         super(c, o, f);
@@ -70,8 +71,8 @@ public class Gesture extends DrawableItem implements DollarListener {
     /**
      * Move path item on moving the panel by dx and dy
      *
-     * @param dx
-     * @param dy
+     * @param dx Delta x
+     * @param dy Delta y
      */
     public void move(int dx, int dy) {
         AffineTransform at = new AffineTransform();

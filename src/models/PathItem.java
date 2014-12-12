@@ -18,11 +18,16 @@ import java.awt.geom.GeneralPath;
  */
 public class PathItem extends DrawableItem {
 
-    protected Panel panel;
+    Panel panel;
     int thickness;
     Point firstpoint;
     boolean hidden;
     boolean hiddenWithPanel;
+
+    @Override
+    public Object clone() {
+        return this;
+    }
 
     /**
      * Constructor

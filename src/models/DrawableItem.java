@@ -57,8 +57,8 @@ public abstract class DrawableItem implements Serializable{
     /**
      * Moves item by dx horizontally and dy vertically
      *
-     * @param dx
-     * @param dy
+     * @param dx Delta x
+     * @param dy Delta y
      */
     public abstract void move(int dx, int dy);
     

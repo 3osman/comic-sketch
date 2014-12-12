@@ -114,10 +114,10 @@ public class Panel extends DrawableItem {
     /**
      * Moves the anchor point of the rectangle and updates width/height
      *
-     * @param x
-     * @param y
-     * @param width
-     * @param height
+     * @param x New x position
+     * @param y New y position
+     * @param width New width
+     * @param height New Height
      */
     public void moveAnchor(int x, int y, int width, int height) {
         ((Rectangle) shape).x = x;
@@ -132,8 +132,8 @@ public class Panel extends DrawableItem {
     /**
      * Moves the anchor point of the rectangle and updates width/height
      *
-     * @param x
-     * @param y
+     * @param x Delta x to move
+     * @param y Delta y to move
      */
     public void moveA(int x, int y) {
         ((Rectangle) shape).x = x;

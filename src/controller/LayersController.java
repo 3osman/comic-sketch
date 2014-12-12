@@ -68,7 +68,6 @@ public class LayersController implements Serializable {
      * Gets the active layer in a panel
      *
      * @param l
-     * @param p panel
      * @return active layer
      */
     public Layer getActiveLayer(ArrayList<Layer> l) {

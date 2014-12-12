@@ -26,7 +26,6 @@ public class Layer implements Serializable{
     /**
      * Constructor
      *
-     * @param p panel that layer belongs to
      * @param isB Blue ink layer or not
      */
     public Layer(boolean isB) {
@@ -40,8 +39,8 @@ public class Layer implements Serializable{
 /**
      * Moves the layer with all its contents
      *
-     * @param x
-     * @param y
+     * @param x Delta x
+     * @param y Delta y
      */
     public void moveLayer(int x, int y) {
         for (DrawableItem pi : this.ditems) {

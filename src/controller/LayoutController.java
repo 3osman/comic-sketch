@@ -17,11 +17,18 @@ import models.Panel;
 import models.Variables;
 
 /**
- *
+ * Layout controller
  * @author Osman
  */
 public class LayoutController {
-
+/**
+ * Sets layout for predefined templates
+ * @param row number of rows
+ * @param column number of columns per each row
+ * @param mainLayer Active layer
+ * @param c Canvas to draw on
+ * @return ArrayList of panels
+ */
     public ArrayList<DrawableItem> setLayoutPanels(int row, int[] column, Layer mainLayer, PersistentCanvas c) {
         ArrayList<DrawableItem> allPanels = new ArrayList<>();
         int heightOfPanel = (Variables.CANVAS_HEIGHT / row) - 10;
@@ -42,7 +49,14 @@ public class LayoutController {
         }
         return allPanels;
     }
-
+/**
+ * Sets layout for predefined templates
+ * @param row number of rows per each row
+ * @param column number of columns
+ * @param mainLayer Active layer
+ * @param c Canvas to draw on
+ * @return Arraylist of panels to add to canvas
+ */
     public ArrayList<DrawableItem> setLayoutVerticalPanels(int[] row, int column, Layer mainLayer, PersistentCanvas c) {
         ArrayList<DrawableItem> allPanels = new ArrayList<>();
         int widthOfPanel = ((Variables.CANVAS_WIDTH - 50) / column) - 10;

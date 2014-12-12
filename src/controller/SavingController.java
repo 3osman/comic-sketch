@@ -23,7 +23,12 @@ import models.Variables;
  * @author Osman
  */
 public class SavingController {
-
+/**
+ * Saving function
+ * @param drawings Drawings to save
+ * @param name File name
+ * @return file is saved or not
+ */
     public boolean save(ArrayList<Layer> drawings, String name) {
         //todo
 
@@ -59,7 +64,11 @@ public class SavingController {
         return true;
 
     }
-
+/**
+ * Load from file
+ * @param path File path
+ * @return Arraylist of layers
+ */
     public ArrayList<Layer> load(String path) {
         //to-do
         ArrayList<Layer> itemList = new ArrayList<>();

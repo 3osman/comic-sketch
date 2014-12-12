@@ -6,12 +6,12 @@
 package models;
 
 /**
- *
+ * Class for final values
  * @author Osman
  */
 public class Variables {
 
-    public static final int THUMBNAIL_HEIGHT = 150;
+    public static final int THUMBNAIL_HEIGHT = 200;
     public static final int THUMBNAIL_WIDTH = 260;
 
     public static final int CANVAS_HEIGHT = 900;
