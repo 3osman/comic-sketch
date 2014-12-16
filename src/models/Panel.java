@@ -9,7 +9,6 @@ import UI.PersistentCanvas;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Shape;
 import java.util.ArrayList;
 
 /**
@@ -29,7 +28,6 @@ public class Panel extends DrawableItem {
     private int initialHeight;
     Rectangle firstCorner;
     Rectangle secondCorner;
-    //LayersController lc = new LayersController();
     Rectangle thirdCorner;
     Rectangle fourthCorner;
     Point anchor;
@@ -48,12 +46,10 @@ public class Panel extends DrawableItem {
         super(c, o, f);
         type = 0;
         lines = new ArrayList<>();
-        //layers.add(new Layer(this, true));
         if (parentL != null) {
             parentL.addPanelToLayer(this);
             parentLayer = parentL;
         }
-        // lc.setActiveLayer(l, true);
 
         shape = new Rectangle(p.x, p.y, 0, 0);
         firstpoint = p;
@@ -112,7 +108,7 @@ public class Panel extends DrawableItem {
     }
 
     /**
-     * Moves the panel
+     * Moves the panel for undo
      *
      * @param dx Horizontal difference
      * @param dy Vertical difference

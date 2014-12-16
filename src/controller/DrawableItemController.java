@@ -5,29 +5,13 @@
  */
 package controller;
 
-import UI.PersistentCanvas;
 import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Stroke;
-import java.awt.Toolkit;
-import java.util.ArrayList;
-import javax.swing.ImageIcon;
-import java.awt.Rectangle;
 import java.io.Serializable;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JToggleButton;
 
 import models.DrawableItem;
-import models.Layer;
 import models.Panel;
 import models.PathItem;
 
@@ -134,8 +118,4 @@ public class DrawableItemController implements Serializable {
     public Boolean contains(DrawableItem di, Point p) {
         return di.getShape().contains(p);
     }
-
-  
-
-
 }

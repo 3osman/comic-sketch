@@ -65,9 +65,10 @@ import models.UndoableItem;
 import models.Variables;
 
 /**
- * Editor for the graphical interface
+ * Editor for the graphical interface This class is responsible for the UI of
+ * the application
  *
- * @author Osman
+ * @author Osman and Martino
  */
 @SuppressWarnings("serial")
 public class GraphicalEditor extends JFrame {
@@ -100,6 +101,7 @@ public class GraphicalEditor extends JFrame {
     LayersController lc = new LayersController(); //layers controller
     SavingController sc = new SavingController();
     LayoutController layc = new LayoutController();
+    static Variables variables = new Variables();
     private JToggleButton jcb; //checkbox for blue ink
     private boolean isMoving; //is currently moving
     private String mode;  // Mode of interaction
@@ -120,7 +122,12 @@ public class GraphicalEditor extends JFrame {
     private JPanel canvasOpsPanel;
     private JPanel rightPanel;
 
-    // Constructor of the Graphical Editor
+    /**
+     * Constructor of the Graphical Editor
+     *
+     * @param width the width of the hole application
+     * @param height the height of the hole application
+     */
     public GraphicalEditor(int width, int height) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -227,9 +234,7 @@ public class GraphicalEditor extends JFrame {
                         canvas,
                         "Choose Color",
                         o);
-
             }
-
         };
 
         styleButton.setAction(styleAction);
@@ -444,7 +449,7 @@ public class GraphicalEditor extends JFrame {
         //canvasOpsPanel.add(redoButton);
         canvas = new PersistentCanvas(dic);
         canvas.setBackground(Color.WHITE);
-        canvas.setPreferredSize(new Dimension(Variables.CANVAS_WIDTH, Variables.CANVAS_HEIGHT));
+        canvas.setPreferredSize(new Dimension(variables.CANVAS_WIDTH, variables.CANVAS_HEIGHT));
 
         canvasPanel.add(new JScrollPane(canvas), BorderLayout.CENTER);
         canvas.setCursor(createPathCursor());
@@ -563,7 +568,7 @@ public class GraphicalEditor extends JFrame {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
                 if (e.getID() == KeyEvent.KEY_PRESSED) {
-                    // System.out.println(e.getExtendedKeyCode());
+                    System.out.println(e.getExtendedKeyCode());
                     if (e.getKeyCode() == 18) {
                         canvas.setCursor(createAddCursor());
                         mode = "Rectangle";
@@ -573,7 +578,7 @@ public class GraphicalEditor extends JFrame {
                     } else if (e.getKeyCode() == 16) {
                         mode = "Gesture";
                         canvas.setCursor(createGestureCursor());
-                    }
+                    } 
                     if (mode.equals("Select/Move")) {
                         if (e.getExtendedKeyCode() == 90) {
 
@@ -619,11 +624,23 @@ public class GraphicalEditor extends JFrame {
                         } else if (e.getKeyCode() == 76) { //allign
                             gc.allign(true, canvas.getItems());
                             gc.allign(false, canvas.getItems());
+                            ArrayList<DrawableItem> mud = new ArrayList<DrawableItem>();
+                            for (Layer l : allLayers) {
+                                for (DrawableItem p : l.getDrawable()) {
+                                    if (p instanceof Panel) {
+                                        mud.add(p);
+                                    }
+                                }
+                            }
+                            udc.saveMoveToUndo(mud);
+                            resetLayerPanel();
+
                         } else if (e.getKeyCode() == 83) { //save
                             saveOptions();
                             //  saveCanvasFn();
                         } else if (e.getKeyCode() == 79) { //open
                             loadCanvasFn();
+                            resetLayerPanel();
                         } else if (e.getKeyCode() == 78) { //new
                             newOptions();
                         }
@@ -754,10 +771,10 @@ public class GraphicalEditor extends JFrame {
                                     if (isWhite) {
                                         item = new PathItem(canvas, Color.WHITE, f, p, null, whiteLayer);
                                         whiteLayer.addItemToLayer((PathItem) item);
-                                        for (Layer l : allLayers) {
-                                            l.addItemToLayer((PathItem) item);
+                                        /* for (Layer l : allLayers) {
+                                         l.addItemToLayer((PathItem) item);
 
-                                        }
+                                         }*/
                                         ((PathItem) item).setThickness(20);
 
                                     } else {
@@ -779,10 +796,10 @@ public class GraphicalEditor extends JFrame {
                                         item = new PathItem(canvas, Color.WHITE, f, p, insidePanel, whiteLayer);
                                         // insidePanel.getParentLayer().addItemToLayer((PathItem) item);
                                         whiteLayer.addItemToLayer((PathItem) item);
-                                        for (Layer l : allLayers) {
-                                            l.addItemToLayer((PathItem) item);
+                                        /*  for (Layer l : allLayers) {
+                                         l.addItemToLayer((PathItem) item);
 
-                                        }
+                                         }*/
                                         ((PathItem) item).setThickness(20);
 
                                     } else {
@@ -941,7 +958,8 @@ public class GraphicalEditor extends JFrame {
     }
 
     /**
-     * Function for showing new dialog box after pressing ctrl+N
+     * Function for showing new dialog box after pressing ctrl+N This function
+     * call a JDialog to show the predefined panels
      */
     public void newOptions() {
 
@@ -967,8 +985,8 @@ public class GraphicalEditor extends JFrame {
         jda.add(l, BorderLayout.PAGE_END);
         jda.setPreferredSize(new Dimension(600, 400));
         jda.setModal(true);
-        final int x = ((Variables.CANVAS_WIDTH - jda.getWidth()) / 2) - 100;
-        final int y = ((Variables.CANVAS_HEIGHT - jda.getHeight()) / 2) - 50;
+        final int x = ((variables.CANVAS_WIDTH - jda.getWidth()) / 2) - 100;
+        final int y = ((variables.CANVAS_HEIGHT - jda.getHeight()) / 2) - 50;
         jda.setLocation(x, y);
         jda.setResizable(false);
         jda.pack();
@@ -977,7 +995,8 @@ public class GraphicalEditor extends JFrame {
     }
 
     /**
-     * Show save options
+     * Show save options This method call a JDialog to show the option save to
+     * png or comico
      */
     public void saveOptions() {
         jd = new JDialog(GraphicalEditor.this, "Save");
@@ -1010,8 +1029,8 @@ public class GraphicalEditor extends JFrame {
         jd.add(savePng, BorderLayout.LINE_START);
         jd.add(saveFile, BorderLayout.LINE_END);
         jd.setPreferredSize(new Dimension(205, 100));
-        final int x = (Variables.CANVAS_WIDTH - jd.getWidth()) / 2;
-        final int y = (Variables.CANVAS_HEIGHT - jd.getHeight()) / 2;
+        final int x = (variables.CANVAS_WIDTH - jd.getWidth()) / 2;
+        final int y = (variables.CANVAS_HEIGHT - jd.getHeight()) / 2;
         jd.setLocation(x, y);
 
         jd.setResizable(false);
@@ -1221,7 +1240,8 @@ public class GraphicalEditor extends JFrame {
     }
 
     /**
-     * Changes selected panels color
+     * Changes selected panels color This method calla JDialog that shows the
+     * color.
      */
     public void panelColor() {
         panelColor = JColorChooser.showDialog(
@@ -1242,7 +1262,7 @@ public class GraphicalEditor extends JFrame {
     }
 
     /**
-     * Loads file into canvas
+     * Loads .comico file into canvas
      */
     public void loadCanvasFn() {
         JFileChooser chooser = new JFileChooser();
@@ -1328,7 +1348,6 @@ public class GraphicalEditor extends JFrame {
 
     /**
      * Resets the layer side panel on any change
-     *
      */
     private void resetLayerPanel() {
 
@@ -1464,9 +1483,8 @@ public class GraphicalEditor extends JFrame {
                     panel4.add(select, costraintsForButtonPanel);
 
                     JPanel panel5 = new JPanel();
-                    //panel5.setPreferredSize(new Dimension(150, 100));
                     ThumbNailCanvas tempcanvas = new ThumbNailCanvas(dic);
-                    tempcanvas.setPreferredSize(new Dimension(Variables.THUMBNAIL_WIDTH, Variables.THUMBNAIL_HEIGHT));
+                    tempcanvas.setPreferredSize(new Dimension(variables.THUMBNAIL_WIDTH, variables.THUMBNAIL_HEIGHT + 22));
                     panel5.add(tempcanvas);
 
                     tempcanvas.setBackground(Color.WHITE);
@@ -1853,7 +1871,7 @@ public class GraphicalEditor extends JFrame {
     }
 
     public static void main(String[] args) {
-        GraphicalEditor editor = new GraphicalEditor(Variables.CANVAS_WIDTH, Variables.CANVAS_HEIGHT);
+        GraphicalEditor editor = new GraphicalEditor(variables.WINDOW_WIDTH, variables.WINDOW_HEIGHT);
 
         editor.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }

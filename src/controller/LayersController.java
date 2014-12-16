@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import models.DrawableItem;
 import models.Layer;
 import models.Panel;
-import models.PathItem;
 
 /**
  * Layers Controller

@@ -5,17 +5,37 @@
  */
 package models;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
 /**
  * Class for final values
+ *
  * @author Osman
  */
 public class Variables {
 
-    public static final int THUMBNAIL_HEIGHT = 200;
-    public static final int THUMBNAIL_WIDTH = 260;
+    public int WINDOW_HEIGHT;
+    public int WINDOW_WIDTH;
+    public int CANVAS_WIDTH;
+    public int CANVAS_HEIGHT;
+    public int THUMBNAIL_HEIGHT;
+    public int THUMBNAIL_WIDTH;
 
-    public static final int CANVAS_HEIGHT = 900;
-    public static final int CANVAS_WIDTH = 1600;
+    public Variables() {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+        WINDOW_HEIGHT = screenSize.height;
+        WINDOW_WIDTH = screenSize.width;
+
+        CANVAS_HEIGHT = WINDOW_HEIGHT * 4/5 ;
+        CANVAS_WIDTH = WINDOW_WIDTH *4/5;
+        
+        THUMBNAIL_HEIGHT = WINDOW_HEIGHT * 1/5;
+        THUMBNAIL_WIDTH = CANVAS_WIDTH * 1/5;
+    }
+
+    
 
     public static final String EXTENSION = "comico";
     public final static int PANEL_5_HEIGHT = 2;

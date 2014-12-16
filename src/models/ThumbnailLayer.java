@@ -22,6 +22,7 @@ public class ThumbnailLayer {
     ArrayList<Rectangle> panels;
     // Panel p;
     Layer l;
+    Variables variables = new Variables();
 
     public ArrayList<GeneralPath> getLines() {
         return lines;
@@ -32,7 +33,7 @@ public class ThumbnailLayer {
         panels = new ArrayList<>();
         for (DrawableItem pi : this.l.getDrawable()) {
             if (pi instanceof PathItem && !((PathItem) pi).hidden) {
-               
+
                 lines.add((GeneralPath) ((GeneralPath) (pi.getShape())).clone());
             }
         }
@@ -68,21 +69,20 @@ public class ThumbnailLayer {
      * Translates all drawings to 0,0
      */
     public void translateAll() {
-
         for (DrawableItem pa : l.getDrawable()) {
-            if (pa instanceof Panel && !((Panel)pa).deleted) {
+            if (pa instanceof Panel && !((Panel) pa).deleted) {
                 Point p = getPanelAnchor((Panel) pa);
-                double hfactor = -(p.x - (((double) Variables.THUMBNAIL_WIDTH * p.x) / (double) Variables.CANVAS_WIDTH));
-                double wfactor = -(p.y - (((double) Variables.THUMBNAIL_HEIGHT * p.y) / (double) Variables.CANVAS_HEIGHT));
+                double hfactor = -(p.x - (((double) variables.THUMBNAIL_WIDTH * p.x) / (double) variables.CANVAS_WIDTH));
+                double wfactor = -(p.y - (((double) variables.THUMBNAIL_HEIGHT * p.y) / (double) variables.CANVAS_HEIGHT));
                 Rectangle newRect = (Rectangle) ((Rectangle) ((Panel) pa).getShape()).clone();
-                newRect.translate((int) hfactor, (int) wfactor);
+                newRect.translate((int) hfactor, ((int) wfactor));
                 panels.add(newRect);
             } else if (l.isBlueLayer) {
                 if (((PathItem) pa).getPanel() != null) {
 
                     Point p = getPanelAnchor(((PathItem) pa).getPanel());
-                    double hfactor = -(p.x - (((double)Variables.THUMBNAIL_WIDTH * p.x) / (double)Variables.CANVAS_WIDTH));
-                    double wfactor = -(p.y - (((double)Variables.THUMBNAIL_HEIGHT * p.y) / (double)Variables.CANVAS_HEIGHT));
+                    double hfactor = -(p.x - (((double) variables.THUMBNAIL_WIDTH * p.x) / (double) variables.CANVAS_WIDTH));
+                    double wfactor = -(p.y - (((double) variables.THUMBNAIL_HEIGHT * p.y) / (double) variables.CANVAS_HEIGHT));
                     AffineTransform at = new AffineTransform();
                     at.translate((int) Math.ceil(hfactor), (int) Math.ceil(wfactor));
                 }
@@ -94,8 +94,8 @@ public class ThumbnailLayer {
      * Resizes all drawings to fit
      */
     public void resizeAll() {
-        double hfactor = (double) Variables.THUMBNAIL_HEIGHT / (double) Variables.CANVAS_HEIGHT;
-        double wfactor = (double) Variables.THUMBNAIL_WIDTH / (double) Variables.CANVAS_WIDTH;
+        double hfactor = (double) variables.THUMBNAIL_HEIGHT / (double) variables.CANVAS_HEIGHT;
+        double wfactor = (double) variables.THUMBNAIL_WIDTH / (double) variables.CANVAS_WIDTH;
 
         for (GeneralPath pi : lines) {
             AffineTransform at = new AffineTransform();

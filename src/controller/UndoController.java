@@ -10,7 +10,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import models.DrawableItem;
-import models.Layer;
 import models.Panel;
 import models.PathItem;
 import models.SizedStack;
@@ -112,11 +111,11 @@ public class UndoController {
             } else {
                 for (UndoableItem ui : toUndo) {
                     if (ui.getDitem() instanceof Panel) {
-                         for (PathItem pi : ((Panel) ui.getDitem()).getLines()) {
-                            pi.move(toUndo.get(0).getX(), toUndo.get(0).getY());
+                        for (PathItem pi : ((Panel) ui.getDitem()).getLines()) {
+                            pi.move(ui.getX(), ui.getY());
                         }
-                        ((Panel) ui.getDitem()).moveUndo(toUndo.get(0).getX(), toUndo.get(0).getY());
-                        
+                        ((Panel) ui.getDitem()).moveUndo(ui.getX(), ui.getY());
+
                     }
                 }
             }
@@ -187,10 +186,10 @@ public class UndoController {
                 for (UndoableItem ui : toUndo) {
                     if (ui.getDitem() instanceof Panel) {
                         for (PathItem pi : ((Panel) ui.getDitem()).getLines()) {
-                            pi.move(toUndo.get(0).getX() * -1, toUndo.get(0).getY() * -1);
+                            pi.move(ui.getX() * -1, ui.getY() * -1);
                         }
-                        ((Panel) ui.getDitem()).moveUndo(toUndo.get(0).getX() * -1, toUndo.get(0).getY() * -1);
-                        
+                        ((Panel) ui.getDitem()).moveUndo(ui.getX() * -1, ui.getY() * -1);
+
                     }
                 }
             }
@@ -307,12 +306,9 @@ public class UndoController {
                             toReturn.add(new UndoableItem(pi, ui.getActionType()));
                         }
                     }
-                    // }
                 }
             }
             return toReturn;
         }
-
     }
-
 }

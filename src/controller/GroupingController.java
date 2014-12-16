@@ -5,13 +5,9 @@
  */
 package controller;
 
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import models.DrawableItem;
-import models.Layer;
 import models.Panel;
 
 /**
@@ -54,14 +50,9 @@ public class GroupingController {
                             }
                         }
                     }
-                    //animate the view
-                    // for (int i = 0; i < nearDifference; i = i + 2) {
-                    ((Panel) (di)).move(horizontal ? 0 : nearDifference, horizontal ? nearDifference : 0);
-                       // Thread.sleep(100);
 
-                   // }
-                    //la.moveLayer(horizontal ? 0 : nearDifference, horizontal ? nearDifference : 0);
-                    //at the end update the values for all the y1 not in the first round
+                    ((Panel) (di)).move(horizontal ? 0 : nearDifference, horizontal ? nearDifference : 0);
+
                     value[0] = value[3];
                     value[1] = value[4];
                     value[2] = value[5];

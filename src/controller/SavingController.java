@@ -12,10 +12,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import models.DrawableItem;
 import models.Layer;
-import models.Panel;
-import models.PathItem;
 import models.Variables;
 
 /**
@@ -90,5 +87,4 @@ public class SavingController {
         }
         return itemList;
     }
-
 }

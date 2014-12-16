@@ -18,22 +18,26 @@ import models.Variables;
 
 /**
  * Layout controller
+ *
  * @author Osman
  */
 public class LayoutController {
-/**
- * Sets layout for predefined templates
- * @param row number of rows
- * @param column number of columns per each row
- * @param mainLayer Active layer
- * @param c Canvas to draw on
- * @return ArrayList of panels
- */
+        Variables variables = new Variables();
+
+    /**
+     * Sets layout for predefined templates
+     *
+     * @param row number of rows
+     * @param column number of columns per each row
+     * @param mainLayer Active layer
+     * @param c Canvas to draw on
+     * @return ArrayList of panels
+     */
     public ArrayList<DrawableItem> setLayoutPanels(int row, int[] column, Layer mainLayer, PersistentCanvas c) {
         ArrayList<DrawableItem> allPanels = new ArrayList<>();
-        int heightOfPanel = (Variables.CANVAS_HEIGHT / row) - 10;
+        int heightOfPanel = (variables.CANVAS_HEIGHT / row) - 10;
         for (int i = 0; i < row; i++) {
-            int widthOfPanel = ((Variables.CANVAS_WIDTH - 50) / column[i]) - 5;
+            int widthOfPanel = ((variables.CANVAS_WIDTH - 50) / column[i]) - 5;
             for (int j = 0; j < column[i]; j++) {
                 Point p = new Point(10 + (widthOfPanel + 10) * j, 10 + (heightOfPanel + 10) * i);
                 Color f = new Color(255, 255, 255, 128);
@@ -49,19 +53,21 @@ public class LayoutController {
         }
         return allPanels;
     }
-/**
- * Sets layout for predefined templates
- * @param row number of rows per each row
- * @param column number of columns
- * @param mainLayer Active layer
- * @param c Canvas to draw on
- * @return Arraylist of panels to add to canvas
- */
+
+    /**
+     * Sets layout for predefined templates
+     *
+     * @param row number of rows per each row
+     * @param column number of columns
+     * @param mainLayer Active layer
+     * @param c Canvas to draw on
+     * @return Arraylist of panels to add to canvas
+     */
     public ArrayList<DrawableItem> setLayoutVerticalPanels(int[] row, int column, Layer mainLayer, PersistentCanvas c) {
         ArrayList<DrawableItem> allPanels = new ArrayList<>();
-        int widthOfPanel = ((Variables.CANVAS_WIDTH - 50) / column) - 10;
+        int widthOfPanel = ((variables.CANVAS_WIDTH - 50) / column) - 10;
         for (int i = 0; i < column; i++) {
-            int heightOfPanel = (Variables.CANVAS_HEIGHT / row[i]) - 5;
+            int heightOfPanel = (variables.CANVAS_HEIGHT  / row[i]) - 5;
             for (int j = 0; j < row[i]; j++) {
                 Point p = new Point(10 + (widthOfPanel + 10) * i, 10 + (heightOfPanel + 10) * j);
                 Color f = new Color(255, 255, 255, 128);
@@ -77,7 +83,4 @@ public class LayoutController {
         }
         return allPanels;
     }
-
-    
-
 }

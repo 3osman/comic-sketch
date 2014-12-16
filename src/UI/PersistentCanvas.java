@@ -1,18 +1,13 @@
 package UI;
 
 import controller.DrawableItemController;
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
-import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
 import models.DrawableItem;
-import models.Gesture;
 import models.Panel;
 import models.PathItem;
 

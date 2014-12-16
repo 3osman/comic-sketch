@@ -11,15 +11,9 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
-import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
-import models.DrawableItem;
-import models.Panel;
-import models.PathItem;
 
 /**
  * Canvas for drawing thumbnails of layers
